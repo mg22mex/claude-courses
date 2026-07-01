@@ -1,0 +1,12 @@
+# System / OS files
+.DS_Store
+Thumbs.db
+
+# Claude Code Local Configurations & Session Caches
+.claude/settings.local.json
+.claude/sessions/
+CLAUDE.local.md
+
+# Node / Build logs (if you add extensions later)
+node_modules/
+*.log
