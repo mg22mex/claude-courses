@@ -3,7 +3,7 @@
 **Course Title:** Brand Compliance & Copy Optimization with Claude Code
 **Target User:** Christine — Marketing team
 **Prerequisites:** Familiarity with brand style guides, basic markdown editing, and web copy workflows; no coding experience required.
-**Estimated Duration:** 4 hours (split across two 2-hour sessions)
+**Estimated Duration:** 6 hours (split across three 2-hour sessions)
 **Format:** Live walkthrough + hands-on terminal exercises
 
 ---
@@ -28,6 +28,9 @@ By the end of this course, Christine will be able to:
 4. Strip and normalize messy HTML/Markdown formatting tags from imported web copy.
 5. Generate compliant A/B copy variants tailored to different channels (email, social, landing page).
 6. Build a reusable weekly brand-compliance review prompt template.
+7. Draft and validate automated email templates with correct merge tags and CAN-SPAM compliance.
+8. Analyze email send logs to identify deliverability issues, engagement trends, and segmentation opportunities.
+9. Ingest multi-channel campaign performance data and calculate ROI, ROAS, and channel health scores.
 
 ---
 
@@ -303,6 +306,193 @@ Please do the following, in order:
 
 ---
 
+### Lesson 5 — Email Automation Labs (60 min)
+
+**Objective:** Draft, validate, and analyze automated email templates with correct merge tags, brand-voice compliance, and send-log performance analysis.
+
+| Segment | Topic | Activity |
+|---|---|---|
+| 5.1 | Email automation landscape | Marketing teams send welcome flows, cart abandonment sequences, and promotional blasts. Each requires correct merge tags, CAN-SPAM compliance, and a single clear CTA. |
+| 5.2 | Loading an email template | Load `data/raw_email_campaign.md` — a flawed promotional email with broken merge vars, aggressive tone, and missing unsubscribe link. |
+| 5.3 | Merge tag validation | Scan the template for required tags (`{{first_name}}`, `{{unsubscribe_url}}`, `{{offer_code}}`). Flag missing tags, broken syntax, and hardcoded personalization. |
+| 5.4 | Brand-voice enforcement | Check subject line length (≤ 60 chars), preheader (≤ 130 chars), passive voice, and CTA structure. Ensure exactly one primary CTA exists. |
+| 5.5 | Send log performance analysis | Load `data/email_send_log.csv` — review open rates, click-through rates, bounce rates, and unsubscribe trends across campaigns. Identify deliverability issues and engagement drop-offs. |
+
+**CLI Exercises:**
+
+```
+# Exercise 5.3 — Merge tag validation
+claude data/raw_email_campaign.md
+```
+
+Prompt:
+
+```
+Scan this email template and report:
+
+1. Which merge tags are present (e.g., {{first_name}}, {{unsubscribe_url}},
+   {{offer_code}}, {{expiry_date}})?
+2. Which required tags are MISSING?
+3. Are there any hardcoded "Dear Customer" or generic greetings
+   where {{first_name}} should be used?
+4. Is {{unsubscribe_url}} formatted as a clickable link
+
+   (<a href="{{unsubscribe_url}}">Unsubscribe</a>)
+
+   or as plain text?
+5. Are there any broken braces or misspelled variable names?
+
+Output a tag consistency table: tag, status (present/missing/broken),
+line_number, recommendation
+```
+
+```
+# Exercise 5.4 — Brand-voice and layout audit
+Prompt (continuing the same session):
+
+Audit this email against brand rules:
+
+1. Subject line length — is it ≤ 60 characters? If not, suggest a trim.
+2. Preheader text — is it ≤ 130 characters?
+3. Count passive voice instances. List each with line number.
+4. Does the email have exactly ONE primary CTA button/link?
+   If zero or multiple, flag it.
+5. Check for exclamation marks, slang, or competitor mentions.
+6. Verify unsubscribe link is visible in the footer.
+
+Output: a violations table with issue, line, severity, and fix.
+```
+
+```
+# Exercise 5.5 — Send log analysis
+claude data/email_send_log.csv
+```
+
+Prompt:
+
+```
+Load data/email_send_log.csv and analyze:
+
+1. Calculate aggregate metrics across all sends:
+   - Average delivery rate
+   - Average open rate (unique_opens / delivered)
+   - Average click-through rate (unique_clicks / delivered)
+   - Average bounce rate
+   - Average unsubscribe rate
+
+2. For the weekly newsletter series (EM-2026-002, EM-2026-006):
+   - Plot open rate trend over time (January → June)
+   - Flag any edition where open rate dropped more than 15% WoW
+   - Identify whether unsubscribe rates are rising
+
+3. For the cart abandonment flow (EM-2026-004):
+   - Compare February vs. March performance
+   - Which step has the highest drop-off?
+   - Is the 10% offer (step 3) driving more clicks than step 1?
+
+4. Deliverability flags:
+   - Are any campaigns showing bounce rates above 2%?
+   - Are spam complaint rates above 0.1%?
+
+Output a performance summary table per campaign family.
+Flag any metric below brand threshold with a recommendation.
+```
+
+---
+
+### Lesson 6 — Campaign Analytics & Executive Reporting (60 min)
+
+**Objective:** Ingest multi-channel campaign performance data, calculate ROI and ROAS, generate channel health scores, and produce executive-ready summaries.
+
+| Segment | Topic | Activity |
+|---|---|---|
+| 6.1 | Campaign analytics overview | Marketing performance data lives in silos (email, social, search, display, affiliate). A consolidated view reveals which channels drive revenue and which are burning budget. |
+| 6.2 | Loading campaign data | Load `data/campaign_performance_data.csv` — a multi-channel dataset with spend, revenue, impressions, clicks, and conversions across Q1–Q2 2026. |
+| 6.3 | Blended ROAS calculation | Calculate total spend, total revenue, blended ROAS across all channels. Identify which channels are above and below the 3.0x benchmark. |
+| 6.4 | Channel health scoring | Score each channel on a 0–100 scale: ROAS (40%), CTR (20%), conversion rate (20%), cost per conversion (20%). Rank channels from healthiest to weakest. |
+| 6.5 | Executive summary generation | Produce a terminal-ready summary report: headline numbers, channel breakdown table, alert flags, and quick-win recommendations. |
+
+**CLI Exercises:**
+
+```
+# Exercise 6.3 — Blended ROAS and channel breakdown
+claude data/campaign_performance_data.csv
+```
+
+Prompt:
+
+```
+Load data/campaign_performance_data.csv and calculate:
+
+1. Total ad spend across all channels
+2. Total attributed revenue across all channels
+3. Blended ROAS (total revenue / total spend)
+4. Blended cost per conversion (total spend / total conversions)
+
+5. For each channel (email, social, search, display, affiliate):
+   - Total spend, total revenue, ROAS
+   - Total conversions, cost per conversion
+   - Average CTR
+   - Average conversion rate
+
+6. Flag any channel where:
+   - ROAS < 1.0 (money-losing)
+   - ROAS < 3.0 but >= 1.0 (underperforming)
+   - ROAS >= 3.0 (healthy)
+
+Output: a channel breakdown table with all metrics and a
+ROAS health status for each channel.
+```
+
+```
+# Exercise 6.4 — Channel health scoring
+Prompt (continuing the same session):
+
+Score each channel on a 0–100 health scale using these weighted factors:
+
+| Factor | Weight | Benchmark |
+|---|---|---|
+| ROAS | 40% | ≥ 3.0 = excellent, ≥ 1.5 = acceptable, < 1.0 = poor |
+| CTR | 20% | ≥ 3% (email), ≥ 1% (social), ≥ 2% (search) |
+| Conversion Rate | 20% | ≥ 5% (email), ≥ 3% (social/search) |
+| Cost Per Conversion | 20% | ≤ $25 (email), ≤ $40 (social/search) |
+
+For each channel:
+- Calculate the sub-score for each factor (0–100)
+- Apply the weight and sum to get the channel health score
+- Rank channels from highest to lowest score
+
+Flag any channel scoring below 50 as CRITICAL.
+```
+
+```
+# Exercise 6.5 — Executive report generation
+Prompt (continuing the same session):
+
+Generate a Campaign Performance Executive Summary for leadership:
+
+## Headline numbers
+Total ad spend, total revenue, blended ROAS, total conversions,
+weighted average cost per conversion
+
+## By channel (table)
+Channel, Spend, Revenue, ROAS, Conversions, Health Score, Trend arrow
+
+## Alerts
+List any campaign with:
+- ROAS < 1.0 (red alert)
+- ROAS between 1.0 and 2.0 (warning)
+- Conversion rate below channel benchmark
+- Above-average cost per conversion
+
+## Quick Wins
+For each flagged campaign, provide a one-line recommendation.
+Example: "Pause Display Prospecting (ROAS 0.70x) and reallocate
+budget to Search Brand (ROAS 5.50x)"
+```
+
+---
+
 ## Sample Data Files
 
 The following sample files are provided in `data/` for use during exercises:
@@ -312,6 +502,8 @@ The following sample files are provided in `data/` for use during exercises:
 | `data/raw_copy_deck.md` | Messy marketing copy with brand violations, broken HTML, passive voice, and competitor mentions |
 | `data/raw_email_campaign.md` | Flawed promotional email campaign with broken merge vars, aggressive tone, outdated pricing, and raw HTML styling |
 | `data/keyword_targets.csv` | Target keyword list with minimum occurrence thresholds |
+| `data/campaign_performance_data.csv` | Multi-channel campaign performance data (Q1–Q2 2026) with spend, revenue, and conversion metrics |
+| `data/email_send_log.csv` | Email send log with open rates, click rates, bounces, and unsubscribes across 20 sends |
 
 ---
 
@@ -325,6 +517,9 @@ The following sample files are provided in `data/` for use during exercises:
 | Mock raw copy deck | `training/christine/data/raw_copy_deck.md` |
 | Mock email campaign | `training/christine/data/raw_email_campaign.md` |
 | brand-guardrails skill | `skills/brand-guardrails/SKILL.md` |
+| email-automation skill | `skills/email-automation/SKILL.md` |
+| listing-verification skill | `skills/listing-verification/SKILL.md` |
+| campaign-analytics skill | `skills/campaign-analytics/SKILL.md` |
 | csv-analytics skill | `../mollie/skills/csv-analytics/SKILL.md` |
 | data-table-validator skill | `../sunny/skills/data-table-validator/SKILL.md` |
 
@@ -340,3 +535,7 @@ Christine can independently:
 - [ ] Generate channel-specific A/B copy variants that stay on-brand
 - [ ] Export a structured CSV of all violations and SEO gaps
 - [ ] Run the weekly brand-review pipeline using the saved prompt template
+- [ ] Validate email templates for correct merge tags, subject line length, and CAN-SPAM compliance
+- [ ] Analyze email send logs for deliverability issues, engagement trends, and segmentation opportunities
+- [ ] Ingest multi-channel campaign data and calculate blended ROAS with channel-level breakdown
+- [ ] Generate an executive campaign performance summary with alerts and actionable recommendations

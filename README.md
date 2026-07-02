@@ -11,7 +11,7 @@ This repository contains four independent training tracks, each built for a spec
 | **Rick** | Executive, Entrepreneurship & Management | Executive dashboarding, corporate KPI modeling, strategic planning, PRD & presentation automation |
 | **Sunny** | Purchasing & Logistics | Vendor data validation, lead time anomaly detection, customs tariff auditing, warehouse balancing |
 | **Mollie** | Sales & Financials | Order-to-profit analysis, CSV analytics, root-cause investigation |
-| **Christine** | Marketing | Brand compliance, copy optimization, SEO keyword verification |
+| **Christine** | Marketing | Brand compliance, email automation, listing verification, and campaign analytics tracking |
 | **Design** (Paula & Gaby) | Design | SVG auditing, design token validation, asset inventory management |
 
 ## Institutional Memory Infrastructure
@@ -52,7 +52,7 @@ training/
 │   ├── syllabus.md
 │   ├── data/                  # Copy decks, email campaigns, keyword targets
 │   ├── exercises/
-│   └── skills/                # Automation skills (1)
+│   └── skills/                # Automation skills (4)
 └── design/                    # Design
     ├── syllabus.md
     ├── data/mock_assets/      # SVGs, design tokens JSON
@@ -62,12 +62,12 @@ training/
 
 ## Skills Summary
 
-14 custom Claude Code skills are distributed across the tracks:
+17 custom Claude Code skills are distributed across the tracks:
 
 - **Rick** — `fulfillment-anomaly-detector`, `write-a-prd`, `ppt-generation`, `architecture-diagram`
 - **Sunny** — `lead-time-anomaly`, `customs-tariff-audit`, `warehouse-balancing`, `xlsx-processing`, `data-table-validator`
 - **Mollie** — `csv-analytics`, `monte-carlo-analyze-root-cause`
-- **Christine** — `brand-guardrails`
+- **Christine** — `brand-guardrails`, `email-automation`, `listing-verification`, `campaign-analytics`
 - **Design** — `svg-auditor`, `design-token-validator`
 
 Each skill lives in its own directory with a `SKILL.md` defining the prompt and usage. Skills from other tracks can be invoked cross-track by referencing the relative path.
@@ -79,7 +79,7 @@ The `data/` directories contain realistic (but synthetic) operational data:
 - **Rick**: Executive dashboards (department budgets, milestone tracking, profit margins), inventory stock levels, fulfillment delay reports with carrier transit data
 - **Sunny**: Vendor lead times, purchase orders, invoices, contract prices
 - **Mollie**: Shopify order feeds, marketing spend, COGS, ad spend, webhook samples
-- **Christine**: Raw copy decks, email campaigns, keyword targets
+- **Christine**: Raw copy decks, email campaigns, keyword targets, email send logs, campaign performance data
 - **Design**: SVG icons, illustrations, logos, design token JSON
 
 ## Getting Started

@@ -30,6 +30,24 @@
       "sourceType": "local",
       "skillPath": "training/rick/skills/write-a-prd/SKILL.md",
       "computedHash": ""
+    },
+    "campaign-analytics": {
+      "source": "training/christine/skills/campaign-analytics/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/christine/skills/campaign-analytics/SKILL.md",
+      "computedHash": ""
+    },
+    "email-automation": {
+      "source": "training/christine/skills/email-automation/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/christine/skills/email-automation/SKILL.md",
+      "computedHash": ""
+    },
+    "listing-verification": {
+      "source": "training/christine/skills/listing-verification/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/christine/skills/listing-verification/SKILL.md",
+      "computedHash": ""
     }
   }
 }
