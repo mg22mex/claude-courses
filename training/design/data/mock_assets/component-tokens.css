@@ -1,0 +1,32 @@
+/* Component-Level Design Tokens for DataSync Pro */
+/* These tokens reference the global design-tokens.json values */
+
+:root {
+  /* Button Component */
+  --button-primary-bg: var(--color-brand-primary);
+  --button-primary-text: #FFFFFF;
+  --button-primary-hover-bg: #155a8a;
+  --button-primary-radius: 6px;
+  --button-primary-padding: 8px 24px;
+
+  /* Card Component */
+  --card-bg: var(--color-background-surface);
+  --card-border: 1px solid var(--color-semantic-warning);
+  --card-radius: 8px;
+  --card-padding: 16px;
+  --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  /* Input Component */
+  --input-border: 1px solid var(--color-border);
+  --input-radius: 4px;
+  --input-padding: 8px 12px;
+  --input-focus-border: var(--color-brand-primary);
+
+  /* Badge Component — MISSING entirely, no --badge-* tokens defined */
+
+  /* Navigation Component — MISSING entirely, no --nav-* tokens defined */
+
+  /* Legacy — these should be migrated to --button-* pattern */
+  --btn-primary-bg: var(--color-cta-background);
+  --btn-primary-text: var(--color-cta-text);
+}

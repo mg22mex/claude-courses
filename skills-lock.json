@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "monte-carlo-analyze-root-cause": {
+      "source": "monte-carlo-data/mc-agent-toolkit",
+      "sourceType": "github",
+      "skillPath": "skills/analyze-root-cause/SKILL.md",
+      "computedHash": "d9af6c76a9778718f47cb9c4b323dc899cbe283ae7aac2a1dabc87d80a4c2a1d"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+sku,unit_cost,supplier,lead_time_days,preferred
+GADG-010,52.00,Acme Manufacturing,8,true
+GADG-020,18.00,Acme Manufacturing,10,false
+WIDG-001,2.75,Acme Manufacturing,5,true
+WIDG-002,4.50,Acme Manufacturing,6,true
+SPRK-005,7.80,Benson Components,12,true
+FILT-100,4.20,Benson Components,10,true
+FILT-200,8.00,Benson Components,14,false
+SEAL-050,13.50,Benson Components,10,true
+GEAR-015,21.00,Coastal Gear Co,15,true
+GEAR-025,30.00,Coastal Gear Co,18,true
+BEAR-6200,3.50,Coastal Gear Co,20,true
+BEAR-6202,5.00,Coastal Gear Co,22,true
+PUMP-100,135.00,Direct Hydraulics,10,true
+PUMP-200,240.00,Direct Hydraulics,12,true
+HOSE-0600,28.00,Direct Hydraulics,8,true
+HOSE-1000,40.00,Direct Hydraulics,8,true
+MOTR-550,88.00,Eastern Motors,25,true
+MOTR-750,125.00,Eastern Motors,28,true
+CONT-100,55.00,Eastern Motors,20,true
+SENS-001,18.00,Eastern Motors,22,false

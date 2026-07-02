@@ -1,0 +1,21 @@
+date,order_id,channel,sku,product_name,gross_sales,net_sales,shipping,fees,currency
+2026-06-01,ORD-1001,google_shopping,GADG-010,Gadget Pro,129.99,108.15,12.50,9.34,USD
+2026-06-01,ORD-1002,organic,WIDG-001,Widget Small 4in,45.00,36.25,5.00,3.75,USD
+2026-06-01,ORD-1003,meta_newsfeed,SPRK-005,Spark Plug Set,78.50,62.80,8.00,7.70,USD
+2026-06-01,ORD-1004,direct,GADG-020,Gadget Lite,199.99,172.99,15.00,12.00,USD
+2026-06-02,ORD-1005,google_shopping,WIDG-002,Widget Large 8in,85.00,71.25,6.50,7.25,USD
+2026-06-02,ORD-1006,organic,FILT-100,Oil Filter Std,22.50,18.75,3.00,0.75,USD
+2026-06-02,ORD-1007,meta_newsfeed,GADG-010,Gadget Pro,129.99,108.15,12.50,9.34,USD
+2026-06-03,ORD-1008,email,SPRK-005,Spark Plug Set,78.50,65.80,8.00,4.70,USD
+2026-06-03,ORD-1009,google_shopping,SEAL-050,Seal Kit Small,22.00,17.60,4.00,2.40,USD
+2026-06-03,ORD-1010,organic,GADG-020,Gadget Lite,199.99,172.99,15.00,12.00,USD
+2026-06-04,ORD-1011,google_shopping,GEAR-015,Gear Assem 15T,35.00,28.00,5.00,2.00,USD
+2026-06-04,ORD-1012,meta_newsfeed,BEAR-6200,Bearing 6200,6.80,4.80,2.00,0.00,USD
+2026-06-04,ORD-1013,wholesale,PUMP-100,Hydraulic Pump,215.00,193.50,0.00,21.50,USD
+2026-06-05,ORD-1014,google_shopping,PUMP-200,Hydraulic Pump 200,385.00,347.50,18.00,19.50,USD
+2026-06-05,ORD-1015,organic,HOSE-0600,Hydraulic Hose 6mm,45.00,38.25,5.00,1.75,USD
+2026-06-05,ORD-1016,direct,WIDG-001,Widget Small 4in,45.00,38.25,5.00,1.75,USD
+2026-06-06,ORD-1017,meta_newsfeed,GADG-010,Gadget Pro,129.99,108.15,12.50,9.34,USD
+2026-06-06,ORD-1018,email,MOTR-750,Electric Motor 0.75,195.00,175.50,0.00,19.50,USD
+2026-06-06,ORD-1019,google_shopping,CONT-100,Controller BASIC,88.00,75.20,8.00,4.80,USD
+2026-06-07,ORD-1020,organic,SENS-001,Temp Sensor,32.50,26.00,4.00,2.50,USD

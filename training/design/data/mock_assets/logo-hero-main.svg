@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" xml:space="preserve" sodipodi:namedview="xyz">
+  <defs>
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0066cc"/>
+      <stop offset="100%" stop-color="#FF0000"/>
+    </linearGradient>
+    <linearGradient id="unusedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ff00"/>
+      <stop offset="100%" stop-color="#0000ff"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .logo-text { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: bold; fill: #FF0000; }
+    .logo-sub { font-family: 'Inter', sans-serif; font-size: 12px; fill: #666666; }
+  </style>
+  <rect width="200" height="60" fill="#f5f5f5" rx="4"/>
+  <text x="20" y="38" class="logo-text">DataSync</text>
+  <text x="135" y="52" class="logo-sub">by Weatherman</text>
+  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="none"/>
+</svg>

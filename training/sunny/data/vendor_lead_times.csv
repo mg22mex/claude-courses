@@ -1,0 +1,7 @@
+vendor_name,promised_min_days,promised_max_days,origin,transport_mode,preferred_contact
+Acme Supply,3,5,Chicago IL,Ground,orders@acmesupply.com
+Benson Parts,5,8,Dallas TX,Ground,fulfill@bensonparts.com
+Coastal Trading,7,12,Los Angeles CA,Ocean+Ground,logistics@coastaltrading.com
+Direct Parts,2,4,Detroit MI,Ground,parts@directparts.com
+Eastern Logistics,10,15,Shanghai CN,Ocean+Ground,shipping@easternlog.com
+FirstRate Manufacturing,4,7,Cleveland OH,Ground,orders@firstratemfg.com

@@ -1,0 +1,21 @@
+vendor_name,item_code,description,unit_cost,currency,effective_date
+Acme Supply,WIDG-001,Widget Standard 4in,4.50,USD,2026-04-01
+Acme Supply,WIDG-002,Widget Deluxe 6in,7.25,USD,2026-04-01
+Acme Supply,GADG-010,Gadget Pro v2,42.00,USD,2026-04-01
+Acme Supply,GADG-020,Gadget Lite,28.50,USD,2026-04-01
+Benson Parts,SPRK-005,Spark Plug Set,12.75,USD,2026-04-01
+Benson Parts,FILT-100,Oil Filter Standard,8.50,USD,2026-04-01
+Benson Parts,FILT-200,Oil Filter Heavy Duty,14.00,USD,2026-04-01
+Benson Parts,SEAL-050,Seal Kit Small,22.00,USD,2026-04-01
+Coastal Trading,GEAR-015,Gear Assembly 15T,35.00,USD,2026-04-01
+Coastal Trading,GEAR-025,Gear Assembly 25T,48.00,USD,2026-04-01
+Coastal Trading,BEAR-6200,Bearing 6200 series,6.80,USD,2026-04-01
+Coastal Trading,BEAR-6202,Bearing 6202 series,9.20,USD,2026-04-01
+Direct Parts,PUMP-100,Hydraulic Pump 100cc,215.00,USD,2026-04-01
+Direct Parts,PUMP-200,Hydraulic Pump 200cc,385.00,USD,2026-04-01
+Direct Parts,HOSE-0600,Hydraulic Hose 6mm,45.00,USD,2026-04-15
+Direct Parts,HOSE-1000,Hydraulic Hose 10mm,62.00,USD,2026-04-15
+Eastern Logistics,MOTR-550,Electric Motor 0.55kW,140.00,USD,2026-04-01
+Eastern Logistics,MOTR-750,Electric Motor 0.75kW,195.00,USD,2026-04-01
+Eastern Logistics,CONT-100,Controller Unit BASIC,88.00,USD,2026-04-01
+Eastern Logistics,SENS-001,Temperature Sensor,32.50,USD,2026-04-01

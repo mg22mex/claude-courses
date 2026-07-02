@@ -1,0 +1,140 @@
+{
+  "id": 9876543210,
+  "email": "jane.doe@acmecorp.com",
+  "closed_at": null,
+  "created_at": "2026-06-15T14:23:11-04:00",
+  "updated_at": "2026-06-15T14:23:15-04:00",
+  "number": 1001,
+  "note": "Rush delivery requested — please expedite",
+  "token": "abc123def456",
+  "gateway": "shopify_payments",
+  "test": false,
+  "total_price": "322.50",
+  "subtotal_price": "299.99",
+  "total_tax": "22.51",
+  "total_discounts": "0.00",
+  "total_shipping": "15.00",
+  "cart_token": "cart_789xyz",
+  "checkout_token": "checkout_456abc",
+  "referring_site": "https://www.google.com/search?q=gadget+pro",
+  "landing_site": "https://datasyncpro.com/products/gadget-pro",
+  "customer": {
+    "id": 5001,
+    "email": "jane.doe@acmecorp.com",
+    "first_name": "Jane",
+    "last_name": "Doe",
+    "orders_count": 12,
+    "total_spent": "4589.50",
+    "note": "Wholesale account — net 30 terms",
+    "tax_exempt": false,
+    "tags": "wholesale, loyal, acme-corp"
+  },
+  "shipping_address": {
+    "first_name": "Jane",
+    "last_name": "Doe",
+    "address1": "100 Industrial Blvd",
+    "address2": "Suite 200",
+    "city": "Portland",
+    "province": "Oregon",
+    "zip": "97201",
+    "country": "US",
+    "phone": "503-555-0142"
+  },
+  "fulfillment_status": "pending",
+  "financial_status": "paid",
+  "line_items": [
+    {
+      "id": 10001,
+      "variant_id": 4001,
+      "title": "Gadget Pro v2",
+      "quantity": 2,
+      "price": "129.99",
+      "sku": "GADG-010",
+      "requires_shipping": true,
+      "taxable": true,
+      "fulfillment_status": "pending",
+      "total_discount": "0.00",
+      "tax_lines": [
+        {
+          "title": "State Tax",
+          "price": "10.40",
+          "rate": 0.04
+        },
+        {
+          "title": "County Tax",
+          "price": "5.20",
+          "rate": 0.02
+        }
+      ]
+    },
+    {
+      "id": 10002,
+      "variant_id": 4005,
+      "title": "Spark Plug Set",
+      "quantity": 1,
+      "price": "40.01",
+      "sku": "SPRK-005-SP",
+      "requires_shipping": true,
+      "taxable": true,
+      "fulfillment_status": "unfulfilled",
+      "total_discount": "0.00",
+      "tax_lines": [
+        {
+          "title": "State Tax",
+          "price": "1.60",
+          "rate": 0.04
+        },
+        {
+          "title": "County Tax",
+          "price": "0.80",
+          "rate": 0.02
+        }
+      ]
+    }
+  ],
+  "note_attributes": [
+    {
+      "name": "gift note",
+      "value": "Please include invoice in box"
+    }
+  ],
+  "payment_details": {
+    "credit_card_bin": "411111",
+    "credit_card_company": "Visa",
+    "credit_card_number": "****1111",
+    "avs_result_code": "Y",
+    "cvv_result_code": "M",
+    "credit_card_name": "Jane Doe"
+  },
+  "shipping_lines": [
+    {
+      "title": "Ground",
+      "price": "15.00",
+      "code": "GROUND",
+      "carrier_identifier": "fedex_us"
+    }
+  ],
+  "tax_lines": [
+    {
+      "title": "State Tax",
+      "price": "12.00",
+      "rate": 0.04
+    },
+    {
+      "title": "County Tax",
+      "price": "6.00",
+      "rate": 0.02
+    }
+  ],
+  "discount_codes": [],
+  "total_weight": 3400,
+  "currency": "USD",
+  "processed_at": "2026-06-15T14:23:11-04:00",
+  "cancelled_at": null,
+  "cancel_reason": null,
+  "order_status_url": "https://datasyncpro.myshopify.com/admin/orders/9876543210",
+  "app_id": 12345,
+  "browser_ip": "203.0.113.42",
+  "landing_site_ref": "homepage_banner_june",
+  "source_name": "web"
+}
