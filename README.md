@@ -14,6 +14,21 @@ This repository contains four independent training tracks, each built for a spec
 | **Christine** | Marketing | Brand compliance, copy optimization, SEO keyword verification |
 | **Design** (Paula & Gaby) | Design | SVG auditing, design token validation, asset inventory management |
 
+## Institutional Memory Infrastructure
+
+This repository is bound to a dual-engine NotebookLM operational framework. Every track has a dedicated Domain Notebook that encodes its processes, data schemas, and edge cases, plus a shared Master Technical Blueprint.
+
+| Role | NotebookLM URL |
+|---|---|
+| **Master Claude Code Guide** (all tracks) | <https://notebooklm.google.com/notebook/4bdb17a3-6657-4d63-adbe-8f63c22521c2?authuser=1> |
+| Rick — Executive, Entrepreneurship & Management | <https://notebooklm.google.com/notebook/8644375a-5c5f-442d-b35b-fb849e3f93b2?authuser=1> |
+| Sunny — Purchasing & Logistics | <https://notebooklm.google.com/notebook/c3dc698d-38e7-4d64-8451-0bbca3fa9d97?authuser=1> |
+| Mollie — Sales & Financials | <https://notebooklm.google.com/notebook/2ab95bfd-ceeb-436d-b41f-85a89e3ca749?authuser=1> |
+| Christine — Marketing | <https://notebooklm.google.com/notebook/0a616bb3-6ea7-40c8-b53c-984fa4d977bc?authuser=1> |
+| Design (Paula & Gaby) | <https://notebooklm.google.com/notebook/9f67d0db-49c8-4bc3-b2e5-f08a3528028f?authuser=1> |
+
+> **Workflow Rule:** All script generation, data testing, or document templating must cross-verify patterns against both the Master Guide and the relevant Domain Notebook before execution. See `training/NOTEBOOKLM_CORE_STRATEGY.md` for the full framework.
+
 ## Repository Structure
 
 ```

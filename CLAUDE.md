@@ -20,3 +20,8 @@ This repository (`claude-courses`) hosts tailored training course content, sylla
 - Write in clean Markdown.
 - Every syllabus must explicitly outline: Course title, target department user, clear learning objectives, modular lesson breakdowns, practical terminal/CLI exercises, and a link directory pointing to relevant local skills.
 
+### NotebookLM Cross-Verification
+- All script generation, data testing, or document templating must cross-verify patterns against the track's assigned NotebookLM URLs before execution.
+- The master reference is `training/NOTEBOOKLM_CORE_STRATEGY.md`, which defines the Dual-Engine framework binding the Master Claude Code Guide to each Domain Notebook.
+- Syllabi must include a "Pre-Work: Load Your Institutional Memory" section (after metadata, before Learning Objectives) directing learners to query their Domain Notebook alongside the Master Guide.
+

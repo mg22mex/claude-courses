@@ -8,6 +8,16 @@
 
 ---
 
+## Pre-Work: Load Your Institutional Memory
+
+Before starting this course, open the [Master Claude Code Guide](https://notebooklm.google.com/notebook/4bdb17a3-6657-4d63-adbe-8f63c22521c2?authuser=1) alongside your domain-specific NotebookLM notebook. Query both notebooks to understand how Claude Code operates in your domain before writing any scripts or building tools.
+
+**Your Domain Notebook:** [Mollie's Sales Notebook](https://notebooklm.google.com/notebook/2ab95bfd-ceeb-436d-b41f-85a89e3ca749?authuser=1)
+
+> **Workflow Rule:** All script generation, data testing, or document templating in this track must cross-verify patterns against both the Master Guide and your Domain Notebook before execution.
+
+---
+
 ## Learning Objectives
 
 By the end of this course, Mollie will be able to:
