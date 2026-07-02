@@ -8,6 +8,7 @@ This repository contains four independent training tracks, each built for a spec
 
 | Track | Team | Focus |
 |---|---|---|
+| **Rick** | Executive, Entrepreneurship & Management | Executive dashboarding, corporate KPI modeling, strategic planning, PRD & presentation automation |
 | **Sunny** | Purchasing & Logistics | Vendor data validation, lead time anomaly detection, customs tariff auditing, warehouse balancing |
 | **Mollie** | Sales & Financials | Order-to-profit analysis, CSV analytics, root-cause investigation |
 | **Christine** | Marketing | Brand compliance, copy optimization, SEO keyword verification |
@@ -17,6 +18,11 @@ This repository contains four independent training tracks, each built for a spec
 
 ```
 training/
+├── rick/                      # Executive, Entrepreneurship & Management
+│   ├── syllabus.md            # Course outline and lesson plans
+│   ├── data/                  # Executive dashboards, inventory logs, fulfillment reports
+│   ├── exercises/             # Python fulfillment analysis
+│   └── skills/                # Automation skills (4)
 ├── sunny/                     # Purchasing & Logistics
 │   ├── syllabus.md            # Course outline and lesson plans
 │   ├── data/                  # Vendor CSVs (lead times, invoices, prices)
@@ -41,8 +47,9 @@ training/
 
 ## Skills Summary
 
-10 custom Claude Code skills are distributed across the tracks:
+14 custom Claude Code skills are distributed across the tracks:
 
+- **Rick** — `fulfillment-anomaly-detector`, `write-a-prd`, `ppt-generation`, `architecture-diagram`
 - **Sunny** — `lead-time-anomaly`, `customs-tariff-audit`, `warehouse-balancing`, `xlsx-processing`, `data-table-validator`
 - **Mollie** — `csv-analytics`, `monte-carlo-analyze-root-cause`
 - **Christine** — `brand-guardrails`
@@ -54,6 +61,7 @@ Each skill lives in its own directory with a `SKILL.md` defining the prompt and 
 
 The `data/` directories contain realistic (but synthetic) operational data:
 
+- **Rick**: Executive dashboards (department budgets, milestone tracking, profit margins), inventory stock levels, fulfillment delay reports with carrier transit data
 - **Sunny**: Vendor lead times, purchase orders, invoices, contract prices
 - **Mollie**: Shopify order feeds, marketing spend, COGS, ad spend, webhook samples
 - **Christine**: Raw copy decks, email campaigns, keyword targets

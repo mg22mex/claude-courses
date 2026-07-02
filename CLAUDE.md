@@ -4,6 +4,7 @@
 This repository (`claude-courses`) hosts tailored training course content, syllabi, and localized automation custom skills designed to onboard different operational teams (Supply Chain/Logistics, Sales, Marketing, Design, Executive) to Claude Code.
 
 ## Directory Structure
+- `training/rick/` — Executive, Entrepreneurship & Management course (Rick). Contains `syllabus.md`, `data/`, `exercises/`, `skills/`.
 - `training/sunny/` — Purchasing & Logistics course (Sunny). Contains `syllabus.md`, `data/`, `exercises/`, `skills/`.
 - `training/mollie/` — Sales & Financials course (Mollie). Contains `syllabus.md`, `data/`, `exercises/`, `skills/`.
 - `training/christine/` — Marketing course (Christine). Contains `syllabus.md`, `data/`, `exercises/`, `skills/`.

@@ -1,11 +1,35 @@
 {
   "version": 1,
   "skills": {
+    "architecture-diagram": {
+      "source": "training/rick/skills/architecture-diagram/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/rick/skills/architecture-diagram/SKILL.md",
+      "computedHash": ""
+    },
+    "fulfillment-anomaly-detector": {
+      "source": "training/rick/skills/fulfillment-anomaly-detector/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/rick/skills/fulfillment-anomaly-detector/SKILL.md",
+      "computedHash": ""
+    },
     "monte-carlo-analyze-root-cause": {
       "source": "monte-carlo-data/mc-agent-toolkit",
       "sourceType": "github",
       "skillPath": "skills/analyze-root-cause/SKILL.md",
       "computedHash": "d9af6c76a9778718f47cb9c4b323dc899cbe283ae7aac2a1dabc87d80a4c2a1d"
+    },
+    "ppt-generation": {
+      "source": "training/rick/skills/ppt-generation/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/rick/skills/ppt-generation/SKILL.md",
+      "computedHash": ""
+    },
+    "write-a-prd": {
+      "source": "training/rick/skills/write-a-prd/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/rick/skills/write-a-prd/SKILL.md",
+      "computedHash": ""
     }
   }
 }
