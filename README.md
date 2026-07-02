@@ -10,9 +10,9 @@ This repository contains four independent training tracks, each built for a spec
 |---|---|---|
 | **Rick** | Executive, Entrepreneurship & Management | Executive dashboarding, corporate KPI modeling, strategic planning, PRD & presentation automation |
 | **Sunny** | Purchasing & Logistics | Vendor data validation, lead time anomaly detection, customs tariff auditing, warehouse balancing |
-| **Mollie** | Sales & Financials | Order-to-profit analysis, CSV analytics, root-cause investigation |
+| **Mollie** | Sales & Financials | Order-to-profit analysis, CSV analytics, root-cause investigation, financial reconciliation and automated alerting |
 | **Christine** | Marketing | Brand compliance, email automation, listing verification, and campaign analytics tracking |
-| **Design** (Paula & Gaby) | Design | SVG auditing, design token validation, asset inventory management |
+| **Design** (Paula & Gaby) | Design | SVG auditing, design token validation, asset inventory management, component compilation and asset optimization |
 
 ## Institutional Memory Infrastructure
 
@@ -47,7 +47,7 @@ training/
 │   ├── syllabus.md
 │   ├── data/                  # Shopify exports, ad spend, webhook samples
 │   ├── exercises/
-│   └── skills/                # Automation skills (2)
+│   └── skills/                # Automation skills (4)
 ├── christine/                 # Marketing
 │   ├── syllabus.md
 │   ├── data/                  # Copy decks, email campaigns, keyword targets
@@ -57,18 +57,18 @@ training/
     ├── syllabus.md
     ├── data/mock_assets/      # SVGs, design tokens JSON
     ├── exercises/
-    └── skills/                # Automation skills (2)
+    └── skills/                # Automation skills (4)
 ```
 
 ## Skills Summary
 
-17 custom Claude Code skills are distributed across the tracks:
+21 custom Claude Code skills are distributed across the tracks:
 
 - **Rick** — `fulfillment-anomaly-detector`, `write-a-prd`, `ppt-generation`, `architecture-diagram`
 - **Sunny** — `lead-time-anomaly`, `customs-tariff-audit`, `warehouse-balancing`, `xlsx-processing`, `data-table-validator`
-- **Mollie** — `csv-analytics`, `monte-carlo-analyze-root-cause`
+- **Mollie** — `csv-analytics`, `monte-carlo-analyze-root-cause`, `reconciliation-engine`, `anomaly-alert-webhook`
 - **Christine** — `brand-guardrails`, `email-automation`, `listing-verification`, `campaign-analytics`
-- **Design** — `svg-auditor`, `design-token-validator`
+- **Design** — `svg-auditor`, `design-token-validator`, `component-spec-compiler`, `asset-pack-optimizer`
 
 Each skill lives in its own directory with a `SKILL.md` defining the prompt and usage. Skills from other tracks can be invoked cross-track by referencing the relative path.
 

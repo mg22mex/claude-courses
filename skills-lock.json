@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "anomaly-alert-webhook": {
+      "source": "training/mollie/skills/anomaly-alert-webhook/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/mollie/skills/anomaly-alert-webhook/SKILL.md",
+      "computedHash": ""
+    },
     "architecture-diagram": {
       "source": "training/rick/skills/architecture-diagram/SKILL.md",
       "sourceType": "local",
@@ -25,16 +31,34 @@
       "skillPath": "training/rick/skills/ppt-generation/SKILL.md",
       "computedHash": ""
     },
+    "reconciliation-engine": {
+      "source": "training/mollie/skills/reconciliation-engine/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/mollie/skills/reconciliation-engine/SKILL.md",
+      "computedHash": ""
+    },
     "write-a-prd": {
       "source": "training/rick/skills/write-a-prd/SKILL.md",
       "sourceType": "local",
       "skillPath": "training/rick/skills/write-a-prd/SKILL.md",
       "computedHash": ""
     },
+    "asset-pack-optimizer": {
+      "source": "training/design/skills/asset-pack-optimizer/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/design/skills/asset-pack-optimizer/SKILL.md",
+      "computedHash": ""
+    },
     "campaign-analytics": {
       "source": "training/christine/skills/campaign-analytics/SKILL.md",
       "sourceType": "local",
       "skillPath": "training/christine/skills/campaign-analytics/SKILL.md",
+      "computedHash": ""
+    },
+    "component-spec-compiler": {
+      "source": "training/design/skills/component-spec-compiler/SKILL.md",
+      "sourceType": "local",
+      "skillPath": "training/design/skills/component-spec-compiler/SKILL.md",
       "computedHash": ""
     },
     "email-automation": {

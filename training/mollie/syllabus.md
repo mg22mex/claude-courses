@@ -3,7 +3,7 @@
 **Course Title:** Order-to-Profit Analysis with Claude Code
 **Target User:** Mollie — Sales & Financials team
 **Prerequisites:** Familiarity with Shopify admin, basic CSV/spreadsheet experience; no coding experience required.
-**Estimated Duration:** 4 hours (split across two 2-hour sessions)
+**Estimated Duration:** 6 hours (split across three 2-hour sessions)
 **Format:** Live walkthrough + hands-on terminal exercises
 
 ---
@@ -28,6 +28,8 @@ By the end of this course, Mollie will be able to:
 4. Detect anomalies — outliers, missing orders, margin compression, and data gaps.
 5. Generate a consolidated profit-and-loss report from disparate data sources.
 6. Build a reusable weekly sales-review prompt template.
+7. Reconcile payment settlement reports against order ledgers to isolate payout mismatches and platform fee discrepancies.
+8. Parse data observability alerts and format structured Slack/Teams webhook JSON payloads for operations response.
 
 ---
 
@@ -299,6 +301,160 @@ Please do the following, in order:
 
 ---
 
+### Lesson 5 — Payment Reconciliation Engine (60 min)
+
+**Objective:** Cross-reference payment settlement reports against the order ledger to isolate financial drops, platform fee discrepancies, and missing transactions.
+
+| Segment | Topic | Activity |
+|---|---|---|
+| 5.1 | The reconciliation problem | Payment gateways (Stripe, PayPal) send settlement reports. The order ledger tracks every order. Discrepancies between them mean missing money or unaccounted fees. |
+| 5.2 | Loading settlement and ledger data | Load `data/payout_reconciliation.csv` alongside `data/shopify_orders_2026-06.csv` — two views of the same transactions, with intentional mismatches. |
+| 5.3 | Full outer join cross-reference | Perform a full outer join on transaction_id. Classify each row: matched OK, amount mismatch, missing from ledger, missing from settlement. |
+| 5.4 | Platform fee audit | For each gateway, calculate expected fees vs. actual fees. Flag overcharges and inconsistent fee percentages. |
+| 5.5 | Payout gap calculation | Sum settled net amounts vs. expected payout total. Isolate which transactions are missing from payout batches and flag pending/voided statuses. |
+
+**CLI Exercises:**
+
+```
+# Exercise 5.3 — Full reconciliation cross-reference
+claude data/payout_reconciliation.csv data/shopify_orders_2026-06.csv
+```
+
+Prompt:
+
+```
+Load data/payout_reconciliation.csv and data/shopify_orders_2026-06.csv.
+
+Step 1: Normalize column names. Map the settlement file's
+transaction_id → order_id, gross_amount → total_price, fee → transaction_fee.
+
+Step 2: Perform a FULL OUTER JOIN on transaction_id (settlement) / order_id
+(ledger). For each row, classify as:
+- "matched" — present in both files and amounts agree within $0.01
+- "amount mismatch" — present in both but amounts differ by more than $0.01
+- "settlement only" — in settlement file but not in order ledger
+- "ledger only" — in order ledger but not in settlement file
+
+Step 3: Output a discrepancy table with all non-matched rows.
+
+Step 4: Calculate total settled amount, total ledger amount, and the
+net difference.
+```
+
+```
+# Exercise 5.4 — Fee audit by gateway
+Prompt (continuing the same session):
+
+Using the joined dataset:
+
+1. Group by gateway (stripe vs. paypal).
+2. For each gateway, calculate:
+   - Total gross amount processed
+   - Total fees charged
+   - Average fee percentage (total_fees / total_gross * 100)
+   - Transaction count
+3. Compare against expected fee rates:
+   - Stripe: 2.9% + $0.30 per transaction
+   - PayPal: 3.5% + $0.49 per transaction
+4. Flag any gateway where actual avg fee rate exceeds expected by
+   more than 0.5 percentage points.
+
+Output a gateway fee audit table with expected vs. actual rates.
+```
+
+```
+# Exercise 5.5 — Payout gap isolation
+Prompt (continuing the same session):
+
+Using the reconciliation results:
+
+1. List all transactions where payout_id is missing (status = "pending").
+   Why might each one be pending?
+2. Calculate the expected total payout = SUM(net_amount) for all
+   settled transactions.
+3. Compare against the actual payouts by payout_id. Is there a gap?
+4. Identify transactions with "refunded" or "voided" status.
+   Should these be excluded from the expected payout?
+
+Output a payout gap summary table.
+```
+
+---
+
+### Lesson 6 — Anomaly Alert Webhook Automation (60 min)
+
+**Objective:** Parse data observability alerts and generate structured Slack/Teams webhook JSON payloads for real-time operations notification.
+
+| Segment | Topic | Activity |
+|---|---|---|
+| 6.1 | Alerting and observability | Data pipelines generate alerts for freshness drops, volume anomalies, and schema changes. These need to reach operations in their messaging platform of choice. |
+| 6.2 | Loading a Monte Carlo alert | Load a simulated Monte Carlo alert JSON — a freshness alert on the orders table with severity, observed value, and threshold. |
+| 6.3 | Alert classification and severity mapping | Classify the alert dimension (freshness, volume, null_ratio, schema_change) and assign severity (CRITICAL, WARNING, INFO) based on magnitude. |
+| 6.4 | Slack webhook payload generation | Transform the alert into a Slack Block Kit JSON payload with header, fields table, message, and investigation button. |
+| 6.5 | Teams webhook payload generation | Transform the same alert into a Microsoft Teams Adaptive Card JSON payload with matching content. |
+
+**CLI Exercises:**
+
+```
+# Exercise 6.2 — Load and classify an alert
+```
+
+Prompt:
+
+```
+I have a simulated Monte Carlo alert JSON:
+
+{
+  "id": "mc_alert_001",
+  "table_name": "public.orders",
+  "dimension": "freshness",
+  "severity": "critical",
+  "actual_value": "Last update 6 hours ago",
+  "threshold": "Last update within 1 hour",
+  "triggered_at": "2026-07-02T08:15:00Z",
+  "description": "The orders table has not received new data for 6 hours. Expected refresh interval is 1 hour.",
+  "url": "https://getmontecarlo.com/monitor/orders-freshness"
+}
+
+Classify this alert:
+- Dimension: freshness / volume / null_ratio / distribution / schema_change?
+- Severity: critical / warning / info?
+- Suggested Slack channel: what should it be?
+```
+
+```
+# Exercise 6.4 — Generate Slack webhook JSON
+Prompt (continuing the same session):
+
+Generate a Slack Block Kit webhook payload for the alert above.
+
+Rules:
+- Channel: #data-ops-alerts-critical for CRITICAL, #data-ops-alerts-warnings for WARNING
+- Use the Block Kit format with header, section fields, and actions blocks
+- Include an "Investigate in Monte Carlo" button pointing to the alert URL
+- The message field must be in a section block, not the header
+
+Output the complete JSON payload.
+Validate it: no trailing commas, valid JSON, all variables resolved.
+```
+
+```
+# Exercise 6.5 — Generate Teams webhook JSON
+Prompt (continuing the same session):
+
+Generate a Microsoft Teams Adaptive Card payload for the same alert.
+
+Rules:
+- Use Adaptive Card schema version 1.4
+- Use FactSet for the key-value pairs
+- Color the header based on severity (attention for CRITICAL, warning for WARNING)
+- Include an Action.OpenUrl for investigation
+
+Output the complete JSON payload. Validate it.
+```
+
+---
+
 ## Sample Data Files
 
 The following sample files are provided in `data/` for use during exercises:
@@ -310,6 +466,7 @@ The following sample files are provided in `data/` for use during exercises:
 | `data/product_cogs.csv` | COGS master list (20 SKUs with unit cost and supplier) |
 | `data/shopify_fees.csv` | Transaction fees per order (payment gateway + flat fee) |
 | `data/ad_spend_june_2026.csv` | Daily ad spend by channel (Google, Meta, email, organic) |
+| `data/payout_reconciliation.csv` | Payout settlement report with 36 transactions across Stripe and PayPal, including pending, refunded, and voided edge cases |
 
 ---
 
@@ -323,6 +480,8 @@ The following sample files are provided in `data/` for use during exercises:
 | Shopify sales mock data | `training/mollie/data/shopify_sales.csv` |
 | Marketing spend mock data | `training/mollie/data/marketing_spend.csv` |
 | csv-analytics skill | `skills/csv-analytics/SKILL.md` |
+| reconciliation-engine skill | `skills/reconciliation-engine/SKILL.md` |
+| anomaly-alert-webhook skill | `skills/anomaly-alert-webhook/SKILL.md` |
 | xlsx-processing skill | `../sunny/skills/xlsx-processing/SKILL.md` |
 | data-table-validator skill | `../sunny/skills/data-table-validator/SKILL.md` |
 
@@ -338,3 +497,5 @@ Mollie can independently:
 - [ ] Calculate profit margins at the product, order, and channel level
 - [ ] Detect missing dates, price outliers, and margin compression
 - [ ] Run the full weekly sales-review pipeline using the saved prompt template
+- [ ] Reconcile settlement reports against order ledgers and isolate payout mismatches
+- [ ] Generate platform-specific webhook JSON payloads from observability alerts

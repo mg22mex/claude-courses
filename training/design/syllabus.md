@@ -3,7 +3,7 @@
 **Course Title:** SVG Auditing, Design Tokens & Asset Management with Claude Code
 **Target User:** Design team
 **Prerequisites:** Familiarity with SVG files, design tokens, and basic file management; no coding experience required.
-**Estimated Duration:** 4 hours (split across two 2-hour sessions)
+**Estimated Duration:** 6 hours (split across three 2-hour sessions)
 **Format:** Live walkthrough + hands-on terminal exercises
 
 ---
@@ -18,6 +18,8 @@ By the end of this course, the Design team will be able to:
 4. Scan asset directories to produce a structured inventory of image formats, dimensions, and naming convention violations.
 5. Generate CSV audit reports for handoff to engineering and brand teams.
 6. Build a reusable weekly design review prompt that validates all new assets before handoff.
+7. Convert Figma design specs (color palettes, typography matrices, border dimensions) into CSS custom properties and platform-agnostic style dictionaries.
+8. Minify SVG paths, enforce naming conventions, and package assets into structured distribution-ready directories.
 
 ---
 
@@ -322,6 +324,181 @@ applied, re-run the checks and confirm the report shows PASS.
 
 ---
 
+### Lesson 5 — Component Spec Compiler (60 min)
+
+**Objective:** Translate Figma design specifications — color palettes, typography matrices, spacing grids, and border dimensions — into clean CSS custom properties and JSON style dictionaries for engineering handoff.
+
+| Segment | Topic | Activity |
+|---|---|---|
+| 5.1 | The spec-to-code gap | Designers produce pixel specs in Figma. Engineers need CSS variables and token files. Manual conversion is slow and error-prone — Claude Code can automate it. |
+| 5.2 | Loading a component spec | Load a structured design spec document with color swatches, type scale, spacing grid, and button anatomy. |
+| 5.3 | Generating CSS custom properties | Convert the spec into namespaced `--color-*`, `--typography-*`, `--spacing-*`, and `--radius-*` variables. |
+| 5.4 | Building a Style Dictionary JSON | Generate a platform-agnostic JSON token file following the `{value, type}` format. Include category groupings. |
+| 5.5 | Component-specific tokens | For component anatomy specs (e.g., button system), generate self-contained component token blocks referencing the global variables. |
+
+**CLI Exercises:**
+
+```
+# Exercise 5.3 — Generate CSS custom properties from a spec
+```
+
+Prompt:
+
+```
+I have the following design spec for a button component:
+
+COLORS
+- Primary (default): #1A6FB0
+- Primary (hover): #155892
+- Text on primary: #FFFFFF
+- Border: #D0D5DD
+- Background secondary: #F5F7FA
+
+TYPOGRAPHY
+- Button label: Inter, 14px, 600 weight, 1.25 line height
+- Body: Inter, 16px, 400 weight, 1.5 line height
+- Heading 1: Inter, 32px, 700 weight, 1.25 line height, -0.02em letter spacing
+
+SPACING (4px base scale)
+- xs: 4px, sm: 8px, md: 16px, lg: 24px, xl: 32px
+
+BORDER RADIUS
+- sm: 4px, md: 8px, lg: 12px, full: 9999px
+
+Generate:
+
+1. CSS custom properties file with sections:
+   /* Color palette */, /* Typography */, /* Spacing */, /* Border radius */
+
+2. Naming convention: --category-property-modifier
+   Example: --color-primary-hover, --typography-h1-size
+
+3. All spacing in px. All colors as 6-character hex.
+```
+
+```
+# Exercise 5.4 — Generate Style Dictionary JSON
+Prompt (continuing the same session):
+
+Take the same spec and generate a Style Dictionary JSON file.
+
+Format requirements:
+- Nested object structure by category
+- Each token has "value" and "type" fields
+- Types: color, dimension, number, string
+- No nested CSS variable references — just the raw values
+
+Categories to include: color, typography, spacing, borderRadius
+```
+
+```
+# Exercise 5.5 — Component token block
+Prompt (continuing the same session):
+
+Using the generated CSS variables, create component-specific tokens for
+the button system:
+
+Required states: default, hover, active, disabled, focus
+Properties per state: background, text, border
+Also include: padding, font, font-size, border-radius
+
+Naming: --button-{variant}-{property}-{state}
+
+Output the component token block and cross-reference every
+var(--...) to confirm it resolves to a defined variable above.
+```
+
+---
+
+### Lesson 6 — Asset Pack Optimizer (60 min)
+
+**Objective:** Minify SVG path data, validate naming conventions, strip editor metadata, and organize assets into a distribution-ready directory package.
+
+| Segment | Topic | Activity |
+|---|---|---|
+| 6.1 | The asset handoff problem | Raw SVG exports from design tools contain editor metadata, non-standard filenames, and bloated path data. Engineering needs clean, optimized assets. |
+| 6.2 | Scanning an asset directory | Load the `data/mock_assets/` directory and classify every file by type — SVG icon, SVG illustration, PNG, JSON, CSS. |
+| 6.3 | SVG path minification | For each SVG: remove Inkscape/Sodipodi metadata, empty groups, and redundant attributes. Normalize viewBox and inject accessibility tags. |
+| 6.4 | Naming convention enforcement | Audit all filenames for kebab-case compliance. Fix violations: uppercase → lowercase, underscores → hyphens, version suffixes stripped. |
+| 6.5 | Distribution packaging | Generate a `dist/` directory with organized subdirectories (icons/filled, icons/outlined, illustrations, raster) and a manifest CSV. |
+
+**CLI Exercises:**
+
+```
+# Exercise 6.2 — Classify assets in a directory
+claude data/mock_assets/
+```
+
+Prompt:
+
+```
+Scan all files in data/mock_assets/ and classify each:
+
+| File | Extension | Category | Naming OK? |
+|---|---|---|---|
+
+Category: SVG icon / SVG illustration / JSON token / CSS token / raster / other
+Naming: is it valid kebab-case? Flag any violations.
+
+Also report: total files, SVGs, non-SVGs.
+```
+
+```
+# Exercise 6.3 — Minify a set of SVGs
+claude data/mock_assets/*.svg
+```
+
+Prompt:
+
+```
+Load every SVG file from data/mock_assets/ and optimize each one:
+
+1. Remove these attributes if present:
+   - xml:space, version, sodipodi:*, inkscape:*, id
+
+2. Remove empty <g></g> groups.
+
+3. Check viewBox — is it present? Non-integer? Missing?
+   Fix any issues found.
+
+4. After cleanup, measure the byte reduction per file.
+
+5. Check for missing accessibility:
+   - Missing <title> → add derived from filename
+   - Missing <desc> → add
+   - Missing role="img" → add
+
+Output: per-file table with bytes before, bytes after, savings %,
+and issues found.
+```
+
+```
+# Exercise 6.4 — Rename, package and manifest
+Prompt (continuing the session, covering all files in data/mock_assets/):
+
+1. Audit all filenames for kebab-case violations.
+2. Build a rename plan: old_name → new_name → reason.
+3. Create a dist/ directory with:
+   - icons/ (SVGs under 10 KB with currentColor)
+   - illustrations/ (multi-color SVGs)
+   - raster/ (PNG, JPG files)
+   - tokens/ (JSON, CSS)
+4. Write manifest.csv: filename, category, size_before, size_after,
+   savings_pct, issues
+5. Write rename-log.csv
+
+Output a terminal summary like:
+
+=== ASSET PACK OPTIMIZER SUMMARY ===
+SVGs optimized:   X
+Bytes removed:    X (X% avg)
+Naming fixes:     X
+Files packaged:   X into dist/
+Status:           Ready for distribution
+```
+
+---
+
 ## Sample Data Files
 
 The following sample files are provided in `data/mock_assets/` for use during exercises:
@@ -345,6 +522,8 @@ The following sample files are provided in `data/mock_assets/` for use during ex
 | Design lab exercises | `training/design/exercises/design-labs.md` |
 | svg-auditor skill | `skills/svg-auditor/SKILL.md` |
 | design-token-validator skill | `skills/design-token-validator/SKILL.md` |
+| component-spec-compiler skill | `skills/component-spec-compiler/SKILL.md` |
+| asset-pack-optimizer skill | `skills/asset-pack-optimizer/SKILL.md` |
 | brand-guardrails skill | `../christine/skills/brand-guardrails/SKILL.md` |
 
 ---
@@ -359,3 +538,5 @@ The Design team can independently:
 - [ ] Fix broken token references, missing tokens, and deprecated naming conventions
 - [ ] Scan an asset directory and produce a structured inventory CSV with naming and format checks
 - [ ] Run the weekly design review pipeline and confirm all checks pass before handoff
+- [ ] Compile Figma design specs into CSS custom properties and platform-agnostic JSON style dictionaries
+- [ ] Minify SVGs, enforce kebab-case naming, and package assets into structured distribution directories
