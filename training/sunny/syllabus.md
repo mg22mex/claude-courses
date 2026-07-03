@@ -247,11 +247,11 @@ The following sample files are provided in `data/` for use during exercises:
 |---|---|
 | Course materials | `training/sunny/` |
 | Sample data assets | `training/sunny/data/` |
-| Exercise 1 — Vendor Data Ingestion & Schema Alignment | `training/sunny/exercises/exercise_1.md` |
-| Exercise 2 — Lead-Time Profiling & Vendor Performance | `training/sunny/exercises/exercise_2.md` |
-| Exercise 3 — Customs Tariff & Margin Auditing | `training/sunny/exercises/exercise_3.md` |
-| Exercise 4 — Multi-Warehouse Rebalancing Optimization | `training/sunny/exercises/exercise_4.md` |
-| Exercise 5 — Capstone Supply Chain Validator | `training/sunny/exercises/exercise_5.md` |
+| Exercise 1 — Vendor Data Ingestion & Schema Alignment | `training/sunny/exercises/exercise-1.md` |
+| Exercise 2 — Lead-Time Profiling & Vendor Performance | `training/sunny/exercises/exercise-2.md` |
+| Exercise 3 — Customs Tariff & Margin Auditing | `training/sunny/exercises/exercise-3.md` |
+| Exercise 4 — Multi-Warehouse Rebalancing Optimization | `training/sunny/exercises/exercise-4.md` |
+| Exercise 5 — Capstone Supply Chain Validator | `training/sunny/exercises/exercise-5.md` |
 | lead-time-anomaly skill | `skills/lead-time-anomaly/SKILL.md` |
 | customs-tariff-audit skill | `skills/customs-tariff-audit/SKILL.md` |
 | warehouse-balancing skill | `skills/warehouse-balancing/SKILL.md` |

@@ -16,7 +16,7 @@ The Design team has accumulated a batch of raw SVG exports from various sources 
 
 ## Dataset
 
-Use the `data/mock_assets/` directory which contains a mix of SVGs, JSON, and CSS files.
+Use the `data/mock-assets/` directory which contains a mix of SVGs, JSON, and CSS files.
 
 | File | Type | Size | Issues |
 |---|---|---|---|
@@ -45,13 +45,13 @@ Use the `data/mock_assets/` directory which contains a mix of SVGs, JSON, and CS
 ### Step 1 — Load the asset directory and scan all files
 
 ```bash
-claude ../data/mock_assets/
+claude ../data/mock-assets/
 ```
 
 Prompt:
 
 ```
-List every file in ../data/mock_assets/. For each file, report:
+List every file in ../data/mock-assets/. For each file, report:
 - Filename
 - Extension
 - File size in KB
@@ -64,13 +64,13 @@ Sort by category. Flag any naming violations.
 ### Step 2 — Run the asset-pack-optimizer skill
 
 ```bash
-claude ../data/mock_assets/ --skill asset-pack-optimizer
+claude ../data/mock-assets/ --skill asset-pack-optimizer
 ```
 
 Prompt:
 
 ```
-Run the asset-pack-optimizer skill against ../data/mock_assets/.
+Run the asset-pack-optimizer skill against ../data/mock-assets/.
 
 Phase 1 — Directory Classification:
 Classify every file:
@@ -111,7 +111,7 @@ After each operation, report the byte reduction per file.
 Prompt (continuing the session):
 
 ```
-Audit all filenames in ../data/mock_assets/ for kebab-case compliance:
+Audit all filenames in ../data/mock-assets/ for kebab-case compliance:
 
 Rules:
 - Lowercase only
@@ -171,7 +171,7 @@ Prompt (continuing the session):
 Print a terminal summary:
 
 === ASSET PACK OPTIMIZER SUMMARY ===
-Source directory:       ../data/mock_assets/
+Source directory:       ../data/mock-assets/
 
 Processing results:
   SVGs scanned:         X

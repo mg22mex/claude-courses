@@ -40,18 +40,18 @@ By the end of this course, the Design team will be able to:
 | Segment | Topic | Activity |
 |---|---|---|
 | 1.1 | Loading the Domain Notebook | Open the Design NotebookLM and query for SVG validation baselines, brand color standards, and accessibility requirements before writing any audit scripts. |
-| 1.2 | Loading SVG files into Claude Code | Load three sample SVGs from `data/mock_assets/` — an icon, logo, and illustration. |
+| 1.2 | Loading SVG files into Claude Code | Load three sample SVGs from `data/mock-assets/` — an icon, logo, and illustration. |
 | 1.3 | Running the svg-auditor skill | Invoke Claude Code with the `svg-auditor` skill to scan all three SVGs for viewBox, color governance, accessibility, and path redundancy. |
 | 1.4 | Parsing viewBox and canvas issues | Review flagged viewBox problems: missing viewBox, non-integer values, incorrect aspect ratios. |
 | 1.5 | Tokenizing colors and stripping metadata | Replace hardcoded colors with `var(--...)` tokens. Strip editor metadata (sodipodi, inkscape, xml:space). |
 
-**Lab:** `exercises/exercise_1.md` — SVG Structural Auditing
+**Lab:** `exercises/exercise-1.md` — SVG Structural Auditing
 
 **CLI Exercises:**
 
 ```
 # Exercise 1.3 — Run SVG audit on icon set
-claude data/mock_assets/icon-cloud-sync.svg data/mock_assets/logo-hero-main.svg data/mock_assets/illustration-dashboard.svg --skill svg-auditor
+claude data/mock-assets/icon-cloud-sync.svg data/mock-assets/logo-hero-main.svg data/mock-assets/illustration-dashboard.svg --skill svg-auditor
 ```
 
 Prompt:
@@ -80,18 +80,18 @@ Output a table per file: check, status (pass/fail/warn), detail
 | Segment | Topic | Activity |
 |---|---|---|
 | 2.1 | The token management problem | Design token files accumulate drift. Claude Code can diff token values against a spec and flag every inconsistency. |
-| 2.2 | Loading token files | Load `design-tokens.json` and `component-tokens.css` from `data/mock_assets/`. |
+| 2.2 | Loading token files | Load `design-tokens.json` and `component-tokens.css` from `data/mock-assets/`. |
 | 2.3 | Running the design-token-validator skill | Invoke Claude Code with the `design-token-validator` skill. |
 | 2.4 | Color and spacing validation | Review flagged color values outside the approved palette, inconsistent hex formats, and spacing values off the modular scale. |
 | 2.5 | Token reference resolution and missing tokens | Identify broken `{reference}` paths and missing required tokens. |
 
-**Lab:** `exercises/exercise_2.md` — Automated Design Token Validation
+**Lab:** `exercises/exercise-2.md` — Automated Design Token Validation
 
 **CLI Exercises:**
 
 ```
 # Exercise 2.3 — Run token validation
-claude data/mock_assets/design-tokens.json data/mock_assets/component-tokens.css --skill design-token-validator
+claude data/mock-assets/design-tokens.json data/mock-assets/component-tokens.css --skill design-token-validator
 ```
 
 Prompt:
@@ -129,7 +129,7 @@ Output a validation table per category.
 | 3.4 | Building a Style Dictionary JSON | Generate a platform-agnostic JSON token file following the `{value, type}` format with category groupings. |
 | 3.5 | Component-specific token blocks | For component anatomy specs (button system), generate self-contained component token blocks referencing global variables. |
 
-**Lab:** `exercises/exercise_3.md` — Component Specification Compiling
+**Lab:** `exercises/exercise-3.md` — Component Specification Compiling
 
 **CLI Exercises:**
 
@@ -180,24 +180,24 @@ Generate:
 | Segment | Topic | Activity |
 |---|---|---|
 | 4.1 | The asset handoff problem | Raw SVG exports contain editor metadata, non-standard filenames, and bloated path data. Engineering needs clean, optimized assets. |
-| 4.2 | Scanning and classifying an asset directory | Load the `data/mock_assets/` directory and classify every file by type — SVG icon, SVG illustration, JSON, CSS. |
+| 4.2 | Scanning and classifying an asset directory | Load the `data/mock-assets/` directory and classify every file by type — SVG icon, SVG illustration, JSON, CSS. |
 | 4.3 | SVG path minification and metadata stripping | For each SVG: remove Inkscape/Sodipodi metadata, empty groups, redundant attributes. Normalize viewBox and inject accessibility tags. |
 | 4.4 | Naming convention enforcement | Audit all filenames for kebab-case compliance. Fix violations: uppercase → lowercase, underscores → hyphens, version suffixes stripped. |
 | 4.5 | Distribution packaging | Generate a `dist/` directory with organized subdirectories (icons/filled, icons/outlined, illustrations, tokens) and a manifest CSV. |
 
-**Lab:** `exercises/exercise_4.md` — Production Asset Pack Optimization
+**Lab:** `exercises/exercise-4.md` — Production Asset Pack Optimization
 
 **CLI Exercises:**
 
 ```
 # Exercise 4.2 — Classify assets in a directory
-claude data/mock_assets/
+claude data/mock-assets/
 ```
 
 Prompt:
 
 ```
-Scan all files in data/mock_assets/ and classify each:
+Scan all files in data/mock-assets/ and classify each:
 
 | File | Extension | Category | Naming OK? |
 |---|---|---|---|
@@ -210,13 +210,13 @@ Also report: total files, SVGs, non-SVGs.
 
 ```
 # Exercise 4.3 — Minify and optimize SVGs
-claude data/mock_assets/*.svg --skill asset-pack-optimizer
+claude data/mock-assets/*.svg --skill asset-pack-optimizer
 ```
 
 Prompt:
 
 ```
-Run the asset-pack-optimizer on every SVG in data/mock_assets/:
+Run the asset-pack-optimizer on every SVG in data/mock-assets/:
 
 1. Strip editor metadata: sodipodi:*, inkscape:*, xml:space, version
 2. Remove empty <g></g> groups and unused <defs>
@@ -242,13 +242,13 @@ and issues found.
 | 5.4 | Asset optimization and packaging | Run asset-pack-optimizer on all corrected files; produce dist/ with manifest and rename log. |
 | 5.5 | Consolidated handoff report | Generate a single engineering handoff report with quality gate results and recommendations. |
 
-**Lab:** `exercises/exercise_5.md` — Capstone: The Automated Design-to-Code Pipeline
+**Lab:** `exercises/exercise-5.md` — Capstone: The Automated Design-to-Code Pipeline
 
 **CLI Exercises:**
 
 ```
 # Exercise 5.2 — Run the full pipeline
-claude ../data/mock_assets/
+claude ../data/mock-assets/
 ```
 
 Prompt:
@@ -279,7 +279,7 @@ Print the final quality gate summary for engineering sign-off.
 
 ## Sample Data Files
 
-The following sample files are provided in `data/mock_assets/` for use during exercises:
+The following sample files are provided in `data/mock-assets/` for use during exercises:
 
 | File | Description |
 |---|---|
@@ -296,12 +296,12 @@ The following sample files are provided in `data/mock_assets/` for use during ex
 | Resource | Path / Location |
 |---|---|
 | Course slide deck | `training/design/` |
-| Sample data assets | `training/design/data/mock_assets/` |
-| Exercise 1 — SVG Structural Auditing | `training/design/exercises/exercise_1.md` |
-| Exercise 2 — Automated Design Token Validation | `training/design/exercises/exercise_2.md` |
-| Exercise 3 — Component Specification Compiling | `training/design/exercises/exercise_3.md` |
-| Exercise 4 — Production Asset Pack Optimization | `training/design/exercises/exercise_4.md` |
-| Exercise 5 — Capstone: Design-to-Code Pipeline | `training/design/exercises/exercise_5.md` |
+| Sample data assets | `training/design/data/mock-assets/` |
+| Exercise 1 — SVG Structural Auditing | `training/design/exercises/exercise-1.md` |
+| Exercise 2 — Automated Design Token Validation | `training/design/exercises/exercise-2.md` |
+| Exercise 3 — Component Specification Compiling | `training/design/exercises/exercise-3.md` |
+| Exercise 4 — Production Asset Pack Optimization | `training/design/exercises/exercise-4.md` |
+| Exercise 5 — Capstone: Design-to-Code Pipeline | `training/design/exercises/exercise-5.md` |
 | svg-auditor skill | `skills/svg-auditor/SKILL.md` |
 | design-token-validator skill | `skills/design-token-validator/SKILL.md` |
 | component-spec-compiler skill | `skills/component-spec-compiler/SKILL.md` |

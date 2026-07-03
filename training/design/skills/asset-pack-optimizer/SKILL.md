@@ -134,7 +134,7 @@ Write to `dist/`:
 
 ```
 === ASSET PACK OPTIMIZER SUMMARY ===
-Source directory:       data/mock_assets/
+Source directory:       data/mock-assets/
 
 Processing results:
   SVGs scanned:         12

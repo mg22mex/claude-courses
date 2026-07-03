@@ -227,11 +227,11 @@ claude data/executive_dashboard.csv skills/ppt-generation/SKILL.md
 | Executive dashboard data | `training/rick/data/executive_dashboard.csv` |
 | Inventory stock levels | `training/rick/data/inventory_stock_levels.csv` |
 | Fulfillment delay report | `training/rick/data/fulfillment_delay_report.csv` |
-| Exercise 1 — Source Material Parsing | `training/rick/exercises/exercise_1.md` |
-| Exercise 2 — Enterprise Architecture Modeling | `training/rick/exercises/exercise_2.md` |
-| Exercise 3 — Rigid Product Requirement Drafting | `training/rick/exercises/exercise_3.md` |
-| Exercise 4 — Executive KPI & Board Room Slide Structuring | `training/rick/exercises/exercise_4.md` |
-| Exercise 5 — Capstone Strategic Blueprint | `training/rick/exercises/exercise_5.md` |
+| Exercise 1 — Source Material Parsing | `training/rick/exercises/exercise-1.md` |
+| Exercise 2 — Enterprise Architecture Modeling | `training/rick/exercises/exercise-2.md` |
+| Exercise 3 — Rigid Product Requirement Drafting | `training/rick/exercises/exercise-3.md` |
+| Exercise 4 — Executive KPI & Board Room Slide Structuring | `training/rick/exercises/exercise-4.md` |
+| Exercise 5 — Capstone Strategic Blueprint | `training/rick/exercises/exercise-5.md` |
 | Fulfillment anomaly detector skill | `skills/fulfillment-anomaly-detector/SKILL.md` |
 | PRD generator skill | `skills/write-a-prd/SKILL.md` |
 | Presentation generator skill | `skills/ppt-generation/SKILL.md` |

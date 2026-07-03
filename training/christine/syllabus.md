@@ -513,11 +513,11 @@ The following sample files are provided in `data/` for use during exercises:
 |---|---|
 | Course slide deck | `training/christine/` |
 | Sample data assets | `training/christine/data/` |
-| Exercise 1 — Brand Compliance & Voice Enforcement | `training/christine/exercises/exercise_1.md` |
-| Exercise 2 — Live Shopify Listing SEO Auditing | `training/christine/exercises/exercise_2.md` |
-| Exercise 3 — Automated Outbound Email Flow Generation | `training/christine/exercises/exercise_3.md` |
-| Exercise 4 — Campaign Analytics Reporting & ROAS Optimization | `training/christine/exercises/exercise_4.md` |
-| Exercise 5 — Capstone Marketing Launch Campaign Pipeline | `training/christine/exercises/exercise_5.md` |
+| Exercise 1 — Brand Compliance & Voice Enforcement | `training/christine/exercises/exercise-1.md` |
+| Exercise 2 — Live Shopify Listing SEO Auditing | `training/christine/exercises/exercise-2.md` |
+| Exercise 3 — Automated Outbound Email Flow Generation | `training/christine/exercises/exercise-3.md` |
+| Exercise 4 — Campaign Analytics Reporting & ROAS Optimization | `training/christine/exercises/exercise-4.md` |
+| Exercise 5 — Capstone Marketing Launch Campaign Pipeline | `training/christine/exercises/exercise-5.md` |
 | Mock raw copy deck | `training/christine/data/raw_copy_deck.md` |
 | Mock email campaign | `training/christine/data/raw_email_campaign.md` |
 | brand-guardrails skill | `skills/brand-guardrails/SKILL.md` |

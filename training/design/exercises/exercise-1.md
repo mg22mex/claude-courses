@@ -14,13 +14,13 @@ The Design team has received three SVG assets from an external contractor (`icon
 
 ## Dataset
 
-Use the three SVGs from the `data/mock_assets/` directory.
+Use the three SVGs from the `data/mock-assets/` directory.
 
 | File | Description |
 |---|---|
-| `../data/mock_assets/icon-cloud-sync.svg` | 24×24 icon with non-integer viewBox, missing a11y tags, hardcoded brand color |
-| `../data/mock_assets/logo-hero-main.svg` | Logo with missing viewBox, non-brand red, Inkscape metadata, unused defs |
-| `../data/mock_assets/illustration-dashboard.svg` | Illustration with empty desc, non-standard hex colors, hardcoded font |
+| `../data/mock-assets/icon-cloud-sync.svg` | 24×24 icon with non-integer viewBox, missing a11y tags, hardcoded brand color |
+| `../data/mock-assets/logo-hero-main.svg` | Logo with missing viewBox, non-brand red, Inkscape metadata, unused defs |
+| `../data/mock-assets/illustration-dashboard.svg` | Illustration with empty desc, non-standard hex colors, hardcoded font |
 
 ### Known Issues Planted in the Data
 
@@ -43,7 +43,7 @@ Use the three SVGs from the `data/mock_assets/` directory.
 ### Step 1 — Load SVGs and run preliminary inspection
 
 ```bash
-claude ../data/mock_assets/icon-cloud-sync.svg ../data/mock_assets/logo-hero-main.svg ../data/mock_assets/illustration-dashboard.svg
+claude ../data/mock-assets/icon-cloud-sync.svg ../data/mock-assets/logo-hero-main.svg ../data/mock-assets/illustration-dashboard.svg
 ```
 
 Prompt:
@@ -63,7 +63,7 @@ Output a per-file summary table.
 ### Step 2 — Run the svg-auditor skill
 
 ```bash
-claude ../data/mock_assets/icon-cloud-sync.svg ../data/mock_assets/logo-hero-main.svg ../data/mock_assets/illustration-dashboard.svg --skill svg-auditor
+claude ../data/mock-assets/icon-cloud-sync.svg ../data/mock-assets/logo-hero-main.svg ../data/mock-assets/illustration-dashboard.svg --skill svg-auditor
 ```
 
 Prompt:

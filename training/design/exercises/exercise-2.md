@@ -15,12 +15,12 @@ The Design team maintains two token files — a JSON global schema (`design-toke
 
 ## Dataset
 
-Use the two token files from `data/mock_assets/`.
+Use the two token files from `data/mock-assets/`.
 
 | File | Description |
 |---|---|
-| `../data/mock_assets/design-tokens.json` | Global token schema with color, spacing, typography, shadow, and component tokens |
-| `../data/mock_assets/component-tokens.css` | Component-level CSS custom properties referencing global tokens |
+| `../data/mock-assets/design-tokens.json` | Global token schema with color, spacing, typography, shadow, and component tokens |
+| `../data/mock-assets/component-tokens.css` | Component-level CSS custom properties referencing global tokens |
 
 ### Approved Brand Palette
 
@@ -63,7 +63,7 @@ Use the two token files from `data/mock_assets/`.
 ### Step 1 — Load token files and run the design-token-validator skill
 
 ```bash
-claude ../data/mock_assets/design-tokens.json ../data/mock_assets/component-tokens.css --skill design-token-validator
+claude ../data/mock-assets/design-tokens.json ../data/mock-assets/component-tokens.css --skill design-token-validator
 ```
 
 Prompt:

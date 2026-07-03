@@ -15,9 +15,9 @@ This is the capstone exercise that integrates everything from Exercises 1-4. Eng
 
 ## Datasets
 
-This exercise uses all files from `data/mock_assets/` plus the inline component spec below.
+This exercise uses all files from `data/mock-assets/` plus the inline component spec below.
 
-### Files from `../data/mock_assets/`
+### Files from `../data/mock-assets/`
 
 | File | Type |
 |---|---|
@@ -110,7 +110,7 @@ modal: 0 20px 25px rgba(0,0,0,0.15)
 ### Phase A — SVG Audit & Fix (Exercise 1 skills)
 
 ```bash
-claude ../data/mock_assets/icon-cloud-sync.svg ../data/mock_assets/logo-hero-main.svg ../data/mock_assets/illustration-dashboard.svg
+claude ../data/mock-assets/icon-cloud-sync.svg ../data/mock-assets/logo-hero-main.svg ../data/mock-assets/illustration-dashboard.svg
 ```
 
 Prompt:
@@ -140,8 +140,8 @@ and fixed-illustration-dashboard.svg.
 Continue in the same session:
 
 ```
-Now load ../data/mock_assets/design-tokens.json and
-../data/mock_assets/component-tokens.css.
+Now load ../data/mock-assets/design-tokens.json and
+../data/mock-assets/component-tokens.css.
 
 Run a full token validation:
 

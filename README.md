@@ -27,7 +27,7 @@ This repository is bound to a dual-engine NotebookLM operational framework. Ever
 | Christine — Marketing | <https://notebooklm.google.com/notebook/0a616bb3-6ea7-40c8-b53c-984fa4d977bc?authuser=1> |
 | Design (Paula & Gaby) | <https://notebooklm.google.com/notebook/9f67d0db-49c8-4bc3-b2e5-f08a3528028f?authuser=1> |
 
-> **Workflow Rule:** All script generation, data testing, or document templating must cross-verify patterns against both the Master Guide and the relevant Domain Notebook before execution. See `training/NOTEBOOKLM_CORE_STRATEGY.md` for the full framework.
+> **Workflow Rule:** All script generation, data testing, or document templating must cross-verify patterns against both the Master Guide and the relevant Domain Notebook before execution. See `training/notebooklm-core-strategy.md` for the full framework.
 
 ## Repository Structure
 
@@ -55,7 +55,7 @@ training/
 │   └── skills/                # Automation skills (4)
 └── design/                    # Design
     ├── syllabus.md
-    ├── data/mock_assets/      # SVGs, design tokens JSON
+    ├── data/mock-assets/      # SVGs, design tokens JSON
     ├── exercises/             # 5 progressive lab walkthroughs (audit → tokens → spec → optimize → capstone)
     └── skills/                # Automation skills (4)
 ```
