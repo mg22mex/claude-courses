@@ -1,10 +1,20 @@
 # Design: SVG Auditing, Design Tokens & Asset Management with Claude Code
 
 **Course Title:** SVG Auditing, Design Tokens & Asset Management with Claude Code
-**Target User:** Design team
+**Target User:** Design team (Paula & Gaby)
 **Prerequisites:** Familiarity with SVG files, design tokens, and basic file management; no coding experience required.
-**Estimated Duration:** 6 hours (split across three 2-hour sessions)
+**Estimated Duration:** 5 hours (split across five 1-hour sessions)
 **Format:** Live walkthrough + hands-on terminal exercises
+
+---
+
+## Pre-Work: Load Your Institutional Memory
+
+Before starting this course, open the [Master Claude Code Guide](https://notebooklm.google.com/notebook/4bdb17a3-6657-4d63-adbe-8f63c22521c2?authuser=1) alongside your domain-specific NotebookLM notebook. Query both notebooks to understand how Claude Code operates in your domain before writing any scripts or building tools.
+
+**Your Domain Notebook:** [Design Team Notebook](https://notebooklm.google.com/notebook/9f67d0db-49c8-4bc3-b2e5-f08a3528028f?authuser=1)
+
+> **Workflow Rule:** All script generation, data testing, or document templating in this track must cross-verify patterns against both the Master Guide and your Domain Notebook before execution.
 
 ---
 
@@ -12,30 +22,30 @@
 
 By the end of this course, the Design team will be able to:
 
-1. Load SVG files into Claude Code and audit them for viewBox correctness, hardcoded colors, and missing accessibility tags.
-2. Replace hardcoded SVG styling attributes with design token variables using Claude's batch editing capabilities.
-3. Validate design token files (CSS custom properties and JSON token schemas) against a brand design system specification.
-4. Scan asset directories to produce a structured inventory of image formats, dimensions, and naming convention violations.
-5. Generate CSV audit reports for handoff to engineering and brand teams.
-6. Build a reusable weekly design review prompt that validates all new assets before handoff.
-7. Convert Figma design specs (color palettes, typography matrices, border dimensions) into CSS custom properties and platform-agnostic style dictionaries.
-8. Minify SVG paths, enforce naming conventions, and package assets into structured distribution-ready directories.
+1. Interrogate the design Domain NotebookLM to establish strict asset validation baselines before writing any audit scripts.
+2. Parse raw SVG XML elements and flag broken paths, missing viewBox attributes, and non-standard inline styling using the svg-auditor skill.
+3. Read and parse structured JSON design token files, verifying hex codes, font scale values, and spacing variables against the approved master system using the design-token-validator skill.
+4. Convert raw layout coordinates, dimensions, and visual properties into CSS custom properties and platform-agnostic style dictionaries using the component-spec-compiler skill.
+5. Programmatically clean, compress, strip metadata from, and organize batches of visual assets into production-ready folder trees using the asset-pack-optimizer skill.
+6. Run an end-to-end design-to-code pipeline that ingests raw asset dumps, executes compliance checks, compiles theme specifications, and packages an optimized asset library for developer handoff.
 
 ---
 
 ## Lesson Breakdown
 
-### Lesson 1 — SVG Asset Auditing & Optimization (60 min)
+### Lesson 1 — SVG Structural Auditing (60 min)
 
-**Objective:** Use Claude Code to load SVG files, inspect them for structural correctness, brand color compliance, and accessibility completeness.
+**Objective:** Interrogate the design Domain NotebookLM to establish strict asset validation baselines, then use Claude Code to parse raw SVG XML elements and flag broken paths, missing viewBox attributes, and non-standard inline styling.
 
 | Segment | Topic | Activity |
 |---|---|---|
-| 1.1 | Why SVG auditing matters | SVGs are text files — Claude Code can inspect viewBox, colors, and accessibility tags inline, catching issues before they reach production. |
-| 1.2 | Loading SVG files | Load three sample SVGs from `data/mock_assets/` — an icon, logo, and illustration. |
-| 1.3 | Running the svg-auditor skill | Invoke Claude Code with the `svg-auditor` skill to scan all three SVGs. |
-| 1.4 | Understanding viewBox and canvas issues | Review flagged viewBox problems: missing viewBox, non-integer values, incorrect aspect ratios. |
-| 1.5 | Color governance and path optimization | Identify hardcoded colors that should be CSS token variables. Flag overly complex path data for optimization. |
+| 1.1 | Loading the Domain Notebook | Open the Design NotebookLM and query for SVG validation baselines, brand color standards, and accessibility requirements before writing any audit scripts. |
+| 1.2 | Loading SVG files into Claude Code | Load three sample SVGs from `data/mock_assets/` — an icon, logo, and illustration. |
+| 1.3 | Running the svg-auditor skill | Invoke Claude Code with the `svg-auditor` skill to scan all three SVGs for viewBox, color governance, accessibility, and path redundancy. |
+| 1.4 | Parsing viewBox and canvas issues | Review flagged viewBox problems: missing viewBox, non-integer values, incorrect aspect ratios. |
+| 1.5 | Tokenizing colors and stripping metadata | Replace hardcoded colors with `var(--...)` tokens. Strip editor metadata (sodipodi, inkscape, xml:space). |
+
+**Lab:** `exercises/exercise_1.md` — SVG Structural Auditing
 
 **CLI Exercises:**
 
@@ -61,47 +71,21 @@ Load the three SVG files and run a full audit:
 Output a table per file: check, status (pass/fail/warn), detail
 ```
 
-```
-# Exercise 1.4 — Fix viewBox and accessibility
-Prompt (continuing the same session):
-
-For each SVG that failed the viewBox or accessibility checks:
-
-1. Show me the current viewBox value and the corrected value.
-2. Add missing <title> and <desc> elements where absent.
-   - <title> should describe the icon purpose
-   - <desc> should provide context for screen readers
-3. Show a before/after diff for each change.
-```
-
-```
-# Exercise 1.5 — Replace hardcoded colors with tokens
-Prompt (continuing the same session):
-
-For each SVG with hardcoded fill/stroke colors:
-
-1. Replace any instance of #0066cc with var(--color-primary).
-2. Replace #FF0000 or #ff0000 with var(--color-danger).
-3. Any other hardcoded hex color — flag it and suggest the correct
-   design token based on the file's context.
-
-Output a table: file, old_color, new_token, line_number
-Show a diff summary for the most impactful change per file.
-```
-
 ---
 
-### Lesson 2 — Design Token Validation (60 min)
+### Lesson 2 — Automated Design Token Validation (60 min)
 
-**Objective:** Validate CSS custom properties and JSON token files against a design system specification, flagging inconsistencies, missing tokens, and broken references.
+**Objective:** Build local prompt workflows to read and parse structured JSON design token files, verifying that hex codes, font scale values, and spacing variables match the approved master system.
 
 | Segment | Topic | Activity |
 |---|---|---|
-| 2.1 | The token management problem | Design token files grow organically and accumulate drift. Claude Code can diff token values against a spec and flag every inconsistency. |
+| 2.1 | The token management problem | Design token files accumulate drift. Claude Code can diff token values against a spec and flag every inconsistency. |
 | 2.2 | Loading token files | Load `design-tokens.json` and `component-tokens.css` from `data/mock_assets/`. |
 | 2.3 | Running the design-token-validator skill | Invoke Claude Code with the `design-token-validator` skill. |
 | 2.4 | Color and spacing validation | Review flagged color values outside the approved palette, inconsistent hex formats, and spacing values off the modular scale. |
 | 2.5 | Token reference resolution and missing tokens | Identify broken `{reference}` paths and missing required tokens. |
+
+**Lab:** `exercises/exercise_2.md` — Automated Design Token Validation
 
 **CLI Exercises:**
 
@@ -131,215 +115,26 @@ Load both token files and perform a validation:
 Output a validation table per category.
 ```
 
-```
-# Exercise 2.4 — Fix color and spacing inconsistencies
-Prompt (continuing the same session):
-
-For each flagged color inconsistency:
-
-1. If the value is close to a palette color, suggest the correct palette
-   value and show a diff.
-2. If the hex format is wrong (e.g., #222 vs #222222), normalize to
-   6-character lowercase.
-3. For spacing values off the modular scale, suggest the nearest
-   scale value.
-
-Show me: token_name, current_value, corrected_value, reason
-```
-
-```
-# Exercise 2.5 — Fix broken references and add missing tokens
-Prompt (continuing the same session):
-
-1. For each broken token reference (e.g., {color.brand.primary} that
-   doesn't resolve), update the reference path to match the actual
-   token structure in the file.
-2. Identify missing required tokens and suggest their values based on
-   the palette:
-   - --color-semantic-success: #2A9D8F
-   - --shadow-card: 0 2px 8px rgba(0,0,0,0.1)
-3. For deprecated token names, show the old name and the replacement.
-
-Write the corrected file as design-tokens-fixed.json.
-```
-
 ---
 
-### Lesson 3 — Image Asset Inventory & Metadata Review (60 min)
+### Lesson 3 — Component Specification Compiling (60 min)
 
-**Objective:** Scan directories of image assets and produce structured inventories with format, dimension, and naming convention checks.
+**Objective:** Leverage the `component-spec-compiler` skill to systematically convert raw layout coordinates, dimensions, and visual properties into uniform CSS custom properties and platform-agnostic style dictionaries.
 
 | Segment | Topic | Activity |
 |---|---|---|
-| 3.1 | Why asset inventory matters | Design directories accumulate orphaned assets, wrong formats, and inconsistent naming. Claude Code can inventory an entire folder in seconds. |
-| 3.2 | Scanning a directory | Ask Claude to list all files in `data/mock_assets/` and classify each by type (SVG, PNG, JPG, JSON, CSS). |
-| 3.3 | Format and naming checks | Check that all image files use approved formats, that filenames follow kebab-case, and that no orphaned duplicates exist. |
-| 3.4 | SVG compliance cross-check | Re-run the svg-auditor checks on any SVGs in the directory and append the results to the inventory. |
-| 3.5 | Exporting the inventory CSV | Write a structured CSV with file metadata for handoff to engineering. |
+| 3.1 | The spec-to-code gap | Designers produce pixel specs in Figma. Engineers need CSS variables and token files. Claude Code automates the conversion. |
+| 3.2 | Loading a design spec | Load a structured component spec with color swatches, type scale, spacing grid, and button anatomy. |
+| 3.3 | Generating CSS custom properties | Convert the spec into namespaced `--color-*`, `--typography-*`, `--spacing-*`, and `--radius-*` variables. |
+| 3.4 | Building a Style Dictionary JSON | Generate a platform-agnostic JSON token file following the `{value, type}` format with category groupings. |
+| 3.5 | Component-specific token blocks | For component anatomy specs (button system), generate self-contained component token blocks referencing global variables. |
+
+**Lab:** `exercises/exercise_3.md` — Component Specification Compiling
 
 **CLI Exercises:**
 
 ```
-# Exercise 3.2 — Inventory scan
-claude data/mock_assets/
-```
-
-Prompt:
-
-```
-List every file in the data/mock_assets/ directory. For each file, report:
-- Filename
-- Extension
-- File size (KB)
-- Category (SVG icon, SVG logo, SVG illustration, JSON, CSS, other)
-
-Sort by category. Flag any file that doesn't use kebab-case naming.
-```
-
-```
-# Exercise 3.3 — Naming convention audit
-Prompt (continuing the same session):
-
-Check all filenames against kebab-case conventions:
-
-- Should be lowercase
-- Words separated by hyphens, not underscores or spaces
-- No uppercase letters in the filename (extension can be lowercase)
-
-Flag any violations: filename, violation_type, suggested_correction
-```
-
-```
-# Exercise 3.5 — Export asset inventory
-Prompt (continuing the same session):
-
-Write an inventory CSV called asset_inventory.csv with columns:
-
-filename, extension, size_kb, category, kebab_case_ok, svg_issues
-
-For the svg_issues column, cross-reference with the svg-auditor
-findings: if an SVG had viewBox issues, write "viewBox"; if it had
-missing accessibility tags, write "a11y"; if clean, write "pass".
-
-Print a terminal summary:
-
-=== ASSET INVENTORY REPORT ===
-Total files:          XX
-SVG files:            X
-JSON token files:     X
-CSS token files:      X
-Other:                X
-
-Naming violations:    X
-SVGs with issues:     X
-SVGs clean:           X
-
-Overall status:       [all good / needs cleanup / needs review]
-```
-
----
-
-### Lesson 4 — Building the Weekly Design Review Pipeline (60 min)
-
-**Objective:** Package all checks into a single reusable prompt that validates new design assets before engineering handoff.
-
-| Segment | Topic | Activity |
-|---|---|---|
-| 4.1 | The weekly review problem | Handing off design assets without validation causes engineering churn. A single Claude prompt can catch issues before they leave the design team. |
-| 4.2 | Building the combined review prompt | Create a prompt that loads all new SVGs + token files, runs svg-auditor + token-validator, and writes a single consolidated report. |
-| 4.3 | Running the full pipeline | Load the `data/mock_assets/` directory and run the full weekly review. |
-| 4.4 | Reading the consolidated report | The report includes SVG violations, token inconsistencies, and naming issues in one CSV. |
-| 4.5 | Iterating until clean | Fix issues, re-run the review, and confirm all checks pass before marking the assets as ready for handoff. |
-
-**CLI Exercises:**
-
-```
-# Exercise 4.2 — Create the weekly review prompt
-```
-
-Create a file called `weekly-design-review.md` with this content during the lesson:
-
-```markdown
-I have the following files loaded from data/mock_assets/:
-- All .svg files
-- design-tokens.json
-- component-tokens.css
-
-Please do the following, in order:
-
-## Step 1 — SVG Audit
-Run a full audit on every SVG file:
-- viewBox presence and correctness
-- Hardcoded fill/stroke colors (flag non-brand colors)
-- Accessibility tags (title, desc)
-- Empty groups, unused defs, unnecessary attributes
-Output a violations table.
-
-## Step 2 — Token Validation
-Run a full validation on design-tokens.json and component-tokens.css:
-- Check all color values against approved palette
-- Check spacing values against modular scale
-- Resolve all token references
-- Flag missing required tokens and deprecated names
-Output a validation table.
-
-## Step 3 — Asset Inventory
-List all files in the directory:
-- Filename, extension, size
-- Kebab-case naming check
-- Cross-reference SVG issues from Step 1
-
-## Step 4 — Consolidated Report
-Write a single CSV called design_weekly_report.csv with sections:
-1. "svg_violations" — file, check, status, detail
-2. "token_issues" — token_name, category, issue, fix
-3. "naming_issues" — filename, violation, suggestion
-
-Print a summary with:
-- Total SVG issues found
-- Total token issues found
-- Total naming issues found
-- Overall readiness flag (PASS / MINOR ISSUES / FAIL)
-```
-
-```
-# Exercise 4.3 — Run the full pipeline
-claude data/mock_assets/*.svg data/mock_assets/design-tokens.json data/mock_assets/component-tokens.css < weekly-design-review.md
-```
-
-```
-# Exercise 4.5 — Iterate until clean
-Prompt (continuing the same session):
-
-Take the consolidated report and fix all issues found:
-
-1. Fix viewBox and accessibility on SVGs first.
-2. Replace hardcoded colors with design tokens.
-3. Fix token values and broken references.
-4. Rename any files with naming violations.
-
-After each fix round, confirm the change. When all fixes are
-applied, re-run the checks and confirm the report shows PASS.
-```
-
----
-
-### Lesson 5 — Component Spec Compiler (60 min)
-
-**Objective:** Translate Figma design specifications — color palettes, typography matrices, spacing grids, and border dimensions — into clean CSS custom properties and JSON style dictionaries for engineering handoff.
-
-| Segment | Topic | Activity |
-|---|---|---|
-| 5.1 | The spec-to-code gap | Designers produce pixel specs in Figma. Engineers need CSS variables and token files. Manual conversion is slow and error-prone — Claude Code can automate it. |
-| 5.2 | Loading a component spec | Load a structured design spec document with color swatches, type scale, spacing grid, and button anatomy. |
-| 5.3 | Generating CSS custom properties | Convert the spec into namespaced `--color-*`, `--typography-*`, `--spacing-*`, and `--radius-*` variables. |
-| 5.4 | Building a Style Dictionary JSON | Generate a platform-agnostic JSON token file following the `{value, type}` format. Include category groupings. |
-| 5.5 | Component-specific tokens | For component anatomy specs (e.g., button system), generate self-contained component token blocks referencing the global variables. |
-
-**CLI Exercises:**
-
-```
-# Exercise 5.3 — Generate CSS custom properties from a spec
+# Exercise 3.3 — Generate CSS custom properties from a spec
 ```
 
 Prompt:
@@ -376,56 +171,26 @@ Generate:
 3. All spacing in px. All colors as 6-character hex.
 ```
 
-```
-# Exercise 5.4 — Generate Style Dictionary JSON
-Prompt (continuing the same session):
-
-Take the same spec and generate a Style Dictionary JSON file.
-
-Format requirements:
-- Nested object structure by category
-- Each token has "value" and "type" fields
-- Types: color, dimension, number, string
-- No nested CSS variable references — just the raw values
-
-Categories to include: color, typography, spacing, borderRadius
-```
-
-```
-# Exercise 5.5 — Component token block
-Prompt (continuing the same session):
-
-Using the generated CSS variables, create component-specific tokens for
-the button system:
-
-Required states: default, hover, active, disabled, focus
-Properties per state: background, text, border
-Also include: padding, font, font-size, border-radius
-
-Naming: --button-{variant}-{property}-{state}
-
-Output the component token block and cross-reference every
-var(--...) to confirm it resolves to a defined variable above.
-```
-
 ---
 
-### Lesson 6 — Asset Pack Optimizer (60 min)
+### Lesson 4 — Production Asset Pack Optimization (60 min)
 
-**Objective:** Minify SVG path data, validate naming conventions, strip editor metadata, and organize assets into a distribution-ready directory package.
+**Objective:** Execute automated terminal utilities (`asset-pack-optimizer`) to programmatically clean, compress, strip metadata from, and organize batches of visual assets into strict production-ready folder trees.
 
 | Segment | Topic | Activity |
 |---|---|---|
-| 6.1 | The asset handoff problem | Raw SVG exports from design tools contain editor metadata, non-standard filenames, and bloated path data. Engineering needs clean, optimized assets. |
-| 6.2 | Scanning an asset directory | Load the `data/mock_assets/` directory and classify every file by type — SVG icon, SVG illustration, PNG, JSON, CSS. |
-| 6.3 | SVG path minification | For each SVG: remove Inkscape/Sodipodi metadata, empty groups, and redundant attributes. Normalize viewBox and inject accessibility tags. |
-| 6.4 | Naming convention enforcement | Audit all filenames for kebab-case compliance. Fix violations: uppercase → lowercase, underscores → hyphens, version suffixes stripped. |
-| 6.5 | Distribution packaging | Generate a `dist/` directory with organized subdirectories (icons/filled, icons/outlined, illustrations, raster) and a manifest CSV. |
+| 4.1 | The asset handoff problem | Raw SVG exports contain editor metadata, non-standard filenames, and bloated path data. Engineering needs clean, optimized assets. |
+| 4.2 | Scanning and classifying an asset directory | Load the `data/mock_assets/` directory and classify every file by type — SVG icon, SVG illustration, JSON, CSS. |
+| 4.3 | SVG path minification and metadata stripping | For each SVG: remove Inkscape/Sodipodi metadata, empty groups, redundant attributes. Normalize viewBox and inject accessibility tags. |
+| 4.4 | Naming convention enforcement | Audit all filenames for kebab-case compliance. Fix violations: uppercase → lowercase, underscores → hyphens, version suffixes stripped. |
+| 4.5 | Distribution packaging | Generate a `dist/` directory with organized subdirectories (icons/filled, icons/outlined, illustrations, tokens) and a manifest CSV. |
+
+**Lab:** `exercises/exercise_4.md` — Production Asset Pack Optimization
 
 **CLI Exercises:**
 
 ```
-# Exercise 6.2 — Classify assets in a directory
+# Exercise 4.2 — Classify assets in a directory
 claude data/mock_assets/
 ```
 
@@ -444,57 +209,70 @@ Also report: total files, SVGs, non-SVGs.
 ```
 
 ```
-# Exercise 6.3 — Minify a set of SVGs
-claude data/mock_assets/*.svg
+# Exercise 4.3 — Minify and optimize SVGs
+claude data/mock_assets/*.svg --skill asset-pack-optimizer
 ```
 
 Prompt:
 
 ```
-Load every SVG file from data/mock_assets/ and optimize each one:
+Run the asset-pack-optimizer on every SVG in data/mock_assets/:
 
-1. Remove these attributes if present:
-   - xml:space, version, sodipodi:*, inkscape:*, id
-
-2. Remove empty <g></g> groups.
-
-3. Check viewBox — is it present? Non-integer? Missing?
-   Fix any issues found.
-
-4. After cleanup, measure the byte reduction per file.
-
-5. Check for missing accessibility:
-   - Missing <title> → add derived from filename
-   - Missing <desc> → add
-   - Missing role="img" → add
+1. Strip editor metadata: sodipodi:*, inkscape:*, xml:space, version
+2. Remove empty <g></g> groups and unused <defs>
+3. Normalize viewBox (fix decimals, add missing values)
+4. Replace hardcoded colors with currentColor or token variables
+5. Add missing <title>, <desc>, and role="img"
 
 Output: per-file table with bytes before, bytes after, savings %,
 and issues found.
 ```
 
+---
+
+### Lesson 5 — Capstone: The Automated Design-to-Code Pipeline (60 min)
+
+**Objective:** An end-to-end laboratory where the Design team ingests a raw, messy creative asset dump, executes automated code-level compliance checks, compiles theme specifications, and packages a perfectly optimized asset library for direct developer hand-off.
+
+| Segment | Topic | Activity |
+|---|---|---|
+| 5.1 | The complete handoff workflow | Engineering needs verified SVGs, validated tokens, compiled style dictionaries, and an organized package. One Claude Code session can deliver all four. |
+| 5.2 | SVG audit + token validation pipeline | Run svg-auditor and design-token-validator in sequence; cross-reference findings (token colors feed into SVG fixes). |
+| 5.3 | Component spec compilation | Compile the dashboard redesign spec into CSS variables and Style Dictionary JSON. |
+| 5.4 | Asset optimization and packaging | Run asset-pack-optimizer on all corrected files; produce dist/ with manifest and rename log. |
+| 5.5 | Consolidated handoff report | Generate a single engineering handoff report with quality gate results and recommendations. |
+
+**Lab:** `exercises/exercise_5.md` — Capstone: The Automated Design-to-Code Pipeline
+
+**CLI Exercises:**
+
 ```
-# Exercise 6.4 — Rename, package and manifest
-Prompt (continuing the session, covering all files in data/mock_assets/):
+# Exercise 5.2 — Run the full pipeline
+claude ../data/mock_assets/
+```
 
-1. Audit all filenames for kebab-case violations.
-2. Build a rename plan: old_name → new_name → reason.
-3. Create a dist/ directory with:
-   - icons/ (SVGs under 10 KB with currentColor)
-   - illustrations/ (multi-color SVGs)
-   - raster/ (PNG, JPG files)
-   - tokens/ (JSON, CSS)
-4. Write manifest.csv: filename, category, size_before, size_after,
-   savings_pct, issues
-5. Write rename-log.csv
+Prompt:
 
-Output a terminal summary like:
+```
+Run the complete design-to-code pipeline:
 
-=== ASSET PACK OPTIMIZER SUMMARY ===
-SVGs optimized:   X
-Bytes removed:    X (X% avg)
-Naming fixes:     X
-Files packaged:   X into dist/
-Status:           Ready for distribution
+1. SVG Audit: Run svg-auditor on all SVGs. Fix viewBox, colors,
+   a11y, and metadata issues. Save corrected SVGs.
+
+2. Token Validation: Run design-token-validator on design-tokens.json
+   and component-tokens.css. Fix colors, spacing, references, and
+   naming. Save corrected token files.
+
+3. Spec Compilation: Compile the dashboard redesign spec into
+   component-tokens-output.css and style-dictionary-output.json.
+
+4. Asset Optimization: Run asset-pack-optimizer to create dist/
+   with organized subdirectories, manifest.csv, and rename-log.csv.
+
+5. Handoff Report: Write handoff_report.md with consolidated
+   findings and quality gate results.
+
+Print the final quality gate summary for engineering sign-off.
 ```
 
 ---
@@ -519,7 +297,11 @@ The following sample files are provided in `data/mock_assets/` for use during ex
 |---|---|
 | Course slide deck | `training/design/` |
 | Sample data assets | `training/design/data/mock_assets/` |
-| Design lab exercises | `training/design/exercises/design-labs.md` |
+| Exercise 1 — SVG Structural Auditing | `training/design/exercises/exercise_1.md` |
+| Exercise 2 — Automated Design Token Validation | `training/design/exercises/exercise_2.md` |
+| Exercise 3 — Component Specification Compiling | `training/design/exercises/exercise_3.md` |
+| Exercise 4 — Production Asset Pack Optimization | `training/design/exercises/exercise_4.md` |
+| Exercise 5 — Capstone: Design-to-Code Pipeline | `training/design/exercises/exercise_5.md` |
 | svg-auditor skill | `skills/svg-auditor/SKILL.md` |
 | design-token-validator skill | `skills/design-token-validator/SKILL.md` |
 | component-spec-compiler skill | `skills/component-spec-compiler/SKILL.md` |
@@ -532,11 +314,9 @@ The following sample files are provided in `data/mock_assets/` for use during ex
 
 The Design team can independently:
 
-- [ ] Load SVG files and run a full audit for viewBox, color governance, and accessibility using the svg-auditor skill
-- [ ] Replace hardcoded SVG styling with design token variables and show before/after diffs
-- [ ] Validate design token files against a brand color palette and modular spacing scale
-- [ ] Fix broken token references, missing tokens, and deprecated naming conventions
-- [ ] Scan an asset directory and produce a structured inventory CSV with naming and format checks
-- [ ] Run the weekly design review pipeline and confirm all checks pass before handoff
-- [ ] Compile Figma design specs into CSS custom properties and platform-agnostic JSON style dictionaries
-- [ ] Minify SVGs, enforce kebab-case naming, and package assets into structured distribution directories
+- [ ] Interrogate the design Domain NotebookLM to establish asset validation baselines before writing audit scripts
+- [ ] Parse raw SVG XML elements and flag broken paths, missing viewBox attributes, and non-standard inline styling using the svg-auditor skill
+- [ ] Read and parse structured JSON design token files, verifying hex codes, font scale values, and spacing variables using the design-token-validator skill
+- [ ] Convert raw layout coordinates, dimensions, and visual properties into CSS custom properties and platform-agnostic style dictionaries using the component-spec-compiler skill
+- [ ] Programmatically clean, compress, strip metadata from, and organize visual assets into production-ready folder trees using the asset-pack-optimizer skill
+- [ ] Run an end-to-end design-to-code pipeline that ingests raw asset dumps, executes compliance checks, compiles theme specifications, and packages an optimized asset library for developer handoff

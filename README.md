@@ -56,7 +56,7 @@ training/
 └── design/                    # Design
     ├── syllabus.md
     ├── data/mock_assets/      # SVGs, design tokens JSON
-    ├── exercises/
+    ├── exercises/             # 5 progressive lab walkthroughs (audit → tokens → spec → optimize → capstone)
     └── skills/                # Automation skills (4)
 ```
 
