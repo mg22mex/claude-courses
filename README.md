@@ -36,22 +36,22 @@ training/
 ├── rick/                      # Executive, Entrepreneurship & Management
 │   ├── syllabus.md            # Course outline and lesson plans
 │   ├── data/                  # Executive dashboards, inventory logs, fulfillment reports
-│   ├── exercises/             # Python fulfillment analysis
+│   ├── exercises/             # 5 progressive lab walkthroughs (parsing → architecture → PRD → slides → capstone)
 │   └── skills/                # Automation skills (4)
 ├── sunny/                     # Purchasing & Logistics
 │   ├── syllabus.md            # Course outline and lesson plans
 │   ├── data/                  # Vendor CSVs (lead times, invoices, prices)
-│   ├── exercises/             # Lab walkthroughs
+│   ├── exercises/             # 5 progressive lab walkthroughs (ingestion → lead-times → tariffs → rebalancing → capstone)
 │   └── skills/                # Automation skills (5)
 ├── mollie/                    # Sales & Financials
 │   ├── syllabus.md
 │   ├── data/                  # Shopify exports, ad spend, webhook samples
-│   ├── exercises/
+│   ├── exercises/             # 5 progressive lab walkthroughs (root-cause → freshness → reconciliation → webhooks → capstone)
 │   └── skills/                # Automation skills (4)
 ├── christine/                 # Marketing
 │   ├── syllabus.md
 │   ├── data/                  # Copy decks, email campaigns, keyword targets
-│   ├── exercises/
+│   ├── exercises/             # 5 progressive lab walkthroughs (brand-audit → seo-listing → email-flows → analytics → capstone)
 │   └── skills/                # Automation skills (4)
 └── design/                    # Design
     ├── syllabus.md

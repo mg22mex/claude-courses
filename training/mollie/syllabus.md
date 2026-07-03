@@ -476,7 +476,11 @@ The following sample files are provided in `data/` for use during exercises:
 |---|---|
 | Course slide deck | `training/mollie/` |
 | Sample data assets | `training/mollie/data/` |
-| Sales & licensing lab exercises | `training/mollie/exercises/sales-licensing-labs.md` |
+| Exercise 1 — Incident Root-Cause Profiling | `training/mollie/exercises/exercise_1.md` |
+| Exercise 2 — Deep-Dive Data Freshness Verification | `training/mollie/exercises/exercise_2.md` |
+| Exercise 3 — Automated Financial Reconciliation Engine | `training/mollie/exercises/exercise_3.md` |
+| Exercise 4 — Multi-Source Webhook Payload Orchestration | `training/mollie/exercises/exercise_4.md` |
+| Exercise 5 — Capstone Data Observability & Alerting Pipeline | `training/mollie/exercises/exercise_5.md` |
 | Shopify sales mock data | `training/mollie/data/shopify_sales.csv` |
 | Marketing spend mock data | `training/mollie/data/marketing_spend.csv` |
 | csv-analytics skill | `skills/csv-analytics/SKILL.md` |
