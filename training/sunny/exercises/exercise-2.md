@@ -62,13 +62,13 @@ PO-1030,Coastal Shipping,Route E,2026-03-16,8,12,2026-03-25,FALSE,38000.00
 
 ## Walkthrough Steps
 
-```
-claude lead_time_matrix.csv
-```
+Open the Weatherman AI Portal in your browser. Select **Sunny** from the sidebar dropdown. Click the paperclip icon to upload `lead_time_matrix.csv`.
 
 **Step 1 — Calculate actual transit days:**
+
+Type this prompt into the chat input:
+
 ```
-Step 1 Prompt:
 Calculate the actual transit time for every PO:
   actual_days = actual_received_date - order_date (calendar days)
 
@@ -79,8 +79,10 @@ Show: po_number, vendor, route, promised_max_days, actual_days, days_over, value
 ```
 
 **Step 2 — Flag late deliveries:**
+
+Type this prompt:
+
 ```
-Step 2 Prompt:
 For each PO where actual_days > promised_max_days, calculate:
   days_overdue = actual_days - promised_max_days
   overage_cost = (days_overdue / promised_max_days) * value_usd
@@ -89,8 +91,10 @@ Sort by days_overdue descending. Show the top 10 worst offenders.
 ```
 
 **Step 3 — Build vendor discrepancy matrix:**
+
+Type this prompt:
+
 ```
-Step 3 Prompt:
 Group by vendor_name and build a matrix:
   vendor_name, total_pos, on_time_count, late_count, on_time_pct,
   avg_days_overdue, worst_days_overdue, total_overage_cost, total_value_at_risk
@@ -99,8 +103,10 @@ Sort by on_time_pct ascending (worst performers first).
 ```
 
 **Step 4 — Route-level analysis:**
+
+Type this prompt:
+
 ```
-Step 4 Prompt:
 Group by route. For each route show:
   route, vendors_on_route, total_pos, avg_days_overdue, total_value
 
@@ -109,11 +115,13 @@ Which vendor is dragging down that route's performance?
 ```
 
 **Step 5 — Export findings:**
+
+Type this prompt:
+
 ```
-Step 5 Prompt:
 Write a file called lead_time_discrepancy_matrix.csv with:
 - Vendor-level summary rows
-- Route-level summary rows  
+- Route-level summary rows
 - All anomaly flags
 
 Then print the final discrepancy matrix:
@@ -132,3 +140,5 @@ Cost impact:
 Worst vendor:  XXXXX (XX% late)
 Worst route:   Route X
 ```
+
+Click the download button to save the generated CSV file.

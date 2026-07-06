@@ -2,22 +2,22 @@
 
 ## Scenario
 
-This is the capstone exercise that integrates everything from Exercises 1-4. Engineering has requested a complete asset handoff package for the new dashboard redesign. The Design team has a messy creative dump with raw SVGs, unvalidated token files, and an incomplete component spec. Your job is to ingest everything, run the full compliance pipeline (audit, validate, compile, optimize), and produce a perfectly packaged asset library for direct developer hand-off — all within a single Claude Code session.
+This is the capstone exercise that integrates everything from Exercises 1-4. Engineering has requested a complete asset handoff package for the new dashboard redesign. The Design team has a messy creative dump with raw SVGs, unvalidated token files, and an incomplete component spec. Your job is to ingest everything, run the full compliance pipeline (audit, validate, compile, optimize), and produce a perfectly packaged asset library for direct developer hand-off — all within a single Weatherman AI Portal session.
 
 ## Learning Objectives
 
-- Ingest a mixed directory of raw SVG, JSON, CSS, and spec files
-- Execute the svg-auditor, design-token-validator, component-spec-compiler, and asset-pack-optimizer skills in sequence
-- Cross-reference findings across skills (e.g., token validation feeds into SVG color fixes)
+- Ingest a mixed collection of raw SVG, JSON, CSS, and spec files through the portal
+- Execute the svg-auditor, design-token-validator, component-spec-compiler, and asset-pack-optimizer workspace presets in sequence
+- Cross-reference findings across presets (e.g., token validation feeds into SVG color fixes)
 - Compile a complete component spec into CSS variables and Style Dictionary JSON
 - Package a production-ready `dist/` directory with all cleaned, verified assets
 - Generate a consolidated handoff report for engineering
 
 ## Datasets
 
-This exercise uses all files from `data/mock-assets/` plus the inline component spec below.
+This exercise uses all files from `data/mock-assets/` plus the inline component spec below. Open the Weatherman AI Portal, select **"Paula & Gaby"** from the sidebar dropdown, and use the paperclip icon to upload all five files from `data/mock-assets/`.
 
-### Files from `../data/mock-assets/`
+### Files from `data/mock-assets/`
 
 | File | Type |
 |---|---|
@@ -27,7 +27,7 @@ This exercise uses all files from `data/mock-assets/` plus the inline component 
 | `design-tokens.json` | Global JSON token file |
 | `component-tokens.css` | CSS component token file |
 
-### Inline Component Spec (`dashboard-spec.md`)
+### Inline Component Spec
 
 ```
 # Dashboard Redesign — Component Spec
@@ -103,17 +103,15 @@ modal: 0 20px 25px rgba(0,0,0,0.15)
 | Broken references | `design-tokens.json`, `component-tokens.css` | Exercise 2 (reference resolution) |
 | Deprecated token names | `component-tokens.css` | Exercise 2 (naming conventions) |
 | Editor metadata | `logo-hero-main.svg` | Exercise 4 (SVG optimization) |
-| No dark mode in spec | `dashboard-spec.md` | Exercise 3 (spec completeness) |
+| No dark mode in spec | Dashboard spec | Exercise 3 (spec completeness) |
 
 ## Walkthrough
 
 ### Phase A — SVG Audit & Fix (Exercise 1 skills)
 
-```bash
-claude ../data/mock-assets/icon-cloud-sync.svg ../data/mock-assets/logo-hero-main.svg ../data/mock-assets/illustration-dashboard.svg
-```
+Open the Weatherman AI Portal, select **"Paula & Gaby"** from the sidebar dropdown. Click the paperclip icon and upload all three SVG files. Then paste the svg-auditor system prompt (from `presets/svg-auditor/SKILL.md`) into the chat input.
 
-Prompt:
+Type this prompt:
 
 ```
 Run a complete SVG audit on all three files:
@@ -137,11 +135,12 @@ and fixed-illustration-dashboard.svg.
 
 ### Phase B — Token Validation & Fix (Exercise 2 skills)
 
-Continue in the same session:
+Continue in the same session. Upload the token files using the paperclip icon, then paste the design-token-validator system prompt (from `presets/design-token-validator/SKILL.md`) into the chat input.
+
+Type this prompt:
 
 ```
-Now load ../data/mock-assets/design-tokens.json and
-../data/mock-assets/component-tokens.css.
+Now load design-tokens.json and component-tokens.css.
 
 Run a full token validation:
 
@@ -168,14 +167,16 @@ component-tokens-fixed.css.
 
 ### Phase C — Component Spec Compilation (Exercise 3 skills)
 
-Continue in the session. Load the Dashboard Redesign spec:
+Continue in the session. Paste the component-spec-compiler system prompt (from `presets/component-spec-compiler/SKILL.md`) into the chat input.
+
+Type this prompt:
 
 ```
 Now compile the dashboard spec into CSS and JSON tokens.
 
 Use the following spec for the Dashboard Redesign:
 
-[Paste the dashboard-spec.md content above]
+[Paste the dashboard-spec.md content from the Dataset section above]
 
 Generate:
 1. component-tokens-output.css — CSS custom properties for:
@@ -198,13 +199,15 @@ var(--...) resolves to a defined variable in your CSS output.
 
 ### Phase D — Asset Pack Optimization (Exercise 4 skills)
 
-Continue in the session:
+Continue in the session. Paste the asset-pack-optimizer system prompt (from `presets/asset-pack-optimizer/SKILL.md`) into the chat input.
+
+Type this prompt:
 
 ```
 Now optimize and package all processed assets.
 
 Step 1 — Directory classification:
-Scan the working directory for all fixed SVG files, token files,
+Scan the working files for all fixed SVG files, token files,
 and spec files. Classify each by type.
 
 Step 2 — SVG final pass:
@@ -237,7 +240,7 @@ Write rename-log.csv with any renames applied.
 
 ### Phase E — Consolidated Engineering Handoff Report
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Produce a single consolidated handoff report covering all phases.
@@ -261,7 +264,7 @@ Write handoff_report.md with these sections:
    - Issues fixed: X
 
 4. Component Spec Compilation
-   - Spec compiled: dashboard-spec.md
+   - Spec compiled: dashboard spec
    - CSS variables generated: X
    - JSON tokens generated: X
    - Component blocks: sidebar navigation
@@ -282,7 +285,7 @@ Write handoff_report.md with these sections:
    - Items deferred or requiring manual review
    - Suggested next sprint additions (dark mode, responsive tokens)
 
-Print a terminal gate summary:
+Print a gate summary:
 
 === DESIGN-TO-CODE PIPELINE — QUALITY GATE ===
 SVGs audited & fixed:   3/3  ✅
@@ -306,5 +309,5 @@ After completing all phases, you should have:
 - **Phase C**: 3 generated files (`component-tokens-output.css`, `style-dictionary-output.json`, `component-tokens-sidebar.css`)
 - **Phase D**: A `dist/` directory with organized subdirectories, `manifest.csv`, and `rename-log.csv`
 - **Phase E**: A `handoff_report.md` with consolidated findings and quality gate results
-- A complete, engineering-ready asset handoff package
-- Practical experience running the full automated Design-to-Code pipeline
+- A complete, engineering-ready asset handoff package, all downloadable from the portal
+- Practical experience running the full automated Design-to-Code pipeline using workspace presets

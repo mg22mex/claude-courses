@@ -31,14 +31,14 @@ The marketing director needs a comprehensive performance review of all Q1–Q2 2
 
 ## Walkthrough Steps
 
-```
-claude ../data/campaign_performance_data.csv --skill campaign-analytics
-```
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `campaign_performance_data.csv`.
 
 **Step 1 — Data inspection and normalization:**
+
+Type this prompt into the chat input:
+
 ```
-Step 1 Prompt:
-Load ../data/campaign_performance_data.csv. Show me:
+Load campaign_performance_data.csv. Show me:
 
 1. Total campaigns, date range, and channels present
 2. For each channel: number of campaigns, date span
@@ -50,8 +50,10 @@ Summarize the dataset health before proceeding to calculations.
 ```
 
 **Step 2 — Blended and per-channel ROAS:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 2 Prompt:
 Calculate the following:
 
 1. BLENDED (all channels):
@@ -76,8 +78,10 @@ Show a channel breakdown table with ROAS health status.
 ```
 
 **Step 3 — Channel health scoring:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 3 Prompt:
 Score each channel on a 0–100 health scale using weighted factors:
 
 | Factor | Weight | Benchmark |
@@ -96,8 +100,10 @@ Flag any channel scoring below 50 as CRITICAL.
 ```
 
 **Step 4 — Anomaly and outlier detection:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 4 Prompt:
 Use IQR method to detect outlier campaigns within each channel:
 
 For each channel group:
@@ -114,8 +120,10 @@ Show each anomaly with campaign name, metric values, and suggested investigation
 ```
 
 **Step 5 — Export executive summary:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 5 Prompt:
 Write a file called campaign_analysis_report.txt with:
 
 === CAMPAIGN PERFORMANCE EXECUTIVE SUMMARY ===
@@ -137,7 +145,7 @@ CHANNEL HEALTH RANKINGS:
   4. [Channel] — XX/100 — ROAS X.XXx — [Healthy/At Risk/Critical]
   5. [Channel] — XX/100 — ROAS X.XXx — [Healthy/At Risk/Critical]
 
-🚨 ALERTS:
+ALERTS:
   CRITICAL — Display channel ROAS 0.70x (money-losing)
   CRITICAL — Social channel ROAS below 2.0x across all campaigns
   WARNING  — Email newsletter CTR declining, unsubscribes rising
@@ -151,3 +159,11 @@ QUICK WINS:
 
 STATUS: ANALYSIS COMPLETE — 2 CRITICAL, 2 WARNING alerts
 ```
+
+## Expected Output
+
+- A dataset health summary with structural checks
+- Blended and per-channel ROAS breakdown with status flags
+- Weighted channel health scores with rankings
+- Anomaly detection report using IQR method
+- A downloadable `campaign_analysis_report.txt` executive summary

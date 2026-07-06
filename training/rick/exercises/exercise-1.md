@@ -6,15 +6,16 @@ Your executive team uses a shared operational log to post daily status updates a
 
 ## Learning Objectives
 
-- Load unstructured operational log text into Claude Code
+- Upload unstructured operational log text into the Weatherman AI Portal
 - Classify free-text entries by severity using keyword patterns
 - Extract quantitative metrics (percentages, dollar amounts, unit counts)
 - Generate a structured department-level status summary
 - Produce an executive brief with actionable recommendations
+- Download the generated report from the portal
 
 ## Dataset
 
-Use the inline sample data below, or create `raw_operations_log.csv` from it.
+Use the inline sample data below. Copy it into a text file named `raw-operations-log.txt` and upload it using the paperclip icon.
 
 ### Inline Operational Log
 
@@ -46,75 +47,68 @@ Finance,2026-06-17 16:00,Acme Corp invoice INV-402 under review — duplicate li
 
 ## Walkthrough
 
-### Step 1 — Load and inspect the raw log
+### Step 1 — Log into the portal and upload the raw log
 
-Start Claude Code and load the operational log:
+Open the Weatherman AI Portal in your browser. Select "Rick" from the sidebar dropdown. Upload the `raw-operations-log.txt` file using the paperclip icon.
 
-```bash
-claude
-```
+Type this prompt into the chat input:
 
-Paste the following prompt:
-
-```
-Load this operational log and tell me:
-- How many entries there are
-- Which departments are represented
-- The time range covered
-- Any entries that contain monetary values, percentages, or unit counts
-```
+> "Load this operational log and tell me:
+> - How many entries there are
+> - Which departments are represented
+> - The time range covered
+> - Any entries that contain monetary values, percentages, or unit counts"
 
 ### Step 2 — Classify entries by severity
 
-Prompt Claude to classify each entry:
+Type this prompt into the chat input:
 
-```
-For each entry in the operational log, classify it as one of:
-- CRITICAL: mentions failed, outage, breach, missing, escalated, timeout, hold, or overdue
-- WARNING: mentions delayed, flagged, under review, backlog, variance, dropped, or slow
-- POSITIVE: everything else (completed, approved, signed, onboarded, resolved)
-
-Show me a table with: department, timestamp, status, and the first 60 characters of the entry.
-```
+> "For each entry in the operational log, classify it as one of:
+> - CRITICAL: mentions failed, outage, breach, missing, escalated, timeout, hold, or overdue
+> - WARNING: mentions delayed, flagged, under review, backlog, variance, dropped, or slow
+> - POSITIVE: everything else (completed, approved, signed, onboarded, resolved)
+>
+> Show me a table with: department, timestamp, status, and the first 60 characters of the entry."
 
 ### Step 3 — Generate a department status heatmap
 
-```
-Group the classified entries by department. For each department, count how many
-CRITICAL, WARNING, and POSITIVE entries they have. Show me:
-- Department name
-- Total entries
-- Count per status
-- The percentage of entries that are CRITICAL or WARNING
+Type this prompt into the chat input:
 
-Flag any department where more than 30% of entries are non-positive.
-```
+> "Group the classified entries by department. For each department, count how many
+> CRITICAL, WARNING, and POSITIVE entries they have. Show me:
+> - Department name
+> - Total entries
+> - Count per status
+> - The percentage of entries that are CRITICAL or WARNING
+>
+> Flag any department where more than 30% of entries are non-positive."
 
 ### Step 4 — Extract quantitative metrics
 
-```
-From the operational log, extract every quantitative data point. Show me:
-- The entry text
-- What metric was found (e.g., "pick rate", "backlog", "success rate", "disbursement")
-- The numeric value
-- The unit (%, USD, units, days)
+Type this prompt into the chat input:
 
-List all metrics in a single table, sorted by unit type.
-```
+> "From the operational log, extract every quantitative data point. Show me:
+> - The entry text
+> - What metric was found (e.g., "pick rate", "backlog", "success rate", "disbursement")
+> - The numeric value
+> - The unit (%, USD, units, days)
+>
+> List all metrics in a single table, sorted by unit type."
 
 ### Step 5 — Produce the executive summary
 
-```
-Write a one-page executive summary covering:
-1. **Period**: The date range covered
-2. **Department Health**: Number of CRITICAL items per department
-3. **Key Metrics**: The 3 most important numbers from the log
-4. **Action Items**: Specific items that need immediate follow-up
-5. **Recommendations**: 2-3 suggestions for the next operations sync
+Type this prompt into the chat input:
 
-Format this as a markdown brief suitable for sharing with the executive team.
-Write it to a file called executive_brief.md.
-```
+> "Write a one-page executive summary covering:
+> 1. **Period**: The date range covered
+> 2. **Department Health**: Number of CRITICAL items per department
+> 3. **Key Metrics**: The 3 most important numbers from the log
+> 4. **Action Items**: Specific items that need immediate follow-up
+> 5. **Recommendations**: 2-3 suggestions for the next operations sync
+>
+> Format this as a markdown brief suitable for sharing with the executive team."
+
+Use the download button to save the generated response as `executive-brief.md`.
 
 ## Expected Output
 
@@ -122,5 +116,5 @@ After completing all steps, you should have:
 
 - A classified table of all 12 entries with status labels
 - A department heatmap flagging Fulfillment and Procurement as elevated risk
-- An extracted metrics table with ~8-10 quantitative data points
-- An `executive_brief.md` file with a structured one-page summary
+- An extracted metrics table with approximately 8-10 quantitative data points
+- An `executive-brief.md` file with a structured one-page summary

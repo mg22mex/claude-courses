@@ -2,7 +2,7 @@
 
 ## Scenario
 
-Christine needs to design and draft a multi-step automated email sequence for a new customer segment. Using the `email-automation` skill, she will build a structured welcome flow with correct merge tags, brand-voice compliance, and conditional branching. She will also validate an existing flawed email template and analyze a send log for performance issues.
+Christine needs to design and draft a multi-step automated email sequence for a new customer segment. Using the email-automation workspace preset, she will build a structured welcome flow with correct merge tags, brand-voice compliance, and conditional branching. She will also validate an existing flawed email template and analyze a send log for performance issues.
 
 ## Learning Objectives
 
@@ -34,14 +34,14 @@ Christine needs to design and draft a multi-step automated email sequence for a 
 
 ## Walkthrough Steps
 
-```
-claude ../data/raw_email_campaign.md --skill email-automation
-```
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `raw_email_campaign.md`.
 
 **Step 1 — Merge tag validation:**
+
+Type this prompt into the chat input:
+
 ```
-Step 1 Prompt:
-Scan ../data/raw_email_campaign.md and report on merge tag health:
+Scan raw_email_campaign.md and report on merge tag health:
 
 1. Which merge tags are present (e.g., {{first_name}}, {{unsubscribe_url}},
    {{offer_code}}, {{expiry_date}})?
@@ -58,8 +58,10 @@ Output a tag consistency table: tag, status, line_number, recommendation
 ```
 
 **Step 2 — Brand-voice and layout audit:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 2 Prompt:
 Audit the email template against brand rules:
 
 1. Subject line length — is it ≤ 60 characters? If not, suggest a trim.
@@ -76,8 +78,10 @@ Rate the email overall: [compliant / needs revision / non-compliant]
 ```
 
 **Step 3 — Design a 3-step welcome flow:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 3 Prompt:
 Design a 3-step welcome email sequence for new CloudSync subscribers.
 
 Target segment: New signups (free trial)
@@ -104,9 +108,13 @@ Include a Campaign Spec Sheet table.
 ```
 
 **Step 4 — Send log performance analysis:**
+
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `email_send_log.csv`.
+
+Type this prompt into the chat input:
+
 ```
-Step 4 Prompt:
-Load ../data/email_send_log.csv and analyze performance:
+Load email_send_log.csv and analyze performance:
 
 1. Calculate aggregate metrics:
    - Average delivery rate
@@ -133,8 +141,10 @@ Output a performance summary per campaign family with specific recommendations.
 ```
 
 **Step 5 — Export the campaign package:**
+
+Type this prompt into the chat input (continuing the send-log session):
+
 ```
-Step 5 Prompt:
 Write two files:
 
 1. welcome_flow_step_1.md — the Step 1 "Getting Started" email template
@@ -160,8 +170,16 @@ CAMPAIGN FAMILY BREAKDOWN:
   Promo Blast:           Open rate XX% | CTR XX% | Unsub X.X%
   Cart Abandonment:      Open rate XX% | CTR XX% | Recovery rate XX%
 
-🚨 ALERTS:
+ALERTS:
   - [Campaign]: [issue] — [recommendation]
 
 STATUS: ANALYSIS COMPLETE
 ```
+
+## Expected Output
+
+- A merge tag consistency table with status per tag
+- A brand-voice and layout audit with violations and fixes
+- A 3-step welcome flow design with full email templates and spec sheet
+- A send log performance analysis with aggregate metrics and alerts
+- Downloadable files: `welcome_flow_step_1.md` and `send_log_analysis.txt`

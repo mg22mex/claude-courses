@@ -14,7 +14,7 @@ Mollie needs to build an automated observability engine that checks an incoming 
 
 ## Dataset
 
-### Raw Transactions (`raw_transactions_today.csv`)
+### Raw Transactions (`raw-transactions-today.csv`)
 
 ```csv
 txn_id,order_id,amount,gateway,status,timestamp
@@ -57,14 +57,13 @@ TXN-7025,ORD-1023,330.00,paypal,pending,2026-06-17 08:58:00
 
 ## Walkthrough Steps
 
-```
-claude raw_transactions_today.csv
-```
+Open the Weatherman AI Portal in your browser. Select "Mollie" from the sidebar dropdown. Click the paperclip icon to upload the data file, then type each prompt into the chat input.
 
 **Step 1 — Data quality checks and anomaly detection:**
+
 ```
 Step 1 Prompt:
-Load raw_transactions_today.csv. Run these quality checks:
+Upload raw_transactions_today.csv. Run these quality checks:
 1. Find exact duplicate rows (same order_id, same amount, same timestamp)
 2. Find rows with negative amounts
 3. Find rows with status = "failed"
@@ -73,7 +72,8 @@ Load raw_transactions_today.csv. Run these quality checks:
 Summarize: total issues found, by category.
 ```
 
-**Step 2 — Root cause timeline (Ex1 approach):**
+**Step 2 — Root cause timeline:**
+
 ```
 Step 2 Prompt:
 For each anomaly, create a root-cause entry:
@@ -86,7 +86,8 @@ Sort by severity (duplicate = CRITICAL, stale_pending = HIGH, etc.)
 Show a timeline of when each issue first appeared.
 ```
 
-**Step 3 — Financial reconciliation (Ex3 approach):**
+**Step 3 — Financial reconciliation:**
+
 ```
 Step 3 Prompt:
 Calculate the financial impact of each anomaly:
@@ -104,21 +105,23 @@ Also sum all completed transactions:
   Grand total:            $X,XXX.XX
 ```
 
-**Step 4 — Alert payload generation (Ex4 approach):**
+**Step 4 — Alert payload generation:**
+
 ```
 Step 4 Prompt:
 Build a Slack Block Kit JSON payload for the most critical finding
 (the duplicate billing). Include:
-1. Header: 🚨 CRITICAL: Duplicate Billing Detected
+1. Header: CRITICAL: Duplicate Billing Detected
 2. Fields: txn_ids, order_id, amount, gateway, timestamp
 3. Context block: "Auto-detected by Observability Pipeline — 2026-06-17"
-4. Actions: "Investigate in Ledger" → "https://finance.internal/orders/ORD-1001"
+4. Actions: "Investigate in Ledger" -> "https://finance.internal/orders/ORD-1001"
    and "Acknowledge"
 
 Write the payload to alert_payload.json.
 ```
 
 **Step 5 — Export consolidated pipeline output:**
+
 ```
 Step 5 Prompt:
 Write two files:

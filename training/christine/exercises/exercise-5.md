@@ -33,7 +33,7 @@ report_template,Weekly Launch Report Template,not_started,Christine,Executive su
 
 ### Launch Copy Snippets (`launch_copy_snippets.md`)
 
-Create this file from the content below:
+Create this file from the content below and upload it to the portal:
 
 ```markdown
 # CloudSync Business Edition — Launch Copy
@@ -83,13 +83,13 @@ Is my data secure? Absolutely. AES-256 encryption is used for all data.
 
 ## Walkthrough Steps
 
-```
-claude launch_asset_checklist.csv --skill launch-pipeline
-```
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `launch_asset_checklist.csv`.
 
 **Step 1 — Asset inventory and status assessment:**
+
+Type this prompt into the chat input:
+
 ```
-Step 1 Prompt:
 Load launch_asset_checklist.csv. Report:
 
 1. Total assets and breakdown by asset_type
@@ -102,8 +102,10 @@ Estimate overall pipeline readiness as a percentage.
 ```
 
 **Step 2 — Brand compliance and SEO copy audit:**
+
+Upload `launch_copy_snippets.md` to the portal. Then type this prompt into the chat input:
+
 ```
-Step 2 Prompt:
 Load launch_copy_snippets.md. Run a combined brand compliance
 and SEO keyword audit:
 
@@ -131,8 +133,10 @@ issue_type, section, snippet, severity, recommendation
 ```
 
 **Step 3 — Draft the email launch sequence:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 3 Prompt:
 Using the product information from launch_copy_snippets.md, draft
 a 3-email launch sequence for Business Edition:
 
@@ -160,8 +164,10 @@ For each email:
 ```
 
 **Step 4 — Define campaign performance tracking:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 4 Prompt:
 Design the launch performance tracking framework:
 
 1. Define 5 KPIs to track launch success:
@@ -187,8 +193,10 @@ Design the launch performance tracking framework:
 ```
 
 **Step 5 — Consolidated pipeline output:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 5 Prompt:
 Write three files:
 
 1. launch_compliance_report.csv — all brand and SEO violations found
@@ -200,7 +208,7 @@ Write three files:
 3. launch_tracking_template.md — the weekly launch report template
    with KPI definitions, targets, and dashboard structure
 
-Then print a terminal summary:
+Then print a summary:
 
 === MARKETING LAUNCH PIPELINE ===
 Product: CloudSync Business Edition
@@ -232,3 +240,11 @@ PIPELINE STATUS: LAUNCH READINESS REVIEW COMPLETE
   Copy fixes needed:   X
   Ready for launch:    [yes / conditional / no]
 ```
+
+## Expected Output
+
+- An asset inventory report with pipeline readiness percentage
+- A combined brand compliance and SEO audit violations table
+- 3 fully drafted email templates for the launch sequence
+- A performance tracking framework with 5 KPIs and targets
+- 3 downloadable files: `launch_compliance_report.csv`, `launch_email_sequence.md`, and `launch_tracking_template.md`

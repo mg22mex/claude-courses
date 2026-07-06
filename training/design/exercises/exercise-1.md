@@ -6,7 +6,7 @@ The Design team has received three SVG assets from an external contractor (`icon
 
 ## Learning Objectives
 
-- Load SVG files into Claude Code and inspect raw XML structure
+- Upload SVG files into the Weatherman AI Portal and inspect raw XML structure
 - Interrogate the design Domain NotebookLM to establish strict asset validation baselines
 - Parse SVG elements for viewBox correctness, hardcoded styling, and accessibility completeness
 - Flag non-compliant attributes (editor metadata, empty groups, unused defs)
@@ -14,13 +14,13 @@ The Design team has received three SVG assets from an external contractor (`icon
 
 ## Dataset
 
-Use the three SVGs from the `data/mock-assets/` directory.
+Open the Weatherman AI Portal in your browser. Select **"Paula & Gaby"** from the sidebar dropdown. Use the paperclip icon to upload the three SVGs from the `data/mock-assets/` folder.
 
 | File | Description |
 |---|---|
-| `../data/mock-assets/icon-cloud-sync.svg` | 24×24 icon with non-integer viewBox, missing a11y tags, hardcoded brand color |
-| `../data/mock-assets/logo-hero-main.svg` | Logo with missing viewBox, non-brand red, Inkscape metadata, unused defs |
-| `../data/mock-assets/illustration-dashboard.svg` | Illustration with empty desc, non-standard hex colors, hardcoded font |
+| `icon-cloud-sync.svg` | 24x24 icon with non-integer viewBox, missing a11y tags, hardcoded brand color |
+| `logo-hero-main.svg` | Logo with missing viewBox, non-brand red, Inkscape metadata, unused defs |
+| `illustration-dashboard.svg` | Illustration with empty desc, non-standard hex colors, hardcoded font |
 
 ### Known Issues Planted in the Data
 
@@ -40,13 +40,11 @@ Use the three SVGs from the `data/mock-assets/` directory.
 
 ## Walkthrough
 
-### Step 1 — Load SVGs and run preliminary inspection
+### Step 1 — Upload SVGs and run preliminary inspection
 
-```bash
-claude ../data/mock-assets/icon-cloud-sync.svg ../data/mock-assets/logo-hero-main.svg ../data/mock-assets/illustration-dashboard.svg
-```
+Open the Weatherman AI Portal in your browser. Select **"Paula & Gaby"** from the sidebar dropdown. Click the paperclip icon and upload all three SVG files.
 
-Prompt:
+Type this prompt into the chat input:
 
 ```
 Load all three SVG files. For each file:
@@ -60,16 +58,12 @@ Load all three SVG files. For each file:
 Output a per-file summary table.
 ```
 
-### Step 2 — Run the svg-auditor skill
+### Step 2 — Run the svg-auditor workspace preset
 
-```bash
-claude ../data/mock-assets/icon-cloud-sync.svg ../data/mock-assets/logo-hero-main.svg ../data/mock-assets/illustration-dashboard.svg --skill svg-auditor
-```
-
-Prompt:
+Paste the svg-auditor system prompt (from `presets/svg-auditor/SKILL.md`) into the chat input first to configure the AI, then type this prompt:
 
 ```
-Run the svg-auditor skill against all three files.
+Run the svg-auditor against all three files.
 
 For each SVG, perform these checks in order:
 
@@ -102,7 +96,7 @@ Output a compliance table per file with: check, status (pass/fail/warn), severit
 
 ### Step 3 — Fix viewBox and structural issues
 
-Prompt (continuing the same session):
+Type this prompt (continuing the same session):
 
 ```
 Fix the structural issues found:
@@ -125,7 +119,7 @@ Show a before/after diff for every change.
 
 ### Step 4 — Replace hardcoded colors with design tokens
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Replace hardcoded colors with design token variables:
@@ -150,7 +144,7 @@ Show a side-by-side diff for the most impactful change per file.
 
 ### Step 5 — Add accessibility tags
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Add or fix accessibility elements:
@@ -176,7 +170,7 @@ Show the updated <svg> opening section for each file.
 
 ### Step 6 — Export the SVG audit report
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Write svg_audit_report.csv with all issues found and fixes applied.
@@ -188,7 +182,7 @@ Categories:
 - accessibility (title missing, desc empty, role missing, fixed)
 - formatting (empty groups, unused defs, editor metadata, fixed)
 
-Then print a terminal summary:
+Then print a summary:
 
 === SVG AUDIT REPORT ===
 Files audited:      3
@@ -213,4 +207,4 @@ After completing all steps, you should have:
 - Accessibility tags (title, desc, role="img") added to every SVG
 - Editor metadata and empty groups removed
 - A `svg_audit_report.csv` with every issue documented
-- Practical experience running the `svg-auditor` skill in a QA gate workflow
+- Practical experience running the `svg-auditor` workspace preset in a QA gate workflow

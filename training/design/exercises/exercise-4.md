@@ -2,12 +2,12 @@
 
 ## Scenario
 
-The Design team has accumulated a batch of raw SVG exports from various sources — some from Figma, some from Inkscape, some hand-edited. Before shipping to engineering, the team must run these through an automated terminal utility to clean, minify, strip metadata, enforce naming conventions, and organize them into a strict production-ready folder tree. This exercise mirrors a real Friday-afternoon asset pack handoff.
+The Design team has accumulated a batch of raw SVG exports from various sources — some from Figma, some from Inkscape, some hand-edited. Before shipping to engineering, the team must run these through automated cleaning steps to clean, minify, strip metadata, enforce naming conventions, and organize them into a strict production-ready folder tree. This exercise mirrors a real Friday-afternoon asset pack handoff.
 
 ## Learning Objectives
 
 - Scan and classify a mixed asset directory by file type, size, and category
-- Execute the `asset-pack-optimizer` skill to automate SVG optimization
+- Use the `asset-pack-optimizer` workspace preset to automate SVG optimization
 - Minify SVG path data, strip editor metadata, and normalize viewBox values
 - Enforce kebab-case naming conventions across all assets
 - Inject accessibility tags (title, desc, role="img") into every SVG
@@ -16,7 +16,7 @@ The Design team has accumulated a batch of raw SVG exports from various sources 
 
 ## Dataset
 
-Use the `data/mock-assets/` directory which contains a mix of SVGs, JSON, and CSS files.
+Open the Weatherman AI Portal in your browser. Select **"Paula & Gaby"** from the sidebar dropdown. Use the paperclip icon to upload all files from the `data/mock-assets/` folder.
 
 | File | Type | Size | Issues |
 |---|---|---|---|
@@ -42,16 +42,14 @@ Use the `data/mock-assets/` directory which contains a mix of SVGs, JSON, and CS
 
 ## Walkthrough
 
-### Step 1 — Load the asset directory and scan all files
+### Step 1 — Upload the asset files and scan everything
 
-```bash
-claude ../data/mock-assets/
-```
+Open the Weatherman AI Portal in your browser. Select **"Paula & Gaby"** from the sidebar dropdown. Click the paperclip icon and upload all files from `data/mock-assets/`.
 
-Prompt:
+Type this prompt:
 
 ```
-List every file in ../data/mock-assets/. For each file, report:
+List every file I've uploaded. For each file, report:
 - Filename
 - Extension
 - File size in KB
@@ -61,16 +59,12 @@ List every file in ../data/mock-assets/. For each file, report:
 Sort by category. Flag any naming violations.
 ```
 
-### Step 2 — Run the asset-pack-optimizer skill
+### Step 2 — Run the asset-pack-optimizer workspace preset
 
-```bash
-claude ../data/mock-assets/ --skill asset-pack-optimizer
-```
-
-Prompt:
+Paste the asset-pack-optimizer system prompt (from `presets/asset-pack-optimizer/SKILL.md`) into the chat input first to configure the AI, then type this prompt:
 
 ```
-Run the asset-pack-optimizer skill against ../data/mock-assets/.
+Run the asset-pack-optimizer preset against the uploaded files.
 
 Phase 1 — Directory Classification:
 Classify every file:
@@ -81,7 +75,7 @@ For every SVG file, perform these operations:
 
 a) Strip editor metadata:
    - Remove sodipodi:* attributes
-   - Remove inkscape:* attributes  
+   - Remove inkscape:* attributes
    - Remove xml:space="preserve"
    - Remove version="1.1"
 
@@ -108,10 +102,10 @@ After each operation, report the byte reduction per file.
 
 ### Step 3 — Enforce naming conventions
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
-Audit all filenames in ../data/mock-assets/ for kebab-case compliance:
+Audit all filenames for kebab-case compliance:
 
 Rules:
 - Lowercase only
@@ -134,7 +128,7 @@ Write rename-log.csv with columns: original_name, new_name, reason
 
 ### Step 4 — Build the distribution package
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Create a dist/ directory with this structure:
@@ -165,13 +159,13 @@ filename, category, size_before, size_after, savings_pct, issues
 
 ### Step 5 — Export the optimizer report
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
-Print a terminal summary:
+Print a summary:
 
 === ASSET PACK OPTIMIZER SUMMARY ===
-Source directory:       ../data/mock-assets/
+Source directory:       data/mock-assets/
 
 Processing results:
   SVGs scanned:         X
@@ -206,4 +200,5 @@ After completing all steps, you should have:
 - A `dist/` directory with organized subdirectories (icons, illustrations, tokens)
 - A `manifest.csv` with before/after sizes and savings percentages
 - A `rename-log.csv` documenting all naming changes
-- Practical experience running the `asset-pack-optimizer` skill
+- All files downloadable from the portal
+- Practical experience running the `asset-pack-optimizer` workspace preset

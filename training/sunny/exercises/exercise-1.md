@@ -63,13 +63,13 @@ PRM-999,Unknown Part,999.00,USD,1,5,price needs verification
 
 ## Walkthrough Steps
 
-```
-claude apex_catalog.csv global_catalog.csv prime_catalog.csv
-```
+Open the Weatherman AI Portal in your browser. Select **Sunny** from the sidebar dropdown. Click the paperclip icon to upload all three CSV files: `apex_catalog.csv`, `global_catalog.csv`, and `prime_catalog.csv`.
 
 **Step 1 — Schema inventory:**
+
+Type this prompt into the chat input:
+
 ```
-Step 1 Prompt:
 I have three vendor catalog files. For each file, show me:
 - Row count and column names
 - The data type of each column (string, number, etc.)
@@ -80,8 +80,10 @@ Present this as a schema comparison table.
 ```
 
 **Step 2 — Build a unified column mapping:**
+
+Type this prompt:
+
 ```
-Step 2 Prompt:
 Create a mapping table that translates each vendor's column names
 into a unified schema with these canonical fields:
 - product_id
@@ -96,8 +98,10 @@ Canonical Field | Apex Column | Global Column | Prime Column
 ```
 
 **Step 3 — Transform to unified schema:**
+
+Type this prompt:
+
 ```
-Step 3 Prompt:
 Transform all three vendor catalogs into the unified schema.
 For each vendor file, output a clean table using the canonical
 column names. If a vendor is missing a field (e.g., Prime Cargo
@@ -106,8 +110,10 @@ Flag any values that seem suspicious.
 ```
 
 **Step 4 — Flag unmappable columns and orphans:**
+
+Type this prompt:
+
 ```
-Step 4 Prompt:
 Identify:
 1. Any column in a vendor file that has NO equivalent in the unified schema
    (e.g., Prime Cargo's "notes" column — what should we do with this data?)
@@ -118,13 +124,15 @@ Explain the business impact of each finding.
 ```
 
 **Step 5 — Export consolidated catalog:**
+
+Type this prompt:
+
 ```
-Step 5 Prompt:
 Write a CSV called consolidated_vendor_catalog.csv with all products
 from all three vendors in the unified schema. Add a "vendor" column
 to identify the source. Add a "notes" column for any flags.
 
-Then print a terminal summary:
+Then print a summary:
 
 === VENDOR CATALOG CONSOLIDATION SUMMARY ===
 Vendors processed:    3
@@ -136,3 +144,5 @@ Unmappable columns:   X (list them)
 
 Consolidated file: consolidated_vendor_catalog.csv
 ```
+
+Click the download button to save the CSV the portal generates.

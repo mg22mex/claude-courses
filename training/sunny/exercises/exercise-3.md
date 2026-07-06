@@ -58,17 +58,17 @@ INV-15,PO-8808,Raspberry Pi Compute Module,8471.30,500,35.00,17500.00,CN,0.00
 | Missing country of origin | INV-4 and INV-11 have blank country_of_origin — customs may reject |
 | Export license not checked | INV-6 and INV-14 are networking equipment (8517.62) — restricted, no export license noted |
 | Wrong duty calculated | INV-10 8507.60 batteries: 7000.00 * 3.9% = 273.00 (correct) but check others |
-| Zero duty on accessories | INV-12 declared as 8473.30 with 0 duty — should be 3.5% × 19000 = 665.00 |
+| Zero duty on accessories | INV-12 declared as 8473.30 with 0 duty — should be 3.5% * 19000 = 665.00 |
 
 ## Walkthrough Steps
 
-```
-claude tariff_regulatory_table.csv supplier_invoice_june.csv
-```
+Open the Weatherman AI Portal in your browser. Select **Sunny** from the sidebar dropdown. Click the paperclip icon to upload both `tariff_regulatory_table.csv` and `supplier_invoice_june.csv`.
 
 **Step 1 — Load and join:**
+
+Type this prompt into the chat input:
+
 ```
-Step 1 Prompt:
 Load both files. Perform a LEFT JOIN of the supplier invoice against
 the tariff table on hs_code (hs_code_declared = hs_code).
 Show: line_id, item_description, hs_code_declared, duty_rate_pct,
@@ -77,8 +77,10 @@ Flag any row where the hs_code_declared doesn't match any tariff entry.
 ```
 
 **Step 2 — Calculate correct duty:**
+
+Type this prompt:
+
 ```
-Step 2 Prompt:
 For each row with a valid tariff match, calculate:
   correct_duty = line_total * (duty_rate_pct / 100)
 
@@ -91,8 +93,10 @@ Show: line_id, item_description, correct_duty, duty_charged, deviation, flag.
 ```
 
 **Step 3 — Identify restrictions and compliance issues:**
+
+Type this prompt:
+
 ```
-Step 3 Prompt:
 For each row where the tariff table lists a restriction:
 - "export_license_required": Flag for compliance — no license evidence exists
 - "hazardous_material": Flag for special handling documentation
@@ -101,8 +105,10 @@ Show: line_id, item_description, hs_code, restriction, compliance_status.
 ```
 
 **Step 4 — Calculate total financial impact:**
+
+Type this prompt:
+
 ```
-Step 4 Prompt:
 Calculate:
 1. Total duty_charged across all line items
 2. Total correct_duty across all line items
@@ -113,14 +119,16 @@ Which single line item has the biggest duty gap?
 ```
 
 **Step 5 — Export audit report:**
+
+Type this prompt:
+
 ```
-Step 5 Prompt:
 Write a CSV called tariff_audit_report.csv with columns:
 line_id, po_number, item_description, hs_code_declared, duty_rate_pct,
 country_of_origin, line_total, correct_duty, duty_charged, deviation,
 restrictions, compliance_flag, notes
 
-Then print a terminal summary:
+Then print a summary:
 
 === CUSTOMS TARIFF AUDIT REPORT ===
 Total line items:         XX
@@ -137,3 +145,5 @@ Duty Impact:
 
 Recommended action: [describe next steps]
 ```
+
+Click the download button to save the generated CSV file.

@@ -2,7 +2,7 @@
 
 ## Scenario
 
-The `orders_etl` pipeline processes data through 5 sequential stages: **Extract → Normalize → Join → Aggregate → Load**. The pipeline has been failing intermittently for the past 3 days. Stage-level timing logs show that one stage consistently takes 2x longer than the baseline — and during the last run, it timed out completely, causing 6,500 rows to be dropped. Mollie needs to pinpoint exactly where the pipeline stalled.
+The `orders_etl` pipeline processes data through 5 sequential stages: **Extract -> Normalize -> Join -> Aggregate -> Load**. The pipeline has been failing intermittently for the past 3 days. Stage-level timing logs show that one stage consistently takes 2x longer than the baseline — and during the last run, it timed out completely, causing 6,500 rows to be dropped. Mollie needs to pinpoint exactly where the pipeline stalled.
 
 ## Learning Objectives
 
@@ -13,7 +13,7 @@ The `orders_etl` pipeline processes data through 5 sequential stages: **Extract 
 
 ## Dataset
 
-### ETL Timing Log (`etl_timing_log.csv`)
+### ETL Timing Log (`etl-timing-log.csv`)
 
 ```csv
 pipeline_run_id,stage,start_time,end_time,status,rows_processed,error_message
@@ -43,19 +43,18 @@ RUN-104,load,2026-06-17 04:42:30,2026-06-17 04:45:15,success,9900,
 
 | Issue | Detail |
 |---|---|
-| Join stage degradation | Join duration grows across runs: 16.5m → 31.5m → 43m → 24.75m |
+| Join stage degradation | Join duration grows across runs: 16.5m -> 31.5m -> 43m -> 24.75m |
 | Timeout in RUN-103 | Join stage timed out after 2,400 seconds (40 minutes) |
 | Data loss in RUN-103 | 18,000 rows entered join stage, only 6,200 emerged — 6,500 rows lost vs. baseline |
 | Baseline row drop | Normalize stage consistently drops 200-400 rows (data quality filtering) |
-| Aggregate stage collapse | 24,500 rows → 9,800 rows is a 60% collapse — normal? Check if expected |
+| Aggregate stage collapse | 24,500 rows -> 9,800 rows is a 60% collapse — normal? Check if expected |
 
 ## Walkthrough Steps
 
-```
-claude etl_timing_log.csv
-```
+Open the Weatherman AI Portal in your browser. Select "Mollie" from the sidebar dropdown. Click the paperclip icon to upload the data file, then type each prompt into the chat input.
 
 **Step 1 — Calculate stage durations:**
+
 ```
 Step 1 Prompt:
 For each stage in each pipeline run, calculate:
@@ -66,6 +65,7 @@ Run ID | Extract | Normalize | Join | Aggregate | Load | Total
 ```
 
 **Step 2 — Identify the bottleneck stage:**
+
 ```
 Step 2 Prompt:
 For each stage, calculate the average duration across all runs.
@@ -80,13 +80,14 @@ Which run had the longest join duration?
 ```
 
 **Step 3 — Trace data loss:**
+
 ```
 Step 3 Prompt:
 For each run, track the row count through each stage:
-  RUN-101: 25000 → 24800 → 24500 → 9800 → 9800
-  RUN-102: 25200 → 25000 → 24800 → 9900 → 9900
-  RUN-103: 24800 → 24600 → 18000 → 6200 → 6200
-  RUN-104: 25100 → 24900 → 24700 → 9900 → 9900
+  RUN-101: 25000 -> 24800 -> 24500 -> 9800 -> 9800
+  RUN-102: 25200 -> 25000 -> 24800 -> 9900 -> 9900
+  RUN-103: 24800 -> 24600 -> 18000 -> 6200 -> 6200
+  RUN-104: 25100 -> 24900 -> 24700 -> 9900 -> 9900
 
 Calculate rows lost per stage per run.
 In RUN-103, how many rows were lost in the join stage?
@@ -95,6 +96,7 @@ What is the expected row count after aggregate stage? Compare to baseline.
 ```
 
 **Step 4 — Correlate duration with data loss:**
+
 ```
 Step 4 Prompt:
 Create a correlation table:
@@ -109,20 +111,21 @@ What does the RUN-103 data loss pattern suggest about the root cause?
 ```
 
 **Step 5 — Export diagnostic report:**
+
 ```
 Step 5 Prompt:
 Write a file called etl_diagnostic.csv with:
 pipeline_run_id, stage, duration_min, rows_in, rows_out, rows_lost, status, flags
 
-Then print a terminal summary:
+Then display a summary:
 
 === ETL PIPELINE DIAGNOSTIC REPORT ===
 Pipeline: orders_etl
-Analysis period: 2026-06-17 01:00 — 04:45
+Analysis period: 2026-06-17 01:00 -- 04:45
 
 BOTTLENECK: Join Stage
   Avg duration: 28.9 min (vs 15 min baseline)
-  Max duration: 43.0 min (RUN-103 — TIMEOUT)
+  Max duration: 43.0 min (RUN-103 -- TIMEOUT)
   Degradation trend: +160% across 4 runs
 
 DATA LOSS:
@@ -133,5 +136,5 @@ RECOMMENDATIONS:
   1. Optimize join query — add indexes on order_id and payment_id
   2. Increase query timeout from 2400s to 3600s as temporary mitigation
   3. Add retry logic with exponential backoff on the join stage
-  4. Set up stage-level monitoring alerts (duration > 20 min → WARNING)
+  4. Set up stage-level monitoring alerts (duration > 20 min -> WARNING)
 ```

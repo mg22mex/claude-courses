@@ -59,13 +59,13 @@ GADG-030,Gadget Max,0,1,14,20
 
 ## Walkthrough Steps
 
-```
-claude north_inventory.csv central_inventory.csv south_inventory.csv --skill warehouse-balancing
-```
+Open the Weatherman AI Portal in your browser. Select **Sunny** from the sidebar dropdown. Click the paperclip icon to upload all three files: `north_inventory.csv`, `central_inventory.csv`, and `south_inventory.csv`.
 
 **Step 1 — Calculate days of stock per warehouse:**
+
+Type this prompt into the chat input:
+
 ```
-Step 1 Prompt:
 For each warehouse, calculate days_of_stock per SKU:
   days_of_stock = stock_on_hand / daily_demand
 
@@ -77,8 +77,10 @@ Flag any where days_of_stock > 30 as "OVERSTOCKED"
 ```
 
 **Step 2 — Identify stock imbalances:**
+
+Type this prompt:
+
 ```
-Step 2 Prompt:
 For each SKU, compare days_of_stock across all three warehouses.
 Identify transfer opportunities where:
 - One warehouse has > 20 days of stock (surplus)
@@ -88,8 +90,10 @@ Show: SKU, surplus_warehouse, surplus_days, deficit_warehouse, deficit_days
 ```
 
 **Step 3 — Calculate transfer quantities:**
+
+Type this prompt:
+
 ```
-Step 3 Prompt:
 For each transfer opportunity, calculate the recommended transfer quantity:
   target_stock = deficit_warehouse_daily_demand * 14 (2 weeks buffer)
   transfer_qty = target_stock - deficit_warehouse_stock_on_hand
@@ -101,19 +105,23 @@ Show: SKU, from_warehouse, to_warehouse, transfer_qty, available, status
 ```
 
 **Step 4 — Generate rebalancing plan:**
+
+Type this prompt:
+
 ```
-Step 4 Prompt:
 Build the complete rebalancing plan. For each transfer, check if:
 1. The surplus warehouse has enough available stock
-2. The receiving warehouse has capacity (stock + transfer ≤ max_capacity)
+2. The receiving warehouse has capacity (stock + transfer <= max_capacity)
 3. The transfer quantity is at least 10 units (minimum economical transfer)
 
 Flag any transfer that violates these rules.
 ```
 
 **Step 5 — Export and summarize:**
+
+Type this prompt:
+
 ```
-Step 5 Prompt:
 Write a file called rebalance_plan.csv with columns:
 sku, from_warehouse, to_warehouse, transfer_qty, reason, approval_required
 
@@ -128,8 +136,8 @@ Overstocked items:      X
 Transfer opportunities: X
 
 Transfers recommended:
-  North → South:    X units (SKU)
-  Central → North:  X units (SKU)
+  North -> South:    X units (SKU)
+  Central -> North:  X units (SKU)
   ...
 
 After rebalancing, stockout risk items: X
@@ -137,3 +145,5 @@ After rebalancing, overstocked items:   X
 
 Recommended action: Approve transfers and update WMS by end of week.
 ```
+
+Click the download button to save the generated CSV file.

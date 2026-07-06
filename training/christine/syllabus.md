@@ -1,20 +1,20 @@
-# Marketing: Brand Compliance & Copy Optimization with Claude Code
+# Marketing: Brand Compliance & Copy Optimization
 
-**Course Title:** Brand Compliance & Copy Optimization with Claude Code
+**Course Title:** Brand Compliance & Copy Optimization
 **Target User:** Christine — Marketing team
-**Prerequisites:** Familiarity with brand style guides, basic markdown editing, and web copy workflows; no coding experience required.
+**Prerequisites:** Familiarity with brand style guides, basic copy editing, and web copy workflows; no coding experience required.
 **Estimated Duration:** 6 hours (split across three 2-hour sessions)
-**Format:** Live walkthrough + hands-on terminal exercises
+**Format:** Live walkthrough + hands-on portal exercises
 
 ---
 
 ## Pre-Work: Load Your Institutional Memory
 
-Before starting this course, open the [Master Claude Code Guide](https://notebooklm.google.com/notebook/4bdb17a3-6657-4d63-adbe-8f63c22521c2?authuser=1) alongside your domain-specific NotebookLM notebook. Query both notebooks to understand how Claude Code operates in your domain before writing any scripts or building tools.
+Before starting this course, open the [Master Guide Notebook](https://notebooklm.google.com/notebook/4bdb17a3-6657-4d63-adbe-8f63c22521c2?authuser=1) alongside your domain-specific NotebookLM notebook. Query both notebooks to understand how the Weatherman AI Portal operates in your domain before writing any prompts or building presets.
 
 **Your Domain Notebook:** [Christine's Marketing Notebook](https://notebooklm.google.com/notebook/0a616bb3-6ea7-40c8-b53c-984fa4d977bc?authuser=1)
 
-> **Workflow Rule:** All script generation, data testing, or document templating in this track must cross-verify patterns against both the Master Guide and your Domain Notebook before execution.
+> **Workflow Rule:** All prompt generation, data testing, or document templating in this track must cross-verify patterns against both the Master Guide and your Domain Notebook before execution.
 
 ---
 
@@ -22,7 +22,7 @@ Before starting this course, open the [Master Claude Code Guide](https://noteboo
 
 By the end of this course, Christine will be able to:
 
-1. Load raw marketing copy decks, blog drafts, and ad copy into Claude Code for automated review.
+1. Load raw marketing copy decks, blog drafts, and ad copy into the portal for automated review.
 2. Enforce brand style guidelines — flag passive voice, off-tone language, and restricted competitor terms.
 3. Verify SEO keyword presence and density across multiple copy assets in a single pass.
 4. Strip and normalize messy HTML/Markdown formatting tags from imported web copy.
@@ -38,27 +38,26 @@ By the end of this course, Christine will be able to:
 
 ### Lesson 1 — Automated Brand Auditing (60 min)
 
-**Objective:** Use Claude Code to inspect copy decks and flag every deviation from the brand style guide.
+**Objective:** Use the portal to inspect copy decks and flag every deviation from the brand style guide.
 
 | Segment | Topic | Activity |
 |---|---|---|
-| 1.1 | The brand compliance problem | Brand guides are long PDFs — enforcing them across dozens of assets is impractical manually. Claude Code reads copy and flags violations instantly. |
-| 1.2 | Loading a copy deck | Load `data/raw_copy_deck.md` — a messy marketing file with brand violations, passive voice, and mixed formatting. |
-| 1.3 | Running the brand-guardrails skill | Invoke Claude Code with the `brand-guardrails` skill to scan the deck for tone, voice, and terminology violations. |
+| 1.1 | The brand compliance problem | Brand guides are long PDFs — enforcing them across dozens of assets is impractical manually. The portal reads copy and flags violations instantly. |
+| 1.2 | Loading a copy deck | Upload `data/raw_copy_deck.md` to the portal — a messy marketing file with brand violations, passive voice, and mixed formatting. |
+| 1.3 | Running the brand-guardrails preset | Select the "brand-guardrails" Workspace Preset from your profile and paste the audit prompt into the chat input. |
 | 1.4 | Understanding the violation report | Review flagged items: passive voice, off-brand adjectives, competitor mentions, missing CTA structure. |
-| 1.5 | Fixing violations interactively | Ask Claude to rewrite flagged sentences in brand-compliant tone and explain each change. |
+| 1.5 | Fixing violations interactively | Ask the portal to rewrite flagged sentences in brand-compliant tone and explain each change. |
 
-**CLI Exercises:**
+**Portal Exercises:**
+
+**Exercise 1.3 — Run brand guardrails on a copy deck**
+
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `raw_copy_deck.md`.
+
+Type this prompt into the chat input:
 
 ```
-# Exercise 1.3 — Run brand guardrails on a copy deck
-claude data/raw_copy_deck.md --skill brand-guardrails
-```
-
-Prompt:
-
-```
-Load data/raw_copy_deck.md and run a full brand compliance audit:
+Load raw_copy_deck.md and run a full brand compliance audit:
 
 1. Scan for passive voice — flag every instance with line number.
 2. Scan for competitor brand mentions (e.g., "like Shopify but better"
@@ -72,10 +71,11 @@ Load data/raw_copy_deck.md and run a full brand compliance audit:
 Output a violation table: violation_type, line, text_snippet, severity (low/medium/high)
 ```
 
-```
-# Exercise 1.5 — Interactive fixes
-Prompt (continuing the same session):
+**Exercise 1.5 — Interactive fixes**
 
+Type this prompt into the chat input (continuing the same session):
+
+```
 Take the high-severity violations and rewrite each one in brand-compliant tone.
 For each rewrite, show me:
 - Original line
@@ -93,19 +93,18 @@ For each rewrite, show me:
 | Segment | Topic | Activity |
 |---|---|---|
 | 2.1 | SEO keyword density basics | Target keywords must appear with minimum frequency in body copy, headings, and meta descriptions. Manual counting across 20+ pages is impractical. |
-| 2.2 | Loading copy assets | Load `data/raw_copy_deck.md` alongside a target keyword list. |
-| 2.3 | Counting keyword occurrences | Ask Claude to scan the copy and report occurrences per keyword, with context snippets. |
-| 2.4 | Density calculation | Instruct Claude to calculate keyword density as a percentage of total word count, and flag any keyword below the minimum threshold. |
+| 2.2 | Loading copy assets | Upload `data/raw_copy_deck.md` alongside a target keyword list. |
+| 2.3 | Counting keyword occurrences | Ask the portal to scan the copy and report occurrences per keyword, with context snippets. |
+| 2.4 | Density calculation | Instruct the portal to calculate keyword density as a percentage of total word count, and flag any keyword below the minimum threshold. |
 | 2.5 | Keyword gap analysis | Identify which target keywords are missing entirely and suggest natural insertion points. |
 
-**CLI Exercises:**
+**Portal Exercises:**
 
-```
-# Exercise 2.3 — Keyword occurrence scan
-claude data/raw_copy_deck.md
-```
+**Exercise 2.3 — Keyword occurrence scan**
 
-Prompt:
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `raw_copy_deck.md`.
+
+Type this prompt into the chat input:
 
 ```
 I have a copy deck loaded. Here is my target keyword list with minimum
@@ -128,10 +127,11 @@ Scan the document and for each keyword tell me:
 Flag any keyword that appears zero times as MISSING.
 ```
 
-```
-# Exercise 2.4 — Density check
-Prompt (continuing the same session):
+**Exercise 2.4 — Density check**
 
+Type this prompt into the chat input (continuing the same session):
+
+```
 Calculate:
 - Total word count of the document (body copy only, exclude headings)
 - Keyword density % = (occurrences / total word count) * 100 for each keyword
@@ -141,10 +141,11 @@ Flag any keyword with density below 0.5% or above 3.0% (keyword stuffing).
 Show me: keyword, occurrences, density(%), status (low/ok/stuffed)
 ```
 
-```
-# Exercise 2.5 — Keyword gap insertion
-Prompt (continuing the same session):
+**Exercise 2.5 — Keyword gap insertion**
 
+Type this prompt into the chat input (continuing the same session):
+
+```
 For each MISSING keyword, identify a paragraph where it could be
 naturally inserted. Show me:
 - The original paragraph
@@ -164,19 +165,18 @@ paragraph is a good or bad fit.
 | Segment | Topic | Activity |
 |---|---|---|
 | 3.1 | The formatting mess | Web copy exported from CMS tools often contains raw HTML tags (`<span>`, `<div>`, `<font>`), inline styles, and broken markdown. |
-| 3.2 | Inspecting the raw copy | Load `data/raw_copy_deck.md` and identify all HTML artifacts mixed into the markdown. |
-| 3.3 | Stripping inline styles | Ask Claude to remove inline `style="..."` attributes, `<!-- comments -->`, and empty tags. |
+| 3.2 | Inspecting the raw copy | Upload `data/raw_copy_deck.md` and identify all HTML artifacts mixed into the markdown. |
+| 3.3 | Stripping inline styles | Ask the portal to remove inline `style="..."` attributes, `<!-- comments -->`, and empty tags. |
 | 3.4 | Normalizing to clean markdown | Convert remaining HTML (`<strong>` → `**bold**`, `<em>` → `*italic*`, `<a>` → `[text](url)`) and fix broken markdown markers. |
 | 3.5 | Formatting consistency check | Verify heading levels are sequential, lists are consistently formatted, and no raw HTML remains. |
 
-**CLI Exercises:**
+**Portal Exercises:**
 
-```
-# Exercise 3.2 — Identify formatting artifacts
-claude data/raw_copy_deck.md
-```
+**Exercise 3.2 — Identify formatting artifacts**
 
-Prompt:
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `raw_copy_deck.md`.
+
+Type this prompt into the chat input:
 
 ```
 Scan the document and catalog every formatting issue:
@@ -191,10 +191,11 @@ Scan the document and catalog every formatting issue:
 Output a table: issue_type, count, example_line
 ```
 
-```
-# Exercise 3.3 — Strip inline styles
-Prompt (continuing the same session):
+**Exercise 3.3 — Strip inline styles**
 
+Type this prompt into the chat input (continuing the same session):
+
+```
 Remove all of the following from the document:
 - Inline style="..." attributes from any HTML tags
 - HTML comments and their content (<!-- ... -->)
@@ -204,10 +205,11 @@ Remove all of the following from the document:
 Show me a diff of the top 5 most impactful changes.
 ```
 
-```
-# Exercise 3.4 — Normalize to clean markdown
-Prompt (continuing the same session):
+**Exercise 3.4 — Normalize to clean markdown**
 
+Type this prompt into the chat input (continuing the same session):
+
+```
 Convert remaining HTML formatting to markdown equivalents:
 - <strong>text</strong> → **text**
 - <em>text</em> → *text*
@@ -231,17 +233,16 @@ cleaned document as clean_copy_deck.md.
 | 4.1 | Variant generation constraints | Different channels have different rules: email subject lines (60 char max), meta descriptions (160 char), hero text (short and punchy). Variants must stay on-brand. |
 | 4.2 | Single-source variant generation | Take one approved copy block and generate 3 variants each for: email, social (Instagram/Facebook), and landing page hero. |
 | 4.3 | Tone tailoring per channel | Email variants should be slightly warmer; social variants shorter and more urgent; landing page variants benefit-driven. |
-| 4.4 | A/B test comparison table | Ask Claude to output variants in a structured table with character count, reading level, and brand-compliance score. |
+| 4.4 | A/B test comparison table | Ask the portal to output variants in a structured table with character count, reading level, and brand-compliance score. |
 | 4.5 | Building the weekly brand-review prompt | Create a single prompt that loads the copy deck, runs brand audit + SEO check + formatting sanitization, and writes a report. |
 
-**CLI Exercises:**
+**Portal Exercises:**
 
-```
-# Exercise 4.2 — Generate channel variants
-claude data/raw_copy_deck.md
-```
+**Exercise 4.2 — Generate channel variants**
 
-Prompt:
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `raw_copy_deck.md`.
+
+Type this prompt into the chat input:
 
 ```
 I have a hero section in my copy deck. Extract the main headline and
@@ -266,15 +267,12 @@ For each variant, include: character count and a brand-compliance
 check (flag if any variant violates brand tone).
 ```
 
-```
-# Exercise 4.5 — Full weekly brand-review prompt
-claude data/raw_copy_deck.md < weekly_brand_review.md
-```
+**Exercise 4.5 — Full weekly brand-review prompt**
 
-**weekly_brand_review.md** (create this file during the lesson):
+Prepare a text file called `weekly_brand_review.md` with the following content, then upload it to the portal:
 
 ```markdown
-I have one file loaded: data/raw_copy_deck.md — this week's marketing copy assets.
+I have one file loaded: raw_copy_deck.md — this week's marketing copy assets.
 
 Please do the following, in order:
 
@@ -300,7 +298,7 @@ Please do the following, in order:
   1. "violations" — type, line, snippet, severity
   2. "seo_keywords" — keyword, occurrences, density, status
   3. "formatting_issues" — issue_type, count, example
-- Print a terminal summary with total violations, SEO status,
+- Print a summary with total violations, SEO status,
   and formatting issues found
 ```
 
@@ -313,19 +311,18 @@ Please do the following, in order:
 | Segment | Topic | Activity |
 |---|---|---|
 | 5.1 | Email automation landscape | Marketing teams send welcome flows, cart abandonment sequences, and promotional blasts. Each requires correct merge tags, CAN-SPAM compliance, and a single clear CTA. |
-| 5.2 | Loading an email template | Load `data/raw_email_campaign.md` — a flawed promotional email with broken merge vars, aggressive tone, and missing unsubscribe link. |
+| 5.2 | Loading an email template | Upload `data/raw_email_campaign.md` — a flawed promotional email with broken merge vars, aggressive tone, and missing unsubscribe link. |
 | 5.3 | Merge tag validation | Scan the template for required tags (`{{first_name}}`, `{{unsubscribe_url}}`, `{{offer_code}}`). Flag missing tags, broken syntax, and hardcoded personalization. |
-| 5.4 | Brand-voice enforcement | Check subject line length (≤ 60 chars), preheader (≤ 130 chars), passive voice, and CTA structure. Ensure exactly one primary CTA exists. |
-| 5.5 | Send log performance analysis | Load `data/email_send_log.csv` — review open rates, click-through rates, bounce rates, and unsubscribe trends across campaigns. Identify deliverability issues and engagement drop-offs. |
+| 5.4 | Brand-voice enforcement | Check subject line length (<= 60 chars), preheader (<= 130 chars), passive voice, and CTA structure. Ensure exactly one primary CTA exists. |
+| 5.5 | Send log performance analysis | Upload `data/email_send_log.csv` — review open rates, click-through rates, bounce rates, and unsubscribe trends across campaigns. Identify deliverability issues and engagement drop-offs. |
 
-**CLI Exercises:**
+**Portal Exercises:**
 
-```
-# Exercise 5.3 — Merge tag validation
-claude data/raw_email_campaign.md
-```
+**Exercise 5.3 — Merge tag validation**
 
-Prompt:
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `raw_email_campaign.md`.
+
+Type this prompt into the chat input:
 
 ```
 Scan this email template and report:
@@ -346,10 +343,11 @@ Output a tag consistency table: tag, status (present/missing/broken),
 line_number, recommendation
 ```
 
-```
-# Exercise 5.4 — Brand-voice and layout audit
-Prompt (continuing the same session):
+**Exercise 5.4 — Brand-voice and layout audit**
 
+Type this prompt into the chat input (continuing the same session):
+
+```
 Audit this email against brand rules:
 
 1. Subject line length — is it ≤ 60 characters? If not, suggest a trim.
@@ -363,15 +361,14 @@ Audit this email against brand rules:
 Output: a violations table with issue, line, severity, and fix.
 ```
 
-```
-# Exercise 5.5 — Send log analysis
-claude data/email_send_log.csv
-```
+**Exercise 5.5 — Send log analysis**
 
-Prompt:
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `email_send_log.csv`.
+
+Type this prompt into the chat input:
 
 ```
-Load data/email_send_log.csv and analyze:
+Load email_send_log.csv and analyze:
 
 1. Calculate aggregate metrics across all sends:
    - Average delivery rate
@@ -407,22 +404,21 @@ Flag any metric below brand threshold with a recommendation.
 | Segment | Topic | Activity |
 |---|---|---|
 | 6.1 | Campaign analytics overview | Marketing performance data lives in silos (email, social, search, display, affiliate). A consolidated view reveals which channels drive revenue and which are burning budget. |
-| 6.2 | Loading campaign data | Load `data/campaign_performance_data.csv` — a multi-channel dataset with spend, revenue, impressions, clicks, and conversions across Q1–Q2 2026. |
+| 6.2 | Loading campaign data | Upload `data/campaign_performance_data.csv` — a multi-channel dataset with spend, revenue, impressions, clicks, and conversions across Q1–Q2 2026. |
 | 6.3 | Blended ROAS calculation | Calculate total spend, total revenue, blended ROAS across all channels. Identify which channels are above and below the 3.0x benchmark. |
-| 6.4 | Channel health scoring | Score each channel on a 0–100 scale: ROAS (40%), CTR (20%), conversion rate (20%), cost per conversion (20%). Rank channels from healthiest to weakest. |
-| 6.5 | Executive summary generation | Produce a terminal-ready summary report: headline numbers, channel breakdown table, alert flags, and quick-win recommendations. |
+| 6.4 | Channel health scoring | Score each channel on a 0-100 scale: ROAS (40%), CTR (20%), conversion rate (20%), cost per conversion (20%). Rank channels from healthiest to weakest. |
+| 6.5 | Executive summary generation | Produce a summary report: headline numbers, channel breakdown table, alert flags, and quick-win recommendations. |
 
-**CLI Exercises:**
+**Portal Exercises:**
+
+**Exercise 6.3 — Blended ROAS and channel breakdown**
+
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `campaign_performance_data.csv`.
+
+Type this prompt into the chat input:
 
 ```
-# Exercise 6.3 — Blended ROAS and channel breakdown
-claude data/campaign_performance_data.csv
-```
-
-Prompt:
-
-```
-Load data/campaign_performance_data.csv and calculate:
+Load campaign_performance_data.csv and calculate:
 
 1. Total ad spend across all channels
 2. Total attributed revenue across all channels
@@ -444,10 +440,11 @@ Output: a channel breakdown table with all metrics and a
 ROAS health status for each channel.
 ```
 
-```
-# Exercise 6.4 — Channel health scoring
-Prompt (continuing the same session):
+**Exercise 6.4 — Channel health scoring**
 
+Type this prompt into the chat input (continuing the same session):
+
+```
 Score each channel on a 0–100 health scale using these weighted factors:
 
 | Factor | Weight | Benchmark |
@@ -465,10 +462,11 @@ For each channel:
 Flag any channel scoring below 50 as CRITICAL.
 ```
 
-```
-# Exercise 6.5 — Executive report generation
-Prompt (continuing the same session):
+**Exercise 6.5 — Executive report generation**
 
+Type this prompt into the chat input (continuing the same session):
+
+```
 Generate a Campaign Performance Executive Summary for leadership:
 
 ## Headline numbers
@@ -511,7 +509,7 @@ The following sample files are provided in `data/` for use during exercises:
 
 | Resource | Path / Location |
 |---|---|
-| Course slide deck | `training/christine/` |
+| Course materials | `training/christine/` |
 | Sample data assets | `training/christine/data/` |
 | Exercise 1 — Brand Compliance & Voice Enforcement | `training/christine/exercises/exercise-1.md` |
 | Exercise 2 — Live Shopify Listing SEO Auditing | `training/christine/exercises/exercise-2.md` |
@@ -520,12 +518,12 @@ The following sample files are provided in `data/` for use during exercises:
 | Exercise 5 — Capstone Marketing Launch Campaign Pipeline | `training/christine/exercises/exercise-5.md` |
 | Mock raw copy deck | `training/christine/data/raw_copy_deck.md` |
 | Mock email campaign | `training/christine/data/raw_email_campaign.md` |
-| brand-guardrails skill | `skills/brand-guardrails/SKILL.md` |
-| email-automation skill | `skills/email-automation/SKILL.md` |
-| listing-verification skill | `skills/listing-verification/SKILL.md` |
-| campaign-analytics skill | `skills/campaign-analytics/SKILL.md` |
-| csv-analytics skill | `../mollie/skills/csv-analytics/SKILL.md` |
-| data-table-validator skill | `../sunny/skills/data-table-validator/SKILL.md` |
+| brand-guardrails workspace preset | `presets/brand-guardrails/SKILL.md` |
+| email-automation workspace preset | `presets/email-automation/SKILL.md` |
+| listing-verification workspace preset | `presets/listing-verification/SKILL.md` |
+| campaign-analytics workspace preset | `presets/campaign-analytics/SKILL.md` |
+| csv-analytics workspace preset | `../mollie/presets/csv-analytics/SKILL.md` |
+| data-table-validator workspace preset | `../sunny/presets/data-table-validator/SKILL.md` |
 
 ---
 
@@ -533,7 +531,7 @@ The following sample files are provided in `data/` for use during exercises:
 
 Christine can independently:
 
-- [ ] Load a copy deck and run a full brand compliance audit using the brand-guardrails skill
+- [ ] Load a copy deck and run a full brand compliance audit using the brand-guardrails workspace preset
 - [ ] Scan copy for SEO keyword presence and density against a target list
 - [ ] Strip HTML formatting artifacts and normalize to clean markdown
 - [ ] Generate channel-specific A/B copy variants that stay on-brand
@@ -543,3 +541,13 @@ Christine can independently:
 - [ ] Analyze email send logs for deliverability issues, engagement trends, and segmentation opportunities
 - [ ] Ingest multi-channel campaign data and calculate blended ROAS with channel-level breakdown
 - [ ] Generate an executive campaign performance summary with alerts and actionable recommendations
+
+---
+
+### High-Impact Operational Presets
+
+**1. Triple-Angle Campaign Copywriter** — generating SMS/email variants (Urgent, Narrative, Minimalist angles).  
+**2. E-commerce Landing Page CRO Auditor** — reviewing copy/layout for 5 conversion improvements.  
+**3. Multi-Channel Customer Support Playbook Assistant** — drafting resolution scripts for seasonal/shipping delays.  
+**4. Virtual Platform Integration Guide** — non-technical steps for digital tool setup.  
+**5. Email Retention Flow Architect** — building cart-abandonment copy sequences.

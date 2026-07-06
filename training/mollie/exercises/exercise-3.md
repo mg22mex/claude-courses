@@ -13,7 +13,7 @@ The finance team processes payment settlements from two gateways — **Stripe** 
 
 ## Dataset
 
-Reference the file at `../data/payout_reconciliation.csv` (36 transactions, June 2026).
+Reference the file at `data/payout-reconciliation.csv` (36 transactions, June 2026).
 
 Key columns: `transaction_id`, `order_id`, `gateway`, `gross_amount`, `fee`, `net_amount`, `settlement_date`, `payout_id`, `status`, `notes`.
 
@@ -29,14 +29,13 @@ Key columns: `transaction_id`, `order_id`, `gateway`, `gross_amount`, `fee`, `ne
 
 ## Walkthrough Steps
 
-```
-claude payout_reconciliation.csv --skill reconciliation-engine
-```
+Open the Weatherman AI Portal in your browser. Select "Mollie" from the sidebar dropdown. Click the paperclip icon to upload the data file, then type each prompt into the chat input.
 
 **Step 1 — Load and inspect the payout data:**
+
 ```
 Step 1 Prompt:
-Load payout_reconciliation.csv. Show me:
+Upload payout_reconciliation.csv. Show me:
 - Total rows and columns
 - Unique gateway values and their transaction counts
 - Unique status values and their counts
@@ -46,6 +45,7 @@ Load payout_reconciliation.csv. Show me:
 ```
 
 **Step 2 — Detect amount discrepancies on matched transactions:**
+
 ```
 Step 2 Prompt:
 The reconciliation engine uses transaction_id as the join key between
@@ -65,6 +65,7 @@ Show all rows where fee_discrepancy > 0.01.
 ```
 
 **Step 3 — Isolate unmatched and problematic transactions:**
+
 ```
 Step 3 Prompt:
 Identify and categorize every problematic transaction:
@@ -80,6 +81,7 @@ Show a table: txn_id, order_id, gateway, amount, status, notes, flag.
 ```
 
 **Step 4 — Aggregate reconciliation by gateway:**
+
 ```
 Step 4 Prompt:
 Group by gateway and calculate:
@@ -99,16 +101,17 @@ What is the total payout gap across both gateways?
 ```
 
 **Step 5 — Export reconciliation report:**
+
 ```
 Step 5 Prompt:
 Write a CSV called reconciliation_report.csv with ALL transactions
 including these columns: transaction_id, order_id, gateway, gross_amount,
 fee, net_amount, expected_fee, fee_discrepancy, status, flag, notes.
 
-Then print a terminal summary:
+Then display a summary:
 
 === PAYMENT RECONCILIATION REPORT ===
-Period: June 1–17, 2026
+Period: June 1-17, 2026
 Total transactions: 36
 
 BY GATEWAY:

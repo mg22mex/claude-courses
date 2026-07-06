@@ -2,12 +2,12 @@
 
 ## Scenario
 
-The Figma design team has delivered a structured component spec for a new button system and typography scale. Engineering needs CSS custom properties and a platform-agnostic Style Dictionary JSON file extracted from those specs. The Design team will use the `component-spec-compiler` skill to systematically convert raw layout coordinates, dimensions, and visual properties into uniform CSS variables and a style dictionary.
+The Figma design team has delivered a structured component spec for a new button system and typography scale. Engineering needs CSS custom properties and a platform-agnostic Style Dictionary JSON file extracted from those specs. The Design team will use the `component-spec-compiler` workspace preset to systematically convert raw layout coordinates, dimensions, and visual properties into uniform CSS variables and a style dictionary.
 
 ## Learning Objectives
 
-- Load and interpret structured design specification documents
-- Use the `component-spec-compiler` skill to generate CSS custom properties from raw specs
+- Interpret structured design specification documents
+- Use the `component-spec-compiler` workspace preset to generate CSS custom properties from raw specs
 - Build platform-agnostic Style Dictionary JSON with `{value, type}` format
 - Generate component-specific token blocks (button system with states)
 - Cross-reference all generated `var(--...)` references to confirm they resolve
@@ -15,9 +15,9 @@ The Figma design team has delivered a structured component spec for a new button
 
 ## Dataset
 
-Use the inline design spec below. Create `button-system-spec.md` from it.
+Use the inline design spec below. Open the Weatherman AI Portal, select **"Paula & Gaby"** from the sidebar dropdown, and paste the full spec directly into the chat input.
 
-### Inline Design Spec (`button-system-spec.md`)
+### Inline Design Spec
 
 ```
 # Button System — Design Specification
@@ -98,32 +98,26 @@ Use the inline design spec below. Create `button-system-spec.md` from it.
 
 ## Walkthrough
 
-### Step 1 — Review the component-spec-compiler skill
+### Step 1 — Review the component-spec-compiler workspace preset
 
-```bash
-claude ../skills/component-spec-compiler/SKILL.md
-```
+Open the Weatherman AI Portal in your browser. Select **"Paula & Gaby"** from the sidebar dropdown. Paste the component-spec-compiler system prompt (from `presets/component-spec-compiler/SKILL.md`) into the chat input to configure the AI.
 
-Prompt:
+Type this prompt:
 
 ```
-Read the component-spec-compiler skill definition and summarize:
+Read the component-spec-compiler preset definition and summarize:
 - What input formats does it accept?
 - What output files does it generate?
 - What naming conventions does it enforce?
 - What are the hard-block strictness rules?
 ```
 
-### Step 2 — Load the design spec and run the skill
+### Step 2 — Load the design spec and run the preset
 
-```bash
-claude button-system-spec.md --skill component-spec-compiler
-```
-
-Or load through a free-form prompt without a file:
+Type this prompt:
 
 ```
-Run the component-spec-compiler skill. Here is the design spec:
+Run the component-spec-compiler preset. Here is the design spec:
 
 COLOR PALETTE
 - Primary: default #1A6FB0, hover #155892, active #104273, disabled #A0C4E8
@@ -159,7 +153,7 @@ Generate:
 
 ### Step 3 — Generate CSS custom properties
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Generate the CSS custom properties file with these sections:
@@ -190,7 +184,7 @@ All spacing in px. Line heights unitless.
 
 ### Step 4 — Generate the Style Dictionary JSON
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Now generate a Style Dictionary JSON file with:
@@ -218,7 +212,7 @@ Rules:
 
 ### Step 5 — Generate component-specific button tokens
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Using the generated CSS variables, create component-specific button tokens.
@@ -250,7 +244,7 @@ Output a verification table: component_token, references, resolves (yes/no)
 
 ### Step 6 — Export and summarize
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Write all generated files:
@@ -258,14 +252,14 @@ Write all generated files:
 - style-dictionary-output.json
 - component-tokens-button.css
 
-Then print a terminal summary:
+Then print a summary:
 
 === COMPONENT SPEC COMPILER SUMMARY ===
 Source spec:            button-system-spec.md
 
 Tokens generated:
-  Color:                XX variables (X states × X categories)
-  Typography:           XX variables (X levels × X properties)
+  Color:                XX variables (X states x X categories)
+  Typography:           XX variables (X levels x X properties)
   Spacing:              X variables (X-step scale)
   Border & Radius:      X variables
   Shadow:               X variables (X elevation levels)
@@ -286,6 +280,7 @@ After completing all steps, you should have:
 
 - A complete CSS custom properties file with color, typography, spacing, border, and shadow sections
 - A platform-agnostic Style Dictionary JSON with `{value, type}` format across all categories
-- A component-specific button token block covering all 4 variants × 5 states
+- A component-specific button token block covering all 4 variants x 5 states
 - A cross-reference verification confirming all `var(--...)` references resolve
-- Practical experience running the `component-spec-compiler` skill for design-to-code handoff
+- All files downloadable from the portal for engineering handoff
+- Practical experience running the `component-spec-compiler` workspace preset for design-to-code handoff

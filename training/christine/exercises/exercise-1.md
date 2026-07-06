@@ -31,14 +31,14 @@ Christine has received a raw copy deck from a freelance copywriter (`raw_copy_de
 
 ## Walkthrough Steps
 
-```
-claude ../data/raw_copy_deck.md --skill brand-guardrails
-```
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `raw_copy_deck.md`.
 
 **Step 1 — Initial brand scan:**
+
+Type this prompt into the chat input:
+
 ```
-Step 1 Prompt:
-Load ../data/raw_copy_deck.md. Perform a brand compliance scan and report:
+Load raw_copy_deck.md. Perform a brand compliance scan and report:
 
 1. How many instances of passive voice can you find? List each one
    with its line number and the full sentence.
@@ -52,8 +52,10 @@ Organize findings in a table: issue_type, line, snippet, severity
 ```
 
 **Step 2 — Competitor context analysis:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 2 Prompt:
 For each competitor mention you found, classify the context:
 - Comparative ("unlike X...") → high severity
 - Customer quote mentioning previous vendor → medium severity
@@ -64,8 +66,10 @@ ones need immediate rewriting.
 ```
 
 **Step 3 — Tone and voice report:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 3 Prompt:
 Analyze the overall tone of the document:
 
 1. Identify 3 sentences that sound too formal for the brand
@@ -78,8 +82,10 @@ For each flagged sentence, suggest a brand-compliant rewrite.
 ```
 
 **Step 4 — Generate the audit report:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 4 Prompt:
 Write a CSV called brand_audit_violations.csv with all violations found.
 Columns: violation_type, line, text_snippet, severity, recommendation.
 
@@ -91,7 +97,7 @@ Include at least these violation types in the CSV:
 - formatting_issue
 - superlative_no_evidence
 
-Print a terminal summary:
+Print a summary:
 
 === BRAND AUDIT SUMMARY ===
 File: raw_copy_deck.md
@@ -109,3 +115,9 @@ Low severity:          X
 
 Document rating:       [consistent / mostly consistent / inconsistent]
 ```
+
+## Expected Output
+
+- A structured violation table printed in the chat
+- A downloadable `brand_audit_violations.csv` file with all findings
+- Brand-compliant rewrites for each high-severity violation

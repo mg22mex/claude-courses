@@ -2,13 +2,13 @@
 
 ## Scenario
 
-This is the capstone exercise that integrates everything from Exercises 1-4. Your company needs a unified strategic operational blueprint that combines inventory health, fulfillment performance, and financial risk into a single executive dashboard. You will ingest two datasets, run a multi-phase analysis, and produce a strategic roadmap with clear recommendations.
+This is the capstone exercise that integrates everything from Exercises 1-4. Your company needs a unified strategic operational blueprint that combines inventory health, fulfilment performance, and financial risk into a single executive dashboard. You will upload two datasets, run a multi-phase analysis, and produce a strategic roadmap with clear recommendations.
 
 ## Learning Objectives
 
-- Combine multiple datasets into a unified analysis
+- Combine multiple datasets into a unified analysis in the Weatherman AI Portal
 - Assess inventory health across warehouses (stock levels, reorder points, demand)
-- Evaluate carrier fulfillment performance and compute risk scores
+- Evaluate carrier fulfilment performance and compute risk scores
 - Calculate a composite strategic score for each SKU-warehouse combination
 - Generate prioritised recommendations
 - Export a complete executive roadmap
@@ -17,10 +17,12 @@ This is the capstone exercise that integrates everything from Exercises 1-4. You
 
 This exercise uses two datasets from the data directory:
 
-- `../data/inventory_stock_levels.csv` — SKU-level stock, reorder points, demand
-- `../data/fulfillment_delay_report.csv` — Carrier delivery performance
+- `inventory_stock_levels.csv` — SKU-level stock, reorder points, demand
+- `fulfillment_delay_report.csv` — Carrier delivery performance
 
-### Inventory Stock Levels (`../data/inventory_stock_levels.csv`)
+Upload both files using the paperclip icon before starting.
+
+### Inventory Stock Levels (`inventory_stock_levels.csv`)
 
 ```csv
 sku,warehouse,stock_on_hand,reorder_point,lead_time_days,unit_cost,monthly_demand
@@ -44,7 +46,7 @@ SUPR-002,WH-East,150,80,5,9.00,100
 SUPR-002,WH-South,300,80,5,9.00,100
 ```
 
-### Fulfillment Delay Report (`../data/fulfillment_delay_report.csv`)
+### Fulfillment Delay Report (`fulfillment_delay_report.csv`)
 
 ```csv
 order_id,sku,warehouse,carrier,ship_date,estimated_delivery,actual_delivery,status,destination_region,declared_value
@@ -86,100 +88,101 @@ FUL-1020,GADG-010,WH-East,UPS,2026-03-10,2026-03-14,2026-03-14,delivered,SE,2500
 
 ### Phase A — Inventory Health Assessment
 
-```
-Load ../data/inventory_stock_levels.csv.
+Type this prompt into the chat input:
 
-For each SKU-warehouse combination, classify inventory status:
-- OUT_OF_STOCK: stock_on_hand <= 0
-- BELOW_REORDER: stock_on_hand < reorder_point
-- LOW_STOCK: stock_on_hand < reorder_point * 1.5
-- HEALTHY: everything else
+> "Using the inventory_stock_levels.csv file:
+>
+> For each SKU-warehouse combination, classify inventory status:
+> - OUT_OF_STOCK: stock_on_hand <= 0
+> - BELOW_REORDER: stock_on_hand < reorder_point
+> - LOW_STOCK: stock_on_hand < reorder_point * 1.5
+> - HEALTHY: everything else
+>
+> Also calculate days_of_stock = stock_on_hand / (monthly_demand / 30).
+>
+> Flag any SKU-warehouse that is BELOW_REORDER or worse.
+> Show results in a table sorted by severity (worst first)."
 
-Also calculate days_of_stock = stock_on_hand / (monthly_demand / 30).
+### Phase B — Fulfilment Health Assessment
 
-Flag any SKU-warehouse that is BELOW_REORDER or worse.
-Show results in a table sorted by severity (worst first).
-```
+Type this prompt into the chat input:
 
-### Phase B — Fulfillment Health Assessment
-
-```
-Load ../data/fulfillment_delay_report.csv.
-
-For each carrier, calculate:
-- Total shipments
-- On-time count and percentage
-- Delayed count (status = "delayed" or actual > estimated)
-- Average delay in days
-- Total value at risk
-
-Classify carrier risk:
-- HIGH: on-time < 80%
-- MEDIUM: on-time 80-90%
-- LOW: on-time > 90%
-
-Show a carrier health table sorted by risk (highest first).
-```
+> "Using the fulfillment_delay_report.csv file:
+>
+> For each carrier, calculate:
+> - Total shipments
+> - On-time count and percentage
+> - Delayed count (status = 'delayed' or actual > estimated)
+> - Average delay in days
+> - Total value at risk
+>
+> Classify carrier risk:
+> - HIGH: on-time < 80%
+> - MEDIUM: on-time 80-90%
+> - LOW: on-time > 90%
+>
+> Show a carrier health table sorted by risk (highest first)."
 
 ### Phase C — Strategic Scoring
 
-```
-Combine the inventory and fulfillment analyses.
+Type this prompt into the chat input:
 
-For each SKU-warehouse combo, calculate a strategic score:
-- Base severity from inventory health:
-  - OUT_OF_STOCK = 5.0
-  - BELOW_REORDER = 3.0
-  - LOW_STOCK = 2.0
-  - HEALTHY = 0.0
-- Add carrier modifier based on the WORST carrier risk:
-  - HIGH = +3.0
-  - MEDIUM = +1.5
-  - LOW = +0.5
-
-Generate recommendations:
-- Score >= 6: CRITICAL — Immediate escalation
-- Score >= 4: WARNING — Review within 7 days
-- Score >= 2: MONITOR — Track in weekly review
-- Score < 2: OK — No action required
-
-Show the complete strategic scoring table.
-```
+> "Combine the inventory and fulfilment analyses.
+>
+> For each SKU-warehouse combo, calculate a strategic score:
+> - Base severity from inventory health:
+>   - OUT_OF_STOCK = 5.0
+>   - BELOW_REORDER = 3.0
+>   - LOW_STOCK = 2.0
+>   - HEALTHY = 0.0
+> - Add carrier modifier based on the WORST carrier risk:
+>   - HIGH = +3.0
+>   - MEDIUM = +1.5
+>   - LOW = +0.5
+>
+> Generate recommendations:
+> - Score >= 6: CRITICAL — Immediate escalation
+> - Score >= 4: WARNING — Review within 7 days
+> - Score >= 2: MONITOR — Track in weekly review
+> - Score < 2: OK — No action required
+>
+> Show the complete strategic scoring table."
 
 ### Phase D — Build the Executive Dashboard
 
-```
-Using the combined analysis, produce a unified executive summary:
+Type this prompt into the chat input:
 
-1. **Inventory Health Overview**
-   - Count of SKUs in each status category
-   - Total value of at-risk inventory (sum of stock_on_hand * unit_cost for BELOW_REORDER items)
-
-2. **Fulfillment Health Overview**
-   - On-time rate per carrier
-   - Total value at risk
-
-3. **Strategic Roadmap**
-   - Number of CRITICAL, WARNING, MONITOR, and OK items
-   - Top 5 highest-scored items with their recommendations
-```
+> "Using the combined analysis, produce a unified executive summary:
+>
+> 1. **Inventory Health Overview**
+>    - Count of SKUs in each status category
+>    - Total value of at-risk inventory (sum of stock_on_hand * unit_cost for BELOW_REORDER items)
+>
+> 2. **Fulfilment Health Overview**
+>    - On-time rate per carrier
+>    - Total value at risk
+>
+> 3. **Strategic Roadmap**
+>    - Number of CRITICAL, WARNING, MONITOR, and OK items
+>    - Top 5 highest-scored items with their recommendations"
 
 ### Phase E — Export the Blueprint
 
-```
-Write the complete strategic operational blueprint to strategic_roadmap.md,
-including:
-1. Executive summary (one page)
-2. Inventory health section with status counts and at-risk valuation
-3. Fulfillment health section with carrier rankings
-4. Strategic scoring table with all SKU-warehouse combinations
-5. Prioritised recommendations (CRITICAL items first)
-6. Appendix with data source descriptions
+Type this prompt into the chat input:
 
-Also export a machine-readable CSV (strategic_roadmap.csv) with columns:
-sku, warehouse, stock_on_hand, inventory_status, carrier_risk,
-strategic_score, recommendation
-```
+> "Write the complete strategic operational blueprint, including:
+> 1. Executive summary (one page)
+> 2. Inventory health section with status counts and at-risk valuation
+> 3. Fulfilment health section with carrier rankings
+> 4. Strategic scoring table with all SKU-warehouse combinations
+> 5. Prioritised recommendations (CRITICAL items first)
+> 6. Appendix with data source descriptions
+>
+> Also create a CSV table with columns:
+> sku, warehouse, stock_on_hand, inventory_status, carrier_risk,
+> strategic_score, recommendation"
+
+Use the download button to save the blueprint as `strategic-roadmap.md` and the CSV table as `strategic-roadmap.csv`.
 
 ## Expected Output
 
@@ -188,6 +191,6 @@ After completing all phases, you should have:
 - A complete inventory health assessment across all 18 SKU-warehouse combos
 - A carrier risk evaluation for all 4 carriers
 - A strategic score for every combination
-- A `strategic_roadmap.md` with the full executive blueprint (~3-5 pages)
-- A `strategic_roadmap.csv` with machine-readable prioritised recommendations
+- A `strategic-roadmap.md` with the full executive blueprint (approximately 3-5 pages)
+- A `strategic-roadmap.csv` with machine-readable prioritised recommendations
 - A list of CRITICAL items requiring immediate executive attention

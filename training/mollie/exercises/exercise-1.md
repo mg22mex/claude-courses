@@ -13,7 +13,7 @@ The nightly ETL pipeline failed at 2:34 AM. The data team needs a root-cause ana
 
 ## Dataset
 
-### Monte Carlo Incident Log (`monte_carlo_incident_log.csv`)
+### Monte Carlo Incident Log (`monte-carlo-incident-log.csv`)
 
 ```csv
 timestamp,check_name,status,value,threshold,dimension,severity
@@ -46,14 +46,13 @@ timestamp,check_name,status,value,threshold,dimension,severity
 
 ## Walkthrough Steps
 
-```
-claude monte_carlo_incident_log.csv --skill monte-carlo-analyze-root-cause
-```
+Open the Weatherman AI Portal in your browser. Select "Mollie" from the sidebar dropdown. Click the paperclip icon to upload the data file, then type each prompt into the chat input.
 
 **Step 1 — Load and classify:**
+
 ```
 Step 1 Prompt:
-Load monte_carlo_incident_log.csv. Show me:
+Upload monte_carlo_incident_log.csv. Show me:
 - All unique check_name values
 - All unique severity levels
 - The chronological sequence of FAILED checks
@@ -63,6 +62,7 @@ Filter to FAILED rows only, sorted by timestamp.
 ```
 
 **Step 2 — Build the incident timeline:**
+
 ```
 Step 2 Prompt:
 For each FAILED check, calculate the time since the previous failure:
@@ -75,6 +75,7 @@ Which check failed first? That's the likely root cause.
 ```
 
 **Step 3 — Trace the failure cascade:**
+
 ```
 Step 3 Prompt:
 Group the failures by dimension (table, dimension, field). For each
@@ -83,11 +84,12 @@ dimension, identify:
 - The severity trend (did it get worse over time?)
 - The relationship to other dimensions
 
-Draw the cascade: freshness_orders → volume_payments → null_rate_email
+Draw the cascade: freshness_orders -> volume_payments -> null_rate_email
 Explain how the first failure triggered the downstream failures.
 ```
 
 **Step 4 — Classify by blast radius:**
+
 ```
 Step 4 Prompt:
 Classify each failed check by blast radius:
@@ -100,20 +102,21 @@ Which checks should be prioritized for investigation?
 ```
 
 **Step 5 — Export root cause report:**
+
 ```
 Step 5 Prompt:
 Write a file called root_cause_report.csv with the structured findings:
 Root cause: freshness_orders (started at 02:15, never recovered)
-Cascade: freshness_orders → volume_payments → null_rate_email → dim_row_count_orders
+Cascade: freshness_orders -> volume_payments -> null_rate_email -> dim_row_count_orders
 Total duration: XX minutes
 Checks affected: X of X
 Highest severity: CRITICAL (on X checks)
 
-Then print a terminal summary:
+Then display a summary:
 
 === INCIDENT ROOT CAUSE ANALYSIS ===
-Incident:   Nightly ETL Failure — 2026-06-17
-Duration:   XX minutes (02:15 — XX:XX)
+Incident:   Nightly ETL Failure -- 2026-06-17
+Duration:   XX minutes (02:15 -- XX:XX)
 
 ROOT CAUSE: freshness_orders
 The orders table stopped receiving fresh data at 02:15.

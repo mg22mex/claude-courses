@@ -1,20 +1,20 @@
-# Sales & Financials: Order-to-Profit Analysis with Claude Code
+# Sales & Financials: Order-to-Profit Analysis
 
-**Course Title:** Order-to-Profit Analysis with Claude Code
+**Course Title:** Order-to-Profit Analysis
 **Target User:** Mollie — Sales & Financials team
 **Prerequisites:** Familiarity with Shopify admin, basic CSV/spreadsheet experience; no coding experience required.
 **Estimated Duration:** 6 hours (split across three 2-hour sessions)
-**Format:** Live walkthrough + hands-on terminal exercises
+**Format:** Live walkthrough + hands-on portal exercises
 
 ---
 
 ## Pre-Work: Load Your Institutional Memory
 
-Before starting this course, open the [Master Claude Code Guide](https://notebooklm.google.com/notebook/4bdb17a3-6657-4d63-adbe-8f63c22521c2?authuser=1) alongside your domain-specific NotebookLM notebook. Query both notebooks to understand how Claude Code operates in your domain before writing any scripts or building tools.
+Before starting this course, open the [Master Claude Code Guide](https://notebooklm.google.com/notebook/4bdb17a3-6657-4d63-adbe-8f63c22521c2?authuser=1) alongside your domain-specific NotebookLM notebook. Query both notebooks to understand the business rules, data schemas, and known edge cases for your domain.
 
 **Your Domain Notebook:** [Mollie's Sales Notebook](https://notebooklm.google.com/notebook/2ab95bfd-ceeb-436d-b41f-85a89e3ca749?authuser=1)
 
-> **Workflow Rule:** All script generation, data testing, or document templating in this track must cross-verify patterns against both the Master Guide and your Domain Notebook before execution.
+> **Workflow Rule:** All preset generation, data testing, and document templating in this track must cross-verify patterns against both the Master Guide and your Domain Notebook before finalizing.
 
 ---
 
@@ -22,7 +22,7 @@ Before starting this course, open the [Master Claude Code Guide](https://noteboo
 
 By the end of this course, Mollie will be able to:
 
-1. Load and inspect raw Shopify order exports and webhook payloads in Claude Code.
+1. Load and inspect raw Shopify order exports and webhook payloads in the Weatherman AI Portal.
 2. Join advertising spend data with gross sales data to calculate true profit per channel.
 3. Calculate and track profit margin trends across products, channels, and time periods.
 4. Detect anomalies — outliers, missing orders, margin compression, and data gaps.
@@ -37,27 +37,24 @@ By the end of this course, Mollie will be able to:
 
 ### Lesson 1 — Loading Shopify Order Data (60 min)
 
-**Objective:** Pull orders from Shopify into Claude Code and understand the data shape.
+**Objective:** Pull orders from Shopify into the portal and understand the data shape.
 
 | Segment | Topic | Activity |
 |---|---|---|
-| 1.1 | Where the data lives | Shopify admin → Orders → Export CSV. Also: webhook JSON payloads from the Shopify "orders/create" topic. |
-| 1.2 | Loading an order export CSV | Load `data/shopify_orders_2026-06.csv` and inspect columns: order ID, line items, totals, discounts, shipping, taxes. |
-| 1.3 | Loading a webhook JSON payload | Load a raw `data/shopify_webhook_sample.json` — nested JSON with order items, customer data, and fulfillment status. |
-| 1.4 | Flattening nested data | Ask Claude to unroll line items from the webhook payload into a flat table (one row per line item). |
+| 1.1 | Where the data lives | Shopify admin -> Orders -> Export CSV. Also: webhook JSON payloads from the Shopify "orders/create" topic. |
+| 1.2 | Loading an order export CSV | Upload `data/shopify-orders-2026-06.csv` using the paperclip icon and inspect columns: order ID, line items, totals, discounts, shipping, taxes. |
+| 1.3 | Loading a webhook JSON payload | Upload `data/shopify-webhook-sample.json` — nested JSON with order items, customer data, and fulfillment status. |
+| 1.4 | Flattening nested data | Ask the portal AI to unroll line items from the webhook payload into a flat table (one row per line item). |
 | 1.5 | Filtering and scoping | Filter by date range, order status (paid vs. pending vs. cancelled), and sales channel (online, POS, wholesale). |
 
-**CLI Exercises:**
+**Portal Exercises:**
+
+Open the Weatherman AI Portal in your browser. Select "Mollie" from the sidebar dropdown. Click the paperclip icon to upload the file, then type the natural-language prompt into the chat input.
+
+**Exercise 1.2** — Upload `data/shopify-orders-2026-06.csv` in the portal and type:
 
 ```
-# Exercise 1.2 — Inspect a Shopify order export
-claude data/shopify_orders_2026-06.csv
-```
-
-Prompt:
-
-```
-Read data/shopify_orders_2026-06.csv and tell me:
+Read the uploaded file and tell me:
 - How many rows and columns
 - What each column name is
 - Which date range is covered (look for the "created_at" column)
@@ -65,12 +62,7 @@ Read data/shopify_orders_2026-06.csv and tell me:
 - How many orders are cancelled vs. completed vs. pending
 ```
 
-```
-# Exercise 1.3 — Load a webhook JSON payload
-claude data/shopify_webhook_sample.json
-```
-
-Prompt:
+**Exercise 1.3** — Upload `data/shopify-webhook-sample.json` in the portal and type:
 
 ```
 This is a Shopify "orders/create" webhook payload. Walk me through:
@@ -81,10 +73,9 @@ This is a Shopify "orders/create" webhook payload. Walk me through:
 - What is the "landing_site" or "referring_site" value?
 ```
 
-```
-# Exercise 1.4 — Flatten line items
-Prompt (continuing the same session):
+**Exercise 1.4** — Continuing in the same session, type:
 
+```
 Take the line_items array from this webhook and flatten it into a table.
 One row per line item. Columns: order_id, order_number, item_name, sku,
 quantity, price, total_discount, total_line_item.
@@ -102,26 +93,23 @@ tax_rate column.
 | Segment | Topic | Activity |
 |---|---|---|
 | 2.1 | The reconciliation problem | Ad spend comes from Google Ads / Meta dashboards (CSV). Sales come from Shopify. They use different date labels, channel names, and granularity. |
-| 2.2 | Loading the ad spend matrix | Load `data/ad_spend_june_2026.csv` — columns: date, channel, campaign, spend, impressions, clicks. |
-| 2.3 | Loading the sales table | Load `data/shopify_orders_2026-06.csv` alongside it. |
-| 2.4 | Joining on date + channel | Instruct Claude to aggregate daily gross sales by channel, then join with the ad spend table on `date` and `channel`. |
+| 2.2 | Loading the ad spend matrix | Upload `data/ad-spend-june-2026.csv` — columns: date, channel, campaign, spend, impressions, clicks. |
+| 2.3 | Loading the sales table | Upload `data/shopify-orders-2026-06.csv` alongside it. |
+| 2.4 | Joining on date + channel | Instruct the portal AI to aggregate daily gross sales by channel, then join with the ad spend table on `date` and `channel`. |
 | 2.5 | Calculating net income | Compute `net = gross_sales - ad_spend` per channel per day. Find which channels are losing money. |
 
-**CLI Exercises:**
+**Portal Exercises:**
 
-```
-# Exercise 2.4 — Join ad spend with sales
-claude data/ad_spend_june_2026.csv data/shopify_orders_2026-06.csv
-```
+Open the Weatherman AI Portal in your browser. Select "Mollie" from the sidebar dropdown. Upload both CSV files using the paperclip icon. Then type your prompts.
 
-Prompt:
+**Exercise 2.4** — Upload both files and type:
 
 ```
 I have two files:
-1. data/ad_spend_june_2026.csv — columns: date, channel, campaign, spend, impressions, clicks
+1. ad_spend_june_2026.csv — columns: date, channel, campaign, spend, impressions, clicks
    - "channel" values are: "google_shopping", "google_search", "meta_newsfeed", "meta_stories",
      "email", "organic", "direct"
-2. data/shopify_orders_2026-06.csv — columns: order_id, created_at, total_price, channel, ...
+2. shopify_orders_2026-06.csv — columns: order_id, created_at, total_price, channel, ...
 
 Step 1: Aggregate the Shopify orders by date and channel. For each (date, channel) pair,
 sum up total_price as gross_sales.
@@ -135,10 +123,9 @@ date, channel, spend, gross_sales, (gross_sales - spend) as net
 Step 4: Highlight every row where net is negative.
 ```
 
-```
-# Exercise 2.5 — Channel profitability summary
-Prompt (continuing the same session):
+**Exercise 2.5** — Continuing in the same session, type:
 
+```
 Roll up the joined table by channel. For each channel, show me:
 - Total spend
 - Total gross sales
@@ -157,27 +144,24 @@ Sort by net descending. Which channels are unprofitable?
 | Segment | Topic | Activity |
 |---|---|---|
 | 3.1 | What goes into a margin | COGS (cost of goods sold), shipping, transaction fees, discounts, and ad spend. Each lives in a different data source. |
-| 3.2 | Loading the cost data | Load `data/product_cogs.csv` (SKU → unit cost) and `data/shopify_fees.csv` (transaction fees per order). |
+| 3.2 | Loading the cost data | Upload `data/product-cogs.csv` (SKU -> unit cost) and `data/shopify-fees.csv` (transaction fees per order). |
 | 3.3 | Joining COGS to orders | Match each line item's SKU to its COGS, then calculate `item_margin = (item_price - unit_cost) / item_price`. |
 | 3.4 | Full-profit order view | For each order: `order_margin = (total_revenue - total_cogs - shipping - fees - discounts) / total_revenue`. |
 | 3.5 | Margin reporting by channel | Average margin % per channel. Flag any channel where margin dropped more than 5% month-over-month. |
 
-**CLI Exercises:**
+**Portal Exercises:**
 
-```
-# Exercise 3.3 — Add COGS to line items
-claude data/shopify_orders_2026-06.csv data/product_cogs.csv
-```
+Open the Weatherman AI Portal in your browser. Select "Mollie" from the sidebar dropdown. Upload the required files using the paperclip icon, then type your prompts.
 
-Prompt:
+**Exercise 3.3** — Upload both files and type:
 
 ```
 I have two files:
-1. data/shopify_orders_2026-06.csv — columns include: order_id, item_sku, item_price, quantity, ...
-2. data/product_cogs.csv — columns: sku, unit_cost, supplier
+1. shopify_orders_2026-06.csv — columns include: order_id, item_sku, item_price, quantity, ...
+2. product_cogs.csv — columns: sku, unit_cost, supplier
 
 Step 1: For every line item row in the orders file, look up the matching
-unit_cost from data/product_cogs.csv by SKU.
+unit_cost from product_cogs.csv by SKU.
 
 Step 2: Calculate:
    line_revenue = item_price * quantity
@@ -190,12 +174,7 @@ Those are low-margin products — we need to watch them.
 Step 4: What is the minimum, maximum, and average margin across all line items?
 ```
 
-```
-# Exercise 3.5 — Channel margin comparison
-claude data/shopify_orders_2026-06.csv data/product_cogs.csv data/shopify_fees.csv
-```
-
-Prompt:
+**Exercise 3.5** — Upload all three files and type:
 
 ```
 Load all three files. Use the orders, COGS, and transaction fees to calculate
@@ -222,19 +201,16 @@ does it trail the best-performing channel?
 | Segment | Topic | Activity |
 |---|---|---|
 | 4.1 | Types of anomalies | Missing days (no orders on a weekday), margin dips, zero-revenue ad spend days, spike in cancelled orders, outlier order totals. |
-| 4.2 | Detecting gaps in the order log | Ask Claude to scan the date column and flag any calendar dates with zero orders. |
-| 4.3 | Statistical outliers | Instruct Claude to flag orders where `total_price` is more than 3 standard deviations from the mean. |
+| 4.2 | Detecting gaps in the order log | Ask the portal AI to scan the date column and flag any calendar dates with zero orders. |
+| 4.3 | Statistical outliers | Instruct the portal AI to flag orders where `total_price` is more than 3 standard deviations from the mean. |
 | 4.4 | Margin anomaly alerts | Compare each product's current margin to its trailing 4-week average. Flag drops beyond a threshold. |
 | 4.5 | Building the weekly sales-review prompt | Create a single prompt that loads all data sources, runs the full pipeline, and writes a report. |
 
-**CLI Exercises:**
+**Portal Exercises:**
 
-```
-# Exercise 4.2 — Find missing dates
-claude data/shopify_orders_2026-06.csv
-```
+Open the Weatherman AI Portal in your browser. Select "Mollie" from the sidebar dropdown. Upload the required files using the paperclip icon, then type your prompts.
 
-Prompt:
+**Exercise 4.2** — Upload the file and type:
 
 ```
 Scan the "created_at" column and build a list of every calendar date from
@@ -245,10 +221,9 @@ Show me the list of missing dates, if any. Also count how many weekends
 (Saturday–Sunday) had orders — those may indicate off-hours fulfillment.
 ```
 
-```
-# Exercise 4.3 — Price outlier detection
-Prompt (continuing the same session):
+**Exercise 4.3** — Continuing in the same session, type:
 
+```
 Calculate the mean and standard deviation of "total_price" across all orders.
 
 Flag any order where:
@@ -259,19 +234,14 @@ Explain what might cause this — is it a wholesale bulk order, a refund,
 or a data error?
 ```
 
-```
-# Exercise 4.5 — Full weekly review
-claude data/shopify_orders_2026-06.csv data/product_cogs.csv data/shopify_fees.csv data/ad_spend_june_2026.csv < weekly_sales_review.md
-```
+**Exercise 4.5** — Upload all four data files and type:
 
-**weekly_sales_review.md** (create this file during the lesson):
-
-```markdown
+```
 I have four files loaded:
-1. data/shopify_orders_2026-06.csv — all June orders
-2. data/product_cogs.csv — cost of goods per SKU
-3. data/shopify_fees.csv — transaction fees per order
-4. data/ad_spend_june_2026.csv — advertising spend by channel and day
+1. shopify_orders_2026-06.csv — all June orders
+2. product_cogs.csv — cost of goods per SKU
+3. shopify_fees.csv — transaction fees per order
+4. ad_spend_june_2026.csv — advertising spend by channel and day
 
 Please do the following, in order:
 
@@ -292,11 +262,11 @@ Please do the following, in order:
 - Highlight unprofitable channels (negative net)
 
 ## Step 4 — Report
-- Write a consolidated CSV called weekly_sales_report.csv with these sheets/sections:
+- Write a consolidated CSV called weekly_sales_report.csv with these sections:
   1. "margin_by_product" — SKU, margin%, change_vs_last_month
   2. "channel_pnl" — channel, gross, spend, net, roas
   3. "anomalies" — type, order_id, date, value, threshold, notes
-- Print a terminal summary with total revenue, total ad spend, blended margin, and anomaly count
+- Print a summary with total revenue, total ad spend, blended margin, and anomaly count
 ```
 
 ---
@@ -308,25 +278,22 @@ Please do the following, in order:
 | Segment | Topic | Activity |
 |---|---|---|
 | 5.1 | The reconciliation problem | Payment gateways (Stripe, PayPal) send settlement reports. The order ledger tracks every order. Discrepancies between them mean missing money or unaccounted fees. |
-| 5.2 | Loading settlement and ledger data | Load `data/payout_reconciliation.csv` alongside `data/shopify_orders_2026-06.csv` — two views of the same transactions, with intentional mismatches. |
+| 5.2 | Loading settlement and ledger data | Upload `data/payout-reconciliation.csv` alongside `data/shopify-orders-2026-06.csv` — two views of the same transactions, with intentional mismatches. |
 | 5.3 | Full outer join cross-reference | Perform a full outer join on transaction_id. Classify each row: matched OK, amount mismatch, missing from ledger, missing from settlement. |
 | 5.4 | Platform fee audit | For each gateway, calculate expected fees vs. actual fees. Flag overcharges and inconsistent fee percentages. |
 | 5.5 | Payout gap calculation | Sum settled net amounts vs. expected payout total. Isolate which transactions are missing from payout batches and flag pending/voided statuses. |
 
-**CLI Exercises:**
+**Portal Exercises:**
+
+Open the Weatherman AI Portal in your browser. Select "Mollie" from the sidebar dropdown. Upload both files using the paperclip icon, then type your prompts.
+
+**Exercise 5.3** — Upload both files and type:
 
 ```
-# Exercise 5.3 — Full reconciliation cross-reference
-claude data/payout_reconciliation.csv data/shopify_orders_2026-06.csv
-```
-
-Prompt:
-
-```
-Load data/payout_reconciliation.csv and data/shopify_orders_2026-06.csv.
+Load payout_reconciliation.csv and shopify_orders_2026-06.csv.
 
 Step 1: Normalize column names. Map the settlement file's
-transaction_id → order_id, gross_amount → total_price, fee → transaction_fee.
+transaction_id -> order_id, gross_amount -> total_price, fee -> transaction_fee.
 
 Step 2: Perform a FULL OUTER JOIN on transaction_id (settlement) / order_id
 (ledger). For each row, classify as:
@@ -341,10 +308,9 @@ Step 4: Calculate total settled amount, total ledger amount, and the
 net difference.
 ```
 
-```
-# Exercise 5.4 — Fee audit by gateway
-Prompt (continuing the same session):
+**Exercise 5.4** — Continuing in the same session, type:
 
+```
 Using the joined dataset:
 
 1. Group by gateway (stripe vs. paypal).
@@ -362,10 +328,9 @@ Using the joined dataset:
 Output a gateway fee audit table with expected vs. actual rates.
 ```
 
-```
-# Exercise 5.5 — Payout gap isolation
-Prompt (continuing the same session):
+**Exercise 5.5** — Continuing in the same session, type:
 
+```
 Using the reconciliation results:
 
 1. List all transactions where payout_id is missing (status = "pending").
@@ -388,18 +353,16 @@ Output a payout gap summary table.
 | Segment | Topic | Activity |
 |---|---|---|
 | 6.1 | Alerting and observability | Data pipelines generate alerts for freshness drops, volume anomalies, and schema changes. These need to reach operations in their messaging platform of choice. |
-| 6.2 | Loading a Monte Carlo alert | Load a simulated Monte Carlo alert JSON — a freshness alert on the orders table with severity, observed value, and threshold. |
+| 6.2 | Loading a Monte Carlo alert | Upload a simulated Monte Carlo alert JSON — a freshness alert on the orders table with severity, observed value, and threshold. |
 | 6.3 | Alert classification and severity mapping | Classify the alert dimension (freshness, volume, null_ratio, schema_change) and assign severity (CRITICAL, WARNING, INFO) based on magnitude. |
 | 6.4 | Slack webhook payload generation | Transform the alert into a Slack Block Kit JSON payload with header, fields table, message, and investigation button. |
 | 6.5 | Teams webhook payload generation | Transform the same alert into a Microsoft Teams Adaptive Card JSON payload with matching content. |
 
-**CLI Exercises:**
+**Portal Exercises:**
 
-```
-# Exercise 6.2 — Load and classify an alert
-```
+Open the Weatherman AI Portal in your browser. Select "Mollie" from the sidebar dropdown. Then type your prompts directly in the chat input.
 
-Prompt:
+**Exercise 6.2** — Type this prompt:
 
 ```
 I have a simulated Monte Carlo alert JSON:
@@ -422,10 +385,9 @@ Classify this alert:
 - Suggested Slack channel: what should it be?
 ```
 
-```
-# Exercise 6.4 — Generate Slack webhook JSON
-Prompt (continuing the same session):
+**Exercise 6.4** — Continuing in the same session, type:
 
+```
 Generate a Slack Block Kit webhook payload for the alert above.
 
 Rules:
@@ -438,10 +400,9 @@ Output the complete JSON payload.
 Validate it: no trailing commas, valid JSON, all variables resolved.
 ```
 
-```
-# Exercise 6.5 — Generate Teams webhook JSON
-Prompt (continuing the same session):
+**Exercise 6.5** — Continuing in the same session, type:
 
+```
 Generate a Microsoft Teams Adaptive Card payload for the same alert.
 
 Rules:
@@ -461,12 +422,12 @@ The following sample files are provided in `data/` for use during exercises:
 
 | File | Description |
 |---|---|
-| `data/shopify_orders_2026-06.csv` | 20 Shopify orders from June 2026 across 6 channels |
-| `data/shopify_webhook_sample.json` | Single "orders/create" webhook payload (nested JSON) |
-| `data/product_cogs.csv` | COGS master list (20 SKUs with unit cost and supplier) |
-| `data/shopify_fees.csv` | Transaction fees per order (payment gateway + flat fee) |
-| `data/ad_spend_june_2026.csv` | Daily ad spend by channel (Google, Meta, email, organic) |
-| `data/payout_reconciliation.csv` | Payout settlement report with 36 transactions across Stripe and PayPal, including pending, refunded, and voided edge cases |
+| `data/shopify-orders-2026-06.csv` | 20 Shopify orders from June 2026 across 6 channels |
+| `data/shopify-webhook-sample.json` | Single "orders/create" webhook payload (nested JSON) |
+| `data/product-cogs.csv` | COGS master list (20 SKUs with unit cost and supplier) |
+| `data/shopify-fees.csv` | Transaction fees per order (payment gateway + flat fee) |
+| `data/ad-spend-june-2026.csv` | Daily ad spend by channel (Google, Meta, email, organic) |
+| `data/payout-reconciliation.csv` | Payout settlement report with 36 transactions across Stripe and PayPal, including pending, refunded, and voided edge cases |
 
 ---
 
@@ -474,20 +435,20 @@ The following sample files are provided in `data/` for use during exercises:
 
 | Resource | Path / Location |
 |---|---|
-| Course slide deck | `training/mollie/` |
+| Course overview | `training/mollie/` |
 | Sample data assets | `training/mollie/data/` |
 | Exercise 1 — Incident Root-Cause Profiling | `training/mollie/exercises/exercise-1.md` |
 | Exercise 2 — Deep-Dive Data Freshness Verification | `training/mollie/exercises/exercise-2.md` |
 | Exercise 3 — Automated Financial Reconciliation Engine | `training/mollie/exercises/exercise-3.md` |
 | Exercise 4 — Multi-Source Webhook Payload Orchestration | `training/mollie/exercises/exercise-4.md` |
 | Exercise 5 — Capstone Data Observability & Alerting Pipeline | `training/mollie/exercises/exercise-5.md` |
-| Shopify sales mock data | `training/mollie/data/shopify_sales.csv` |
-| Marketing spend mock data | `training/mollie/data/marketing_spend.csv` |
-| csv-analytics skill | `skills/csv-analytics/SKILL.md` |
-| reconciliation-engine skill | `skills/reconciliation-engine/SKILL.md` |
-| anomaly-alert-webhook skill | `skills/anomaly-alert-webhook/SKILL.md` |
-| xlsx-processing skill | `../sunny/skills/xlsx-processing/SKILL.md` |
-| data-table-validator skill | `../sunny/skills/data-table-validator/SKILL.md` |
+| Shopify sales mock data | `training/mollie/data/shopify-sales.csv` |
+| Marketing spend mock data | `training/mollie/data/marketing-spend.csv` |
+| csv-analytics preset | `training/mollie/presets/csv-analytics/SKILL.md` |
+| reconciliation-engine preset | `training/mollie/presets/reconciliation-engine/SKILL.md` |
+| anomaly-alert-webhook preset | `training/mollie/presets/anomaly-alert-webhook/SKILL.md` |
+| xlsx-processing preset | `training/sunny/presets/xlsx-processing/SKILL.md` |
+| data-table-validator preset | `training/sunny/presets/data-table-validator/SKILL.md` |
 
 ---
 
@@ -503,3 +464,26 @@ Mollie can independently:
 - [ ] Run the full weekly sales-review pipeline using the saved prompt template
 - [ ] Reconcile settlement reports against order ledgers and isolate payout mismatches
 - [ ] Generate platform-specific webhook JSON payloads from observability alerts
+
+---
+
+## Workspace Presets
+
+The following presets are stored in `training/mollie/presets/`. Copy and paste the system prompt from each preset into the Weatherman AI Portal chat before starting a session to configure the AI with domain-specific instructions for that task:
+
+| Preset | Description |
+|---|---|
+| `presets/csv-analytics/SKILL.md` | Cross-examine ad spend and sales CSVs, join on date/channel, calculate profitability |
+| `presets/reconciliation-engine/SKILL.md` | Cross-reference payment settlement tables against order ledgers |
+| `presets/anomaly-alert-webhook/SKILL.md` | Parse observability alerts and generate Slack/Teams webhook JSON |
+| `presets/monte-carlo-analyze-root-cause/SKILL.md` | Investigate data incidents and trace root causes through failure cascades |
+
+---
+
+### 🌟 High-Impact Operational Presets
+
+**1. Enterprise Retail Pitch Strategist** — talking points for premium accounts (Nordstrom, PGA).  
+**2. License Alliance Vetting Assistant** — auditing co-branding layout agreements for IP protection.  
+**3. Demographic Ad Visual Auditor** — reviewing ad targeting and copy for upscale golf/retail alignment.  
+**4. Strategic Account Growth Roadmap Planner** — structured YoY growth strategies for key accounts.  
+**5. Brand Guideline Compliance Verifier** — cross-checking third-party assets against brand identity guardrails.

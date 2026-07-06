@@ -2,7 +2,7 @@
 
 ## Scenario
 
-Christine is preparing a batch of 10 new product listings for the Shopify storefront. Before publishing, she needs to cross-check every listing's metadata — title tags, meta descriptions, image alt text, and body copy — against a target keyword spreadsheet. The listing-verification skill will flag missing keywords, broken metadata, duplicate content, and SEO compliance gaps.
+Christine is preparing a batch of 10 new product listings for the Shopify storefront. Before publishing, she needs to cross-check every listing's metadata — title tags, meta descriptions, image alt text, and body copy — against a target keyword spreadsheet. The listing-verification workspace preset will flag missing keywords, broken metadata, duplicate content, and SEO compliance gaps.
 
 ## Learning Objectives
 
@@ -56,13 +56,13 @@ keyword,min_occurrences,field_focus
 
 ## Walkthrough Steps
 
-```
-claude shopify_listings_export.csv --skill listing-verification
-```
+Open the Weatherman AI Portal in your browser. Select "Christine" from the sidebar dropdown. Click the paperclip icon and upload `shopify_listings_export.csv`.
 
 **Step 1 — Load and inspect listing data:**
+
+Type this prompt into the chat input:
+
 ```
-Step 1 Prompt:
 Load shopify_listings_export.csv. Show me:
 - Total listings and their statuses (published vs. draft)
 - All unique categories
@@ -73,8 +73,10 @@ List all structural issues before running the keyword scan.
 ```
 
 **Step 2 — Metadata technical audit:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 2 Prompt:
 For every published listing, run a technical metadata audit:
 
 1. Title tag length — flag any under 30 or over 60 characters
@@ -87,8 +89,10 @@ Show a table: sku, title_length, title_ok, meta_length, meta_ok, brand_suffix, d
 ```
 
 **Step 3 — Image alt text audit:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 3 Prompt:
 Audit every listing's image_alt_tags field:
 
 1. Are any alt tags empty? (non-compliance)
@@ -101,8 +105,10 @@ Show: sku, alt_tags_count, has_keyword, generic_flags, status
 ```
 
 **Step 4 — Keyword compliance scan:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 4 Prompt:
 Using the target keyword list:
 
 keyword,min_occurrences,field_focus
@@ -118,16 +124,18 @@ Scan every published listing and for each keyword report:
 - Whether min_occurrences is met per field
 - Per-keyword pass/fail across all listings
 
-Grade each keyword per listing: ✅ Present, ⚠️ Underused, ❌ Missing
+Grade each keyword per listing: Present, Underused, Missing
 ```
 
 **Step 5 — Export audit report:**
+
+Type this prompt into the chat input (continuing the same session):
+
 ```
-Step 5 Prompt:
 Write a CSV called listing_audit_report.csv with all violations found.
 Columns: sku, field, issue_type, severity, recommendation.
 
-Then print a terminal summary:
+Then print a summary:
 
 === LISTING SEO AUDIT REPORT ===
 Products scanned:      10
@@ -143,12 +151,20 @@ MOST COMMON ISSUES:
   - Missing brand suffix in title_tag             (X products)
 
 KEYWORD COMPLIANCE:
-  "cloud sync":         X of 10 listings ✅
-  "real-time backup":   X of 10 listings ✅
-  "enterprise security": X of 10 listings ❌ (not found in any listing)
-  "cross-platform":     X of 10 listings ✅
-  "file sharing":       X of 10 listings ✅
-  "cloud storage":       X of 10 listings ✅
+  "cloud sync":         X of 10 listings
+  "real-time backup":   X of 10 listings
+  "enterprise security": X of 10 listings (not found in any listing)
+  "cross-platform":     X of 10 listings
+  "file sharing":       X of 10 listings
+  "cloud storage":       X of 10 listings
 
 OVERALL SEO READINESS: [strong / needs work / poor]
 ```
+
+## Expected Output
+
+- A structural overview of all 10 listings with status breakdown
+- A metadata technical audit table with length and format checks
+- An alt text quality audit identifying generic entries
+- A keyword compliance report with per-keyword pass/fail grades
+- A downloadable `listing_audit_report.csv` file

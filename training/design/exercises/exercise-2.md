@@ -6,8 +6,8 @@ The Design team maintains two token files — a JSON global schema (`design-toke
 
 ## Learning Objectives
 
-- Load and parse structured JSON and CSS design token files in Claude Code
-- Build local prompt workflows for systematic token-by-token validation
+- Upload and parse structured JSON and CSS design token files in the Weatherman AI Portal
+- Build prompt workflows for systematic token-by-token validation
 - Verify hex color codes against an approved brand palette
 - Validate spacing values against a modular scale
 - Resolve token references and flag broken or circular dependency chains
@@ -15,12 +15,12 @@ The Design team maintains two token files — a JSON global schema (`design-toke
 
 ## Dataset
 
-Use the two token files from `data/mock-assets/`.
+Open the Weatherman AI Portal in your browser. Select **"Paula & Gaby"** from the sidebar dropdown. Use the paperclip icon to upload the two token files from `data/mock-assets/`.
 
 | File | Description |
 |---|---|
-| `../data/mock-assets/design-tokens.json` | Global token schema with color, spacing, typography, shadow, and component tokens |
-| `../data/mock-assets/component-tokens.css` | Component-level CSS custom properties referencing global tokens |
+| `design-tokens.json` | Global token schema with color, spacing, typography, shadow, and component tokens |
+| `component-tokens.css` | Component-level CSS custom properties referencing global tokens |
 
 ### Approved Brand Palette
 
@@ -60,13 +60,11 @@ Use the two token files from `data/mock-assets/`.
 
 ## Walkthrough
 
-### Step 1 — Load token files and run the design-token-validator skill
+### Step 1 — Upload token files and run the design-token-validator workspace preset
 
-```bash
-claude ../data/mock-assets/design-tokens.json ../data/mock-assets/component-tokens.css --skill design-token-validator
-```
+Open the Weatherman AI Portal in your browser. Select **"Paula & Gaby"** from the sidebar dropdown. Click the paperclip icon and upload both token files. Then paste the design-token-validator system prompt (from `presets/design-token-validator/SKILL.md`) into the chat input first to configure the AI.
 
-Prompt:
+Type this prompt:
 
 ```
 Load both token files and run a structural audit:
@@ -82,7 +80,7 @@ Load both token files and run a structural audit:
 
 ### Step 2 — Validate all color tokens
 
-Prompt (continuing the same session):
+Type this prompt (continuing the same session):
 
 ```
 Validate every color token against this approved palette:
@@ -106,7 +104,7 @@ Output columns: token_name, current_value, expected_value, status, action
 
 ### Step 3 — Validate typography and spacing
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Validate typography and spacing against brand standards:
@@ -132,7 +130,7 @@ Output: category, token_name, value, issue, suggestion
 
 ### Step 4 — Resolve token references
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Resolve all token references across both files:
@@ -159,7 +157,7 @@ Output: file, reference, resolves_to, status (ok/broken/deprecated), suggested_f
 
 ### Step 5 — Fix token issues and write corrected files
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Fix all the issues found:
@@ -195,13 +193,13 @@ defined token? Show a cross-reference verification table.
 
 ### Step 6 — Export the token audit report
 
-Prompt (continuing the session):
+Type this prompt (continuing the session):
 
 ```
 Write token_audit_report.csv with all issues found.
 Columns: token_name, category, current_value, issue, severity, suggested_fix
 
-Print a terminal summary:
+Print a summary:
 
 === TOKEN VALIDATION REPORT ===
 Files scanned:        2
@@ -230,6 +228,6 @@ After completing all steps, you should have:
 - All broken token references resolved
 - Deprecated naming conventions updated to current patterns
 - Missing required tokens added
-- Corrected files: `design-tokens-fixed.json` and `component-tokens-fixed.css`
+- Corrected files: `design-tokens-fixed.json` and `component-tokens-fixed.css` (downloadable via the portal)
 - A `token_audit_report.csv` documenting every issue and fix
-- Practical experience running the `design-token-validator` skill
+- Practical experience running the `design-token-validator` workspace preset

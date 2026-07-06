@@ -2,11 +2,11 @@
 
 ## Scenario
 
-Your company operates multiple warehouses that stock overlapping SKUs. When a warehouse runs low on a critical SKU, the system needs to know which other warehouses can fulfill the gap. You need to build a dependency map showing how warehouses are connected through shared inventory, and identify single points of failure where only one warehouse stocks a particular SKU.
+Your company operates multiple warehouses that stock overlapping SKUs. When a warehouse runs low on a critical SKU, the system needs to know which other warehouses can fulfil the gap. You need to build a dependency map showing how warehouses are connected through shared inventory, and identify single points of failure where only one warehouse stocks a particular SKU.
 
 ## Learning Objectives
 
-- Load and inspect multi-warehouse inventory data
+- Upload and inspect multi-warehouse inventory data in the Weatherman AI Portal
 - Map SKU-to-warehouse and warehouse-to-SKU relationships
 - Build a warehouse dependency graph based on shared SKUs
 - Calculate criticality scores for each warehouse
@@ -15,9 +15,9 @@ Your company operates multiple warehouses that stock overlapping SKUs. When a wa
 
 ## Dataset
 
-Use `inventory_stock_levels.csv` from the data directory.
+Use `inventory_stock_levels.csv` from the data directory. Upload it using the paperclip icon.
 
-### File: `../data/inventory_stock_levels.csv`
+### File: `inventory_stock_levels.csv`
 
 ```csv
 sku,warehouse,stock_on_hand,reorder_point,lead_time_days,unit_cost,monthly_demand
@@ -53,78 +53,76 @@ SUPR-002,WH-South,300,80,5,9.00,100
 
 ## Walkthrough
 
-### Step 1 — Load and inspect inventory data
+### Step 1 — Log into the portal and upload inventory data
 
-```bash
-claude ../data/inventory_stock_levels.csv
-```
+Open the Weatherman AI Portal in your browser. Select "Rick" from the sidebar dropdown. Upload the `inventory_stock_levels.csv` file using the paperclip icon.
 
-Prompt:
+Type this prompt into the chat input:
 
-```
-Describe this inventory dataset:
-- How many rows and columns
-- What each column means
-- How many unique SKUs and warehouses
-- Which SKUs are stocked in multiple warehouses vs a single warehouse
-```
+> "Describe this inventory dataset:
+> - How many rows and columns
+> - What each column means
+> - How many unique SKUs and warehouses
+> - Which SKUs are stocked in multiple warehouses vs a single warehouse"
 
 ### Step 2 — Build SKU-warehouse relationship map
 
-```
-For each SKU, list all warehouses that stock it. Group by SKU.
-Then for each warehouse, list all SKUs it holds. Group by warehouse.
+Type this prompt into the chat input:
 
-Show me both views in a single report.
-```
+> "For each SKU, list all warehouses that stock it. Group by SKU.
+> Then for each warehouse, list all SKUs it holds. Group by warehouse.
+>
+> Show me both views in a single report."
 
 ### Step 3 — Build the warehouse dependency graph
 
-```
-Two warehouses are "connected" if they stock at least one common SKU.
-Build a dependency graph:
-- WH-North <--> [list of connected warehouses]
-- WH-East  <--> [list of connected warehouses]
-- WH-South <--> [list of connected warehouses]
+Type this prompt into the chat input:
 
-Explain which warehouse would be the most disruptive if it went offline.
-```
+> "Two warehouses are 'connected' if they stock at least one common SKU.
+> Build a dependency graph:
+> - WH-North <--> [list of connected warehouses]
+> - WH-East  <--> [list of connected warehouses]
+> - WH-South <--> [list of connected warehouses]
+>
+> Explain which warehouse would be the most disruptive if it went offline."
 
 ### Step 4 — Criticality analysis
 
-```
-For each SKU, determine how many warehouses stock it:
-- SKUs stocked in exactly 1 warehouse are "exclusive" to that warehouse
-- SKUs stocked in 2+ warehouses have redundancy
+Type this prompt into the chat input:
 
-Calculate per warehouse:
-- Total SKUs held
-- Number of exclusive SKUs (only stocked here)
-- Criticality percentage = (exclusive / total) * 100
-
-Flag any warehouse with criticality >= 50% as HIGH risk.
-```
+> "For each SKU, determine how many warehouses stock it:
+> - SKUs stocked in exactly 1 warehouse are 'exclusive' to that warehouse
+> - SKUs stocked in 2+ warehouses have redundancy
+>
+> Calculate per warehouse:
+> - Total SKUs held
+> - Number of exclusive SKUs (only stocked here)
+> - Criticality percentage = (exclusive / total) * 100
+>
+> Flag any warehouse with criticality >= 50% as HIGH risk."
 
 ### Step 5 — Export dependency and criticality report
 
-```
-Write a structured report to a file called architecture_report.md containing:
+Type this prompt into the chat input:
 
-1. **SKU-Warehouse Map** — table of every SKU and the warehouses that stock it
-2. **Dependency Graph** — text representation of warehouse connections
-3. **Criticality Analysis** — table with warehouse, total_skus, exclusive_skus, criticality_pct, risk_level
-4. **Single Points of Failure** — list of SKUs with no redundancy
-5. **Recommendations** — 2-3 suggestions for reducing dependency risk
+> "Write a structured report containing:
+>
+> 1. **SKU-Warehouse Map** — table of every SKU and the warehouses that stock it
+> 2. **Dependency Graph** — text representation of warehouse connections
+> 3. **Criticality Analysis** — table with warehouse, total_skus, exclusive_skus, criticality_pct, risk_level
+> 4. **Single Points of Failure** — list of SKUs with no redundancy
+> 5. **Recommendations** — 2-3 suggestions for reducing dependency risk
+>
+> Also create a CSV table with the criticality scores."
 
-Also export the criticality table as criticality_report.csv.
-```
+Use the download button to save the generated report as `architecture-report.md` and the CSV table as `criticality-report.csv`.
 
 ## Expected Output
 
 After completing all steps, you should have:
 
-- A complete SKU-warehouse relationship map (14 SKUs × 3 warehouses)
+- A complete SKU-warehouse relationship map (14 SKUs x 3 warehouses)
 - A warehouse dependency graph showing WH-North as the most connected node
 - Criticality analysis flagging WH-South as HIGH risk (GADG-020 is exclusive)
-- An `architecture_report.md` with the full analysis
-- A `criticality_report.csv` with machine-readable scores
+- An `architecture-report.md` with the full analysis
+- A `criticality-report.csv` with machine-readable scores
