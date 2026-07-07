@@ -6,52 +6,82 @@ import os      # Added to safely read environment variables inside the Hugging F
 st.set_page_config(page_title="Weatherman Claude Portal", layout="wide")
 
 # --- Configuration & Secrets ---
-# FIX: Using os.environ.get ensures Hugging Face picks up your DEEPSEEK_API_KEY flawlessly
 DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY")
-GITHUB_RAW_URL = "https://raw.githubusercontent.com/mg22mex/claude-courses/main/training"
+GITHUB_RAW_URL = "https://raw.githubusercontent.com/mg22mex/claude-courses/main"
 
 st.title("⚡ Weatherman AI Portal")
 st.caption("Zero-install enterprise workspace backed by DeepSeek & OpenClaude")
 
-# --- Sidebar Team Picker ---
+# --- Sidebar Team & Preset Picker ---
 st.sidebar.header("Workspace Settings")
+
+# Included General / Master Guide at the top
 user = st.sidebar.selectbox(
     "Who is logging in today?",
-    ["Select Name", "Rick", "Sunny", "Christine", "Mollie", "Paula & Gabby"]
+    ["Select Name", "General / Master Guide", "Rick", "Sunny", "Christine", "Mollie", "Paula & Gabby"]
 )
 
-# Map UI names to your repository directory folders
+# Map UI names to repository directory paths
 folder_map = {
-    "Rick": "rick",
-    "Sunny": "sunny",
-    "Christine": "christine",
-    "Mollie": "mollie",
-    "Paula & Gabby": "design"
+    "General / Master Guide": "", # Root directory
+    "Rick": "training/rick",
+    "Sunny": "training/sunny",
+    "Christine": "training/christine",
+    "Mollie": "training/mollie",
+    "Paula & Gabby": "training/design"
+}
+
+# Map available workspace task presets to each track
+preset_map = {
+    "General / Master Guide": ["global-onboarding", "portal-flight-manual-lookup"],
+    "Rick": ["fulfillment-anomaly-detector", "write-a-prd", "ppt-generation", "architecture-diagram"],
+    "Sunny": ["lead-time-anomaly", "customs-tariff-audit", "warehouse-balancing", "xlsx-processing", "data-table-validator"],
+    "Mollie": ["csv-analytics", "monte-carlo-analyze-root-cause", "reconciliation-engine", "anomaly-alert-webhook"],
+    "Christine": ["brand-guardrails", "email-automation", "listing-verification", "campaign-analytics"],
+    "Paula & Gabby": ["svg-auditor", "design-token-validator", "component-spec-compiler", "asset-pack-optimizer"]
 }
 
 if user != "Select Name":
-    dept_folder = folder_map[user]
+    dept_path = folder_map[user]
     
-    # Model Router adapted for DeepSeek execution engine setups
+    # Model Router
     model_choice = st.sidebar.radio("Select AI Engine", ["DeepSeek (Data/Logic)", "OpenClaude (Creative/Copy)"])
     
-    # Dynamically fetch the system preset from your GitHub repo
+    # Dynamic Secondary Sub-Preset Dropdown Selection
+    selected_preset = st.sidebar.selectbox("Select Workspace Preset Task", preset_map[user])
+    
+    # Dynamically fetch system context from GitHub repo
     with st.spinner("Loading your personalized workspace preset..."):
         try:
-            # Assumes the preset instruction file lives at: training/{dept}/presets/SYSTEM_PROMPT.md
-            response = requests.get(f"{GITHUB_RAW_URL}/{dept_folder}/presets/SYSTEM_PROMPT.md")
-            system_prompt = response.text if response.status_code == 200 else "You are a helpful assistant for Weatherman."
+            # Construct the file path dynamically based on whether it's root or a department folder
+            if dept_path == "":
+                master_prompt_url = f"{GITHUB_RAW_URL}/SYSTEM_PROMPT.md"
+                preset_prompt_url = f"{GITHUB_RAW_URL}/training/general/presets/{selected_preset}/instructions.md" # Fallback/future structure placeholder
+            else:
+                master_prompt_url = f"{GITHUB_RAW_URL}/{dept_path}/presets/SYSTEM_PROMPT.md"
+                preset_prompt_url = f"{GITHUB_RAW_URL}/{dept_path}/presets/{selected_preset}/instructions.md"
+
+            # Fetch Master Role Profile
+            master_resp = requests.get(master_prompt_url)
+            master_prompt = master_resp.text if master_resp.status_code == 200 else "You are a helpful assistant for Weatherman."
+            
+            # Fetch Specific Task Instructions if they exist
+            preset_resp = requests.get(preset_prompt_url)
+            preset_instructions = preset_resp.text if preset_resp.status_code == 200 else f"Execute operational task: {selected_preset}."
+            
+            # Combine master persona with specific task directives
+            system_prompt = f"{master_prompt}\n\n## Active Task Directives\n{preset_instructions}"
+            
         except Exception:
             system_prompt = "You are a helpful assistant for Weatherman."
             
-    st.sidebar.success(f"{user}'s Profile Loaded Active!")
+    st.sidebar.success(f"{user}'s Profile & Preset Loaded!")
     
     # --- File Uploader ---
     uploaded_file = st.file_uploader("Attach operational data sheets (.xlsx, .csv, .pdf)", type=["xlsx", "csv", "pdf"])
     file_context = ""
     if uploaded_file is not None:
         st.info(f"📎 Attached: {uploaded_file.name}")
-        # Simple text representation for prototype testing
         file_context = f"\n\n[Attached File Content from {uploaded_file.name}]:\n" + str(uploaded_file.read())
 
     # --- Chat Interface ---
@@ -70,7 +100,7 @@ if user != "Select Name":
         # Build payload combining system instructions, attached context files, and the user prompt
         full_user_content = prompt + file_context if file_context else prompt
         
-        # Point both setups to DeepSeek Base URL using the environment variable key
+        # Initialize client pointing to DeepSeek Endpoint
         client = openai.OpenAI(api_key=DEEPSEEK_KEY, base_url="https://api.deepseek.com/v1")
         
         if model_choice == "DeepSeek (Data/Logic)":
@@ -79,16 +109,25 @@ if user != "Select Name":
             target_model = "deepseek-chat"      # Fast, standard V3 chat model
 
         with st.chat_message("assistant"):
+            response_placeholder = st.empty()
+            
+            # Enabled streaming for smoother output generation
             response_stream = client.chat.completions.create(
                 model=target_model,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": full_user_content}
                 ],
-                stream=False
+                stream=True
             )
-            ai_response = response_stream.choices[0].message.content
-            st.markdown(ai_response)
-            st.session_state.messages.append({"role": "assistant", "content": ai_response})
+            
+            full_response = ""
+            for chunk in response_stream:
+                if chunk.choices[0].delta.content:
+                    full_response += chunk.choices[0].delta.content
+                    response_placeholder.markdown(full_response + "▌")
+            
+            response_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
 else:
     st.warning("Please select your name in the sidebar to activate your custom prompt presets.")
