@@ -1,0 +1,27 @@
+name: Sync Training to Google Drive
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'training/**'
+      - 'README.md'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Sync Files to Google Drive
+        uses: adityassआजाद/gdrive-upload-action@v1
+        with:
+          credentials: ${{ secrets.GDRIVE_SECRET }}
+          folderId: ${{ secrets.GDRIVE_FOLDER_ID }}
+          overwrite: true
+          mirror: true
+          path: |
+            README.md
+            training/
