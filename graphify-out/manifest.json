@@ -1,0 +1,412 @@
+{
+  ".openclaude/settings.local.json": {
+    "mtime": 1783381128.4075425,
+    "ast_hash": "6cf7faf0a534c8fad18ca5f24a0268ce",
+    "semantic_hash": ""
+  },
+  "app.py": {
+    "mtime": 1783436827.373891,
+    "ast_hash": "48596b4c65354f7c7ae709eaef5521bb",
+    "semantic_hash": ""
+  },
+  "mcp_config.json": {
+    "mtime": 1783436475.782706,
+    "ast_hash": "3845c98b35883dea3c5ad36ff9bc4279",
+    "semantic_hash": ""
+  },
+  "skills-lock.json": {
+    "mtime": 1783381042.5213308,
+    "ast_hash": "0c48b1ca6fd971df437613909a472722",
+    "semantic_hash": ""
+  },
+  "training/mollie/data/shopify-webhook-sample.json": {
+    "mtime": 1783008893.523229,
+    "ast_hash": "176dc946b17d4328bfcd74888dbc4d3b",
+    "semantic_hash": ""
+  },
+  ".github/workflows/sync_to_gdrive.yml": {
+    "mtime": 1783388938.6391857,
+    "ast_hash": "3abcf80fa20357c8e77c12dd141edefd",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1783380371.3996882,
+    "ast_hash": "25067a5bccbb254a99990643facbd143",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1783443675.2788432,
+    "ast_hash": "9c22373ec4b0a49ed54dbc4140a6c646",
+    "semantic_hash": ""
+  },
+  "SYSTEM_PROMPT.md": {
+    "mtime": 1783391102.5450628,
+    "ast_hash": "130d5142e355d16bfd29059b7043bfb7",
+    "semantic_hash": ""
+  },
+  "portal-flight-manual.md": {
+    "mtime": 1783389116.275501,
+    "ast_hash": "f1558f68f0a32f65d5f4b9b78bfc6e48",
+    "semantic_hash": ""
+  },
+  "requirements.txt": {
+    "mtime": 1783436475.7125292,
+    "ast_hash": "fa1d1f15832d638e7e87cdc6502a6ff2",
+    "semantic_hash": ""
+  },
+  "training/christine/data/raw-copy-deck.md": {
+    "mtime": 1783005689.1436794,
+    "ast_hash": "4c61271ec73bed6513003a1d8d75f6b3",
+    "semantic_hash": ""
+  },
+  "training/christine/data/raw-email-campaign.md": {
+    "mtime": 1783006384.9259994,
+    "ast_hash": "16381b7c4bf498bf5b567147ca35c067",
+    "semantic_hash": ""
+  },
+  "training/christine/exercises/exercise-1.md": {
+    "mtime": 1783380632.9946113,
+    "ast_hash": "072063b8fabbff20c1f659334ffce2bf",
+    "semantic_hash": ""
+  },
+  "training/christine/exercises/exercise-2.md": {
+    "mtime": 1783380633.0046117,
+    "ast_hash": "d47e15b919ddf1496867ad3328dd038a",
+    "semantic_hash": ""
+  },
+  "training/christine/exercises/exercise-3.md": {
+    "mtime": 1783380633.0179453,
+    "ast_hash": "58b64234517f38da79b4a98474cc29f8",
+    "semantic_hash": ""
+  },
+  "training/christine/exercises/exercise-4.md": {
+    "mtime": 1783380633.0246122,
+    "ast_hash": "cb1dcf29a19e1d3d29a9feb6b196a687",
+    "semantic_hash": ""
+  },
+  "training/christine/exercises/exercise-5.md": {
+    "mtime": 1783380633.037946,
+    "ast_hash": "373a64d4b32344e1198b1ee8ff00274c",
+    "semantic_hash": ""
+  },
+  "training/christine/presets/SYSTEM_PROMPT.md": {
+    "mtime": 1783389993.6741512,
+    "ast_hash": "fb1647cf51998c31adf1b1c85191ccd4",
+    "semantic_hash": ""
+  },
+  "training/christine/presets/brand-guardrails/SKILL.md": {
+    "mtime": 1783381034.06853,
+    "ast_hash": "a0830f13a66da926fe2db99a90c2f5c9",
+    "semantic_hash": ""
+  },
+  "training/christine/presets/campaign-analytics/SKILL.md": {
+    "mtime": 1783381034.2485106,
+    "ast_hash": "c007c38685c3b89b95660365f77b73b3",
+    "semantic_hash": ""
+  },
+  "training/christine/presets/email-automation/SKILL.md": {
+    "mtime": 1783381034.328502,
+    "ast_hash": "529f5ebb8176427a867e12b1b8a5e000",
+    "semantic_hash": ""
+  },
+  "training/christine/presets/listing-verification/SKILL.md": {
+    "mtime": 1783381034.4318242,
+    "ast_hash": "ad4fda0807335834fe404fbb38f64acc",
+    "semantic_hash": ""
+  },
+  "training/christine/syllabus.md": {
+    "mtime": 1783380558.0055807,
+    "ast_hash": "8f923863ff1ee2eb4020b679301423cb",
+    "semantic_hash": ""
+  },
+  "training/design/exercises/exercise-1.md": {
+    "mtime": 1783380604.957061,
+    "ast_hash": "5df3faaedeeb3a85882bf34e23e375d7",
+    "semantic_hash": ""
+  },
+  "training/design/exercises/exercise-2.md": {
+    "mtime": 1783380604.9670613,
+    "ast_hash": "99bc163caa668b0770a3fd0f804937e7",
+    "semantic_hash": ""
+  },
+  "training/design/exercises/exercise-3.md": {
+    "mtime": 1783380604.9770617,
+    "ast_hash": "6513ebc287ef8c74031584849baba12e",
+    "semantic_hash": ""
+  },
+  "training/design/exercises/exercise-4.md": {
+    "mtime": 1783380604.987062,
+    "ast_hash": "d0a0de834b96749ae55b11690b420bbd",
+    "semantic_hash": ""
+  },
+  "training/design/exercises/exercise-5.md": {
+    "mtime": 1783380604.9937289,
+    "ast_hash": "15460643bc102e0a885f9a3a1e9c3bda",
+    "semantic_hash": ""
+  },
+  "training/design/presets/SYSTEM_PROMPT.md": {
+    "mtime": 1783389993.675058,
+    "ast_hash": "6578b59a71101315c62ae03e09eb49f3",
+    "semantic_hash": ""
+  },
+  "training/design/presets/asset-pack-optimizer/SKILL.md": {
+    "mtime": 1783380678.1493673,
+    "ast_hash": "1a41317883edeb43ed76353a08d38ea9",
+    "semantic_hash": ""
+  },
+  "training/design/presets/component-spec-compiler/SKILL.md": {
+    "mtime": 1783380678.1393669,
+    "ast_hash": "11c19d7f25120d3b4cae814b39b82149",
+    "semantic_hash": ""
+  },
+  "training/design/presets/design-token-validator/SKILL.md": {
+    "mtime": 1783380678.126033,
+    "ast_hash": "e34b1a5a8b87e1ef4c8bf07598c63925",
+    "semantic_hash": ""
+  },
+  "training/design/presets/svg-auditor/SKILL.md": {
+    "mtime": 1783380678.1126995,
+    "ast_hash": "a867755a92ea7879dd2cdca8dad7e077",
+    "semantic_hash": ""
+  },
+  "training/design/syllabus.md": {
+    "mtime": 1783380526.7812624,
+    "ast_hash": "c3c2d57a581331de590fe7266dadc86f",
+    "semantic_hash": ""
+  },
+  "training/mollie/exercises/exercise-1.md": {
+    "mtime": 1783380602.4036472,
+    "ast_hash": "dab6be4b589818a152507c8711dd3317",
+    "semantic_hash": ""
+  },
+  "training/mollie/exercises/exercise-2.md": {
+    "mtime": 1783380602.416981,
+    "ast_hash": "e339e47426793320078692161667ce75",
+    "semantic_hash": ""
+  },
+  "training/mollie/exercises/exercise-3.md": {
+    "mtime": 1783380602.4236479,
+    "ast_hash": "a1e560e9c34c108dc2ff6dd1affa00ce",
+    "semantic_hash": ""
+  },
+  "training/mollie/exercises/exercise-4.md": {
+    "mtime": 1783380602.433648,
+    "ast_hash": "32239a035df3c904970ede9b683942eb",
+    "semantic_hash": ""
+  },
+  "training/mollie/exercises/exercise-5.md": {
+    "mtime": 1783380602.440315,
+    "ast_hash": "20dffa71e6f517f0a0ce3bebed261f17",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/SYSTEM_PROMPT.md": {
+    "mtime": 1783389993.6732285,
+    "ast_hash": "3e0138a489b2cdc1c937807b23c6fa9a",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/anomaly-alert-webhook/SKILL.md": {
+    "mtime": 1783381033.39861,
+    "ast_hash": "0ab2283a62c3214c7d0e4903f2016af6",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/csv-analytics/SKILL.md": {
+    "mtime": 1783381033.2586272,
+    "ast_hash": "e3c9327e6c2be1ec93d704c68ef3ebc1",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/README.md": {
+    "mtime": 1782959440.8267305,
+    "ast_hash": "68216551db76fdb6eb3ba6c7da7dd4ff",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/SKILL.md": {
+    "mtime": 1783381033.8052278,
+    "ast_hash": "2e097a4ed24c3c351e5c5a30251f82df",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/references/common-root-causes.md": {
+    "mtime": 1782959440.8270116,
+    "ast_hash": "a68f1324641d749c42a6874a14727d41",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/references/data-exploration.md": {
+    "mtime": 1782959440.8270214,
+    "ast_hash": "98d0cd59ffa8b12c92119f28341ebe9d",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/references/etl-failure-investigation.md": {
+    "mtime": 1782959440.8270497,
+    "ast_hash": "4fa005b05136b58a1510bbf076b84999",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/references/field-anomaly-investigation.md": {
+    "mtime": 1782959440.8270497,
+    "ast_hash": "f6f453c2456760a50827d4c86365a7d2",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/references/freshness-investigation.md": {
+    "mtime": 1782959440.8270655,
+    "ast_hash": "4a74a5c1f7c5424fc4ab0a2902d03ef6",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/references/intake-no-incident.md": {
+    "mtime": 1782959440.8270776,
+    "ast_hash": "0b607ab857357d5dc535d3a89eec616c",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/references/query-change-investigation.md": {
+    "mtime": 1782959440.8270874,
+    "ast_hash": "fc41e717009e54911dd6d64cb76baeba",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/references/schema-investigation.md": {
+    "mtime": 1782959440.8271053,
+    "ast_hash": "21a92419a852ee7e61f350a89caea239",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/monte-carlo-analyze-root-cause/references/volume-investigation.md": {
+    "mtime": 1782959440.8271053,
+    "ast_hash": "8bd70302b0945b0b6ee8225932c44d8f",
+    "semantic_hash": ""
+  },
+  "training/mollie/presets/reconciliation-engine/SKILL.md": {
+    "mtime": 1783381033.5745156,
+    "ast_hash": "96490df1e811cf806d088c97518691e2",
+    "semantic_hash": ""
+  },
+  "training/mollie/syllabus.md": {
+    "mtime": 1783380549.4819784,
+    "ast_hash": "e5501f12bc558c42c8c4b2ac86766f26",
+    "semantic_hash": ""
+  },
+  "training/rick/exercises/exercise-1.md": {
+    "mtime": 1783380593.643371,
+    "ast_hash": "8272cbc8181bf2f7e3a41cb234640947",
+    "semantic_hash": ""
+  },
+  "training/rick/exercises/exercise-2.md": {
+    "mtime": 1783380593.6600382,
+    "ast_hash": "1d720b1c061a0bbb2ad8f8950d57d47e",
+    "semantic_hash": ""
+  },
+  "training/rick/exercises/exercise-3.md": {
+    "mtime": 1783380593.6700385,
+    "ast_hash": "0941ff3fc2c70f79dc02d53cc19660aa",
+    "semantic_hash": ""
+  },
+  "training/rick/exercises/exercise-4.md": {
+    "mtime": 1783380593.680039,
+    "ast_hash": "7da6d3ad69ace693dc4c05d48c81743f",
+    "semantic_hash": ""
+  },
+  "training/rick/exercises/exercise-5.md": {
+    "mtime": 1783380593.6900392,
+    "ast_hash": "15e401772479ff22b96c65e772d0c078",
+    "semantic_hash": ""
+  },
+  "training/rick/presets/SYSTEM_PROMPT.md": {
+    "mtime": 1783388076.4272187,
+    "ast_hash": "e3c169e98734d6429de28d3b3c05d5bb",
+    "semantic_hash": ""
+  },
+  "training/rick/presets/architecture-diagram/SKILL.md": {
+    "mtime": 1783380822.7705863,
+    "ast_hash": "d2caf1e96df00388c214fbc6fad2a59b",
+    "semantic_hash": ""
+  },
+  "training/rick/presets/fulfillment-anomaly-detector/SKILL.md": {
+    "mtime": 1783380822.5072446,
+    "ast_hash": "ae0d9324d012c41de05707173093dd9e",
+    "semantic_hash": ""
+  },
+  "training/rick/presets/ppt-generation/SKILL.md": {
+    "mtime": 1783380822.7039175,
+    "ast_hash": "4df13d7f683a5931cf3e5002571cf781",
+    "semantic_hash": ""
+  },
+  "training/rick/presets/write-a-prd/SKILL.md": {
+    "mtime": 1783380822.6205816,
+    "ast_hash": "4898acf6eb3b68e6855e8242f8a9a326",
+    "semantic_hash": ""
+  },
+  "training/rick/syllabus.md": {
+    "mtime": 1783380533.0747943,
+    "ast_hash": "c8914693796c7cb9032c1db316090a43",
+    "semantic_hash": ""
+  },
+  "training/sunny/exercises/exercise-1.md": {
+    "mtime": 1783380586.3731418,
+    "ast_hash": "723b7e2592772c62d6f2ea918ea2bdca",
+    "semantic_hash": ""
+  },
+  "training/sunny/exercises/exercise-2.md": {
+    "mtime": 1783380586.3831422,
+    "ast_hash": "2c3547794b56d6406dd1ecbf69e06c35",
+    "semantic_hash": ""
+  },
+  "training/sunny/exercises/exercise-3.md": {
+    "mtime": 1783380586.3931425,
+    "ast_hash": "515e95c518130efd5a830c1810ffb977",
+    "semantic_hash": ""
+  },
+  "training/sunny/exercises/exercise-4.md": {
+    "mtime": 1783380586.4031427,
+    "ast_hash": "459fcb315a46b5033c55e6e2982fbb37",
+    "semantic_hash": ""
+  },
+  "training/sunny/exercises/exercise-5.md": {
+    "mtime": 1783380586.4131432,
+    "ast_hash": "95d6f09c9261975f09685bc935d52f59",
+    "semantic_hash": ""
+  },
+  "training/sunny/presets/SYSTEM_PROMPT.md": {
+    "mtime": 1783389993.6721869,
+    "ast_hash": "0b92d211e090cd8f6b1ab01be053cc2f",
+    "semantic_hash": ""
+  },
+  "training/sunny/presets/customs-tariff-audit/SKILL.md": {
+    "mtime": 1783380912.9734232,
+    "ast_hash": "91f56ae15fb37eb9a8b4a0f68ca20eb9",
+    "semantic_hash": ""
+  },
+  "training/sunny/presets/data-table-validator/SKILL.md": {
+    "mtime": 1783380913.056759,
+    "ast_hash": "ec0bd9bb7c3338827f15ad1f6cef8e5b",
+    "semantic_hash": ""
+  },
+  "training/sunny/presets/lead-time-anomaly/SKILL.md": {
+    "mtime": 1783380912.9000876,
+    "ast_hash": "eeab73160652242b02dca96db11ae93d",
+    "semantic_hash": ""
+  },
+  "training/sunny/presets/warehouse-balancing/SKILL.md": {
+    "mtime": 1783380913.1500955,
+    "ast_hash": "db3cf1150d1efb401f67cba1e0f5a321",
+    "semantic_hash": ""
+  },
+  "training/sunny/presets/xlsx-processing/SKILL.md": {
+    "mtime": 1783380913.2500987,
+    "ast_hash": "a1e4ef953340a987e0c1d631f96911a5",
+    "semantic_hash": ""
+  },
+  "training/sunny/syllabus.md": {
+    "mtime": 1783380586.359808,
+    "ast_hash": "6b34f968245afe2e288afad4b6f4ecf0",
+    "semantic_hash": ""
+  },
+  "training/design/data/mock-assets/icon-cloud-sync.svg": {
+    "mtime": 1783008144.4335408,
+    "ast_hash": "5f2f6c7e654130aa31f226661515836a",
+    "semantic_hash": ""
+  },
+  "training/design/data/mock-assets/illustration-dashboard.svg": {
+    "mtime": 1783008144.443542,
+    "ast_hash": "bb24c7e710aeebab8e8255d2597f0bc6",
+    "semantic_hash": ""
+  },
+  "training/design/data/mock-assets/logo-hero-main.svg": {
+    "mtime": 1783008144.4368746,
+    "ast_hash": "b970807a9b1ac978feafe14f3cfcb1d9",
+    "semantic_hash": ""
+  }
+}
