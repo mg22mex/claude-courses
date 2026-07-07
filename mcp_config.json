@@ -1,0 +1,39 @@
+{
+  "mcp_servers": {
+    "google-drive": {
+      "command": "node /app/mcp-servers/google-drive/dist/index.js",
+      "description": "Read, search, and organize Google Drive files and folders",
+      "enabled": false
+    },
+    "gmail": {
+      "command": "node /app/mcp-servers/gmail/dist/index.js",
+      "description": "Send, read, and search Gmail messages",
+      "enabled": false
+    },
+    "slack": {
+      "command": "node /app/mcp-servers/slack/dist/index.js",
+      "description": "Post messages, search channels, and manage Slack workspace",
+      "enabled": false
+    },
+    "monday-com": {
+      "command": "node /app/mcp-servers/monday-com/dist/index.js",
+      "description": "Create, read, update Monday.com boards, items, and pulses",
+      "enabled": false
+    },
+    "dropbox": {
+      "command": "node /app/mcp-servers/dropbox/dist/index.js",
+      "description": "Upload, download, and manage Dropbox files",
+      "enabled": false
+    },
+    "triple-whale": {
+      "command": "node /app/mcp-servers/triple-whale/dist/index.js",
+      "description": "Query Triple Whale analytics and marketing data",
+      "enabled": false
+    },
+    "sellerboard": {
+      "command": "node /app/mcp-servers/sellerboard/dist/index.js",
+      "description": "Access Sellerboard financial and P&L data",
+      "enabled": false
+    }
+  }
+}
