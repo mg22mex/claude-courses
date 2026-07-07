@@ -110,3 +110,5 @@ No coding experience is required — only basic familiarity with spreadsheets an
 ## License
 
 Internal use — training materials for operational team onboarding.
+
+<- Update CLAUDE.md and README.md with global GDrive Sync Active -->
