@@ -69,3 +69,4 @@ These NotebookLM notebooks contain the full institutional knowledge backing each
 | Mollie — Sales | <https://notebooklm.google.com/notebook/2ab95bfd-ceeb-436d-b41f-85a89e3ca749?authuser=1> |
 | Christine — Marketing | <https://notebooklm.google.com/notebook/0a616bb3-6ea7-40c8-b53c-984fa4d977bc?authuser=1> |
 | Design (Paula & Gaby) | <https://notebooklm.google.com/notebook/9f67d0db-49c8-4bc3-b2e5-f08a3528028f?authuser=1> |
+\n<- Update CLAUDE.md and README.md with global Sync Triggered for Master Notebook Context -->
