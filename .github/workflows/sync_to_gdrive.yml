@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Sync Files to Google Drive
-        uses: adityass आजाद/gdrive-upload-action@v1
+        uses: adityassआजाद/gdrive-upload-action@v1
         with:
           credentials: ${{ secrets.GDRIVE_SECRET }}
           folderId: ${{ secrets.GDRIVE_FOLDER_ID }}
