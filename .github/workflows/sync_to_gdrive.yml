@@ -15,13 +15,34 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Sync Files to Google Drive
-        uses: JBlakem/gdrive-upload-action@v1.2
-        with:
-          credentials: ${{ secrets.GDRIVE_SECRET }}
-          folderId: ${{ secrets.GDRIVE_FOLDER_ID }}
-          overwrite: true
-          mirror: true
-          path: |
-            README.md
-            training/
+      - name: Install Rclone
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rclone
+
+      - name: Configure Rclone & Run Sync
+        env:
+          GDRIVE_SECRET: ${{ secrets.GDRIVE_SECRET }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+        run: |
+          # 1. Safely store the service account JSON
+          echo "$GDRIVE_SECRET" > sa.json
+          
+          # 2. Build a clean on-the-fly rclone config profile
+          mkdir -p ~/.config/rclone
+          cat <<CONFIG > ~/.config/rclone/rclone.conf
+          [gdrive]
+          type = drive
+          service_account_file = sa.json
+          root_folder_id = $GDRIVE_FOLDER_ID
+          CONFIG
+          
+          # 3. Direct mirror syncing
+          echo "⚡ Starting core training assets synchronization..."
+          rclone sync training/ gdrive:training --verbose
+          
+          echo "⚡ Copying master README template..."
+          rclone copyto README.md gdrive:README.md --verbose
+          
+          # 4. Cleanup temporary credentials file
+          rm sa.json
