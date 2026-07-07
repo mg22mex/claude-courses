@@ -7,6 +7,8 @@ on:
     paths:
       - 'training/**'
       - 'README.md'
+      - 'CLAUDE.md'
+      - 'portal-flight-manual.md'
 
 jobs:
   sync:
@@ -34,8 +36,14 @@ jobs:
           root_folder_id = $GDRIVE_FOLDER_ID
           CONFIG
           
-          echo "⚡ Starting synchronization as user..."
+          echo "⚡ Synchronizing the core departmental tracks folder..."
           rclone sync training/ gdrive:training --verbose --drive-use-trash=false
 
           echo "⚡ Copying master README template..."
           rclone copyto README.md gdrive:README.md --verbose --drive-use-trash=false
+
+          echo "⚡ Copying master CLAUDE engineering guidelines..."
+          rclone copyto CLAUDE.md gdrive:CLAUDE.md --verbose --drive-use-trash=false
+
+          echo "⚡ Copying master Portal Flight Manual..."
+          rclone copyto portal-flight-manual.md gdrive:portal-flight-manual.md --verbose --drive-use-trash=false
