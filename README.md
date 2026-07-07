@@ -1,3 +1,11 @@
+---
+title: Weatherman AI Portal
+sdk: streamlit
+emoji: ⚡
+colorFrom: yellow
+colorTo: blue
+pinned: false
+---
 # The Weatherman AI Portal
 
 A custom, zero-install Streamlit web application for operational team training and automated workspace simulation — no terminal, no CLI, no developer setup required.
