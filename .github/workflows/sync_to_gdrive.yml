@@ -28,22 +28,21 @@ jobs:
           # 1. Safely store the service account JSON
           echo "$GDRIVE_SECRET" > sa.json
           
-          # 2. Build rclone config with explicit Shared Drive support flags
+          # 2. Build standard rclone config profile
           mkdir -p ~/.config/rclone
           cat <<CONFIG > ~/.config/rclone/rclone.conf
           [gdrive]
           type = drive
           service_account_file = sa.json
           root_folder_id = $GDRIVE_FOLDER_ID
-          supports_team_drives = true
           CONFIG
           
-          # 3. Mirror syncing with team drive pass-through flags
+          # 3. Direct mirror syncing with ownership bypass flags
           echo "⚡ Starting core training assets synchronization..."
-          rclone sync training/ gdrive:training --verbose --drive-use-trash=false
+          rclone sync training/ gdrive:training --verbose --drive-use-trash=false --drive-upload-cutoff=0
 
           echo "⚡ Copying master README template..."
-          rclone copyto README.md gdrive:README.md --verbose --drive-use-trash=false
+          rclone copyto README.md gdrive:README.md --verbose --drive-use-trash=false --drive-upload-cutoff=0
           
           # 4. Cleanup temporary credentials file
           rm sa.json
