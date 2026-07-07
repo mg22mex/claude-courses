@@ -22,27 +22,20 @@ jobs:
 
       - name: Configure Rclone & Run Sync
         env:
-          GDRIVE_SECRET: ${{ secrets.GDRIVE_SECRET }}
+          GDRIVE_TOKEN: ${{ secrets.GDRIVE_SECRET }}
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
         run: |
-          # 1. Safely store the service account JSON
-          echo "$GDRIVE_SECRET" > sa.json
-          
-          # 2. Build standard rclone config profile
+          # Build a personal user token profile
           mkdir -p ~/.config/rclone
           cat <<CONFIG > ~/.config/rclone/rclone.conf
           [gdrive]
           type = drive
-          service_account_file = sa.json
+          token = $GDRIVE_TOKEN
           root_folder_id = $GDRIVE_FOLDER_ID
           CONFIG
           
-          # 3. Direct mirror syncing with ownership bypass flags
-          echo "⚡ Starting core training assets synchronization..."
-          rclone sync training/ gdrive:training --verbose --drive-use-trash=false --drive-upload-cutoff=0
+          echo "⚡ Starting synchronization as user..."
+          rclone sync training/ gdrive:training --verbose --drive-use-trash=false
 
           echo "⚡ Copying master README template..."
-          rclone copyto README.md gdrive:README.md --verbose --drive-use-trash=false --drive-upload-cutoff=0
-          
-          # 4. Cleanup temporary credentials file
-          rm sa.json
+          rclone copyto README.md gdrive:README.md --verbose --drive-use-trash=false
