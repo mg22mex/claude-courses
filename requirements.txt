@@ -2,3 +2,4 @@ streamlit
 requests
 openai
 pandas
+mcp>=0.1.0

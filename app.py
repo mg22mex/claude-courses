@@ -2,9 +2,12 @@ import streamlit as st
 import requests
 import openai
 import os
+import io
 import json
 import subprocess
 import re
+import pandas as pd
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 
@@ -199,6 +202,215 @@ def render_graphify_section() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Cloud Secrets & Enterprise Data Hooks (Hugging Face Spaces)
+# ---------------------------------------------------------------------------
+
+def _secret_get(key: str) -> str | None:
+    """Read a deployment secret from env or Streamlit secrets without raising."""
+    val = os.environ.get(key)
+    if val:
+        return val
+    try:
+        return st.secrets.get(key, "") or None
+    except Exception:
+        return None
+
+
+def init_cloud_secrets() -> dict[str, str | None]:
+    """Safe-check Hugging Face / cloud environment variables at startup."""
+    keys = (
+        "MONDAY_API_TOKEN",
+        "SLACK_BOT_TOKEN",
+        "DROPBOX_ACCESS_TOKEN",
+        "TRIPLEWHALE_API_KEY",
+        "SELLERBOARD_DAILY_LINK",
+        "SELLERBOARD_PRODUCT_LINK",
+    )
+    return {key: _secret_get(key) for key in keys}
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def fetch_sellerboard_data(report_type: str = "daily") -> bytes | None:
+    """Fetch live Sellerboard CSV and return raw bytes for stable cache keys."""
+    link_key = (
+        "SELLERBOARD_DAILY_LINK"
+        if report_type == "daily"
+        else "SELLERBOARD_PRODUCT_LINK"
+    )
+    url = _secret_get(link_key)
+    if not url:
+        return None
+    try:
+        resp = requests.get(url, timeout=30)
+        resp.raise_for_status()
+        return resp.text.encode("utf-8")
+    except Exception as exc:
+        st.session_state.setdefault("_sellerboard_errors", []).append(str(exc))
+        return None
+
+
+def sellerboard_dataframe(report_type: str = "daily") -> pd.DataFrame | None:
+    """Parse cached Sellerboard CSV bytes into a Pandas DataFrame."""
+    raw = fetch_sellerboard_data(report_type)
+    if raw is None:
+        return None
+    try:
+        return pd.read_csv(io.StringIO(raw.decode("utf-8")))
+    except Exception as exc:
+        st.session_state.setdefault("_sellerboard_errors", []).append(str(exc))
+        return None
+
+
+def build_sellerboard_context(report_type: str = "daily", max_rows: int = 50) -> str:
+    """Expose a compact Sellerboard snapshot for model context during analysis."""
+    df = sellerboard_dataframe(report_type)
+    if df is None or df.empty:
+        return ""
+    preview = df.head(max_rows).to_csv(index=False)
+    return (
+        f"\n\n[Live Sellerboard {report_type} report — {len(df)} rows total, "
+        f"showing first {min(max_rows, len(df))}]:\n```csv\n{preview}\n```\n"
+    )
+
+
+def sync_to_monday(
+    board_id: str = "",
+    item_name: str = "",
+    column_values: dict | None = None,
+) -> dict:
+    """Push a row to Monday.com via GraphQL (enterprise hook stub)."""
+    token = _secret_get("MONDAY_API_TOKEN")
+    if not token:
+        msg = "sync_to_monday: MONDAY_API_TOKEN is not configured."
+        st.warning(msg)
+        return {"ok": False, "error": msg}
+    query = """
+    mutation ($board_id: ID!, $item_name: String!, $column_values: JSON!) {
+      create_item(board_id: $board_id, item_name: $item_name, column_values: $column_values) {
+        id
+      }
+    }
+    """
+    payload = {
+        "query": query,
+        "variables": {
+            "board_id": board_id,
+            "item_name": item_name,
+            "column_values": json.dumps(column_values or {}),
+        },
+    }
+    try:
+        st.info(f"📋 Monday.com sync started — board {board_id}, item '{item_name}'")
+        resp = requests.post(
+            "https://api.monday.com/v2",
+            headers={"Authorization": token, "Content-Type": "application/json"},
+            json=payload,
+            timeout=30,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        if "errors" in data:
+            err = data["errors"][0].get("message", str(data["errors"]))
+            st.error(f"sync_to_monday failed: {err}")
+            return {"ok": False, "error": err}
+        st.success("✅ Monday.com item created successfully.")
+        return {"ok": True, "result": data}
+    except Exception as exc:
+        st.error(f"sync_to_monday failed: {exc}")
+        return {"ok": False, "error": str(exc)}
+
+
+def post_to_slack(channel: str = "", text: str = "") -> dict:
+    """Post a message to Slack (enterprise hook stub)."""
+    token = _secret_get("SLACK_BOT_TOKEN")
+    if not token:
+        msg = "post_to_slack: SLACK_BOT_TOKEN is not configured."
+        st.warning(msg)
+        return {"ok": False, "error": msg}
+    try:
+        st.info(f"💬 Slack post started — channel {channel or '#general'}")
+        resp = requests.post(
+            "https://slack.com/api/chat.postMessage",
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+            json={"channel": channel, "text": text},
+            timeout=30,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        if not data.get("ok"):
+            err = data.get("error", "unknown Slack API error")
+            st.error(f"post_to_slack failed: {err}")
+            return {"ok": False, "error": err}
+        st.success("✅ Slack message posted successfully.")
+        return {"ok": True, "result": data}
+    except Exception as exc:
+        st.error(f"post_to_slack failed: {exc}")
+        return {"ok": False, "error": str(exc)}
+
+
+def read_dropbox_meta(path: str = "") -> dict:
+    """Read Dropbox folder metadata (enterprise hook stub)."""
+    token = _secret_get("DROPBOX_ACCESS_TOKEN")
+    if not token:
+        msg = "read_dropbox_meta: DROPBOX_ACCESS_TOKEN is not configured."
+        st.warning(msg)
+        return {"ok": False, "error": msg}
+    try:
+        st.info(f"📁 Dropbox metadata read started — path '{path or '/'}'")
+        resp = requests.post(
+            "https://api.dropboxapi.com/2/files/list_folder",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+            json={"path": path or "", "recursive": False},
+            timeout=30,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        st.success(f"✅ Dropbox metadata retrieved — {len(data.get('entries', []))} entries.")
+        return {"ok": True, "result": data}
+    except Exception as exc:
+        st.error(f"read_dropbox_meta failed: {exc}")
+        return {"ok": False, "error": str(exc)}
+
+
+NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
+    "sync_to_monday": sync_to_monday,
+    "post_to_slack": post_to_slack,
+    "read_dropbox_meta": read_dropbox_meta,
+}
+
+
+def execute_native_tool(tool_name: str, arguments: dict | None = None) -> dict:
+    """Bridge native Python enterprise hooks into the MCP execution loop."""
+    fn = NATIVE_ENTERPRISE_TOOLS.get(tool_name)
+    if not fn:
+        return {"ok": False, "error": f"Unknown native tool: {tool_name}"}
+    return fn(**(arguments or {}))
+
+
+def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
+    """Describe available native enterprise hooks for the system prompt."""
+    configured = [k for k, v in cloud_secrets.items() if v]
+    if not configured:
+        return ""
+    tool_lines = "\n".join(f"  - `{name}`" for name in NATIVE_ENTERPRISE_TOOLS)
+    secret_lines = "\n".join(f"  - {name}" for name in configured)
+    return (
+        "\n\n## Available Enterprise Data & Integration Hooks\n"
+        "Live Sellerboard CSV feeds are available when SELLERBOARD_*_LINK secrets are set. "
+        "To invoke a native integration hook, output a JSON tool call block exactly like this:\n\n"
+        "```tool_call\n{\"server\": \"enterprise\", \"tool\": \"TOOL_NAME\", \"arguments\": {...}}\n```\n\n"
+        f"**Configured secrets:**\n{secret_lines}\n\n"
+        f"**Native tools:**\n{tool_lines}"
+    )
+
+
+OPERATIONAL_TRACKS = frozenset({"Rick", "Sunny", "Mollie"})
+
+
+# ---------------------------------------------------------------------------
 # Main Application
 # ---------------------------------------------------------------------------
 
@@ -208,6 +420,7 @@ st.caption("Zero-install enterprise workspace backed by DeepSeek & OpenClaude")
 # --- Secrets & Configuration ---
 DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY") or st.secrets.get("DEEPSEEK_API_KEY", "")
 GITHUB_RAW_URL = "https://raw.githubusercontent.com/mg22mex/claude-courses/main"
+CLOUD_SECRETS = init_cloud_secrets()
 
 # Initialise MCP client (lazy — servers are started on demand)
 mcp_client = MCPClient("mcp_config.json")
@@ -297,7 +510,7 @@ with st.spinner("Loading your personalized workspace preset..."):
                 f"**Enabled servers:**\n{server_lines}"
             )
 
-        system_prompt = f"{master_prompt}\n\n## Active Task Directives\n{preset_instructions}{mcp_block}"
+        system_prompt = f"{master_prompt}\n\n## Active Task Directives\n{preset_instructions}{mcp_block}{build_enterprise_tools_block(CLOUD_SECRETS)}"
 
     except Exception:
         system_prompt = "You are a helpful assistant for Weatherman."
@@ -373,6 +586,19 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
     # Build payload
     full_user_content = prompt + file_context if file_context else prompt
 
+    # Inject live Sellerboard data for operational analysis tracks
+    if user in OPERATIONAL_TRACKS and (
+        CLOUD_SECRETS.get("SELLERBOARD_DAILY_LINK")
+        or CLOUD_SECRETS.get("SELLERBOARD_PRODUCT_LINK")
+    ):
+        sellerboard_ctx = ""
+        if CLOUD_SECRETS.get("SELLERBOARD_DAILY_LINK"):
+            sellerboard_ctx += build_sellerboard_context("daily")
+        if CLOUD_SECRETS.get("SELLERBOARD_PRODUCT_LINK"):
+            sellerboard_ctx += build_sellerboard_context("product")
+        if sellerboard_ctx:
+            full_user_content += sellerboard_ctx
+
     # Initialise DeepSeek client (Requirement #1: model routing)
     client = openai.OpenAI(api_key=DEEPSEEK_KEY, base_url="https://api.deepseek.com/v1")
 
@@ -438,6 +664,21 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
                 label=f"🔧 Executing MCP tool: {server_name}::{tool_name}",
                 state="running",
             )
+
+            # ---- Native enterprise hooks (Monday, Slack, Dropbox) ----
+            if server_name == "enterprise":
+                result = execute_native_tool(tool_name, arguments)
+                clean_text = collected[: tool_call_match.start()].strip()
+                tool_result_msg = (
+                    f"{clean_text}\n\n"
+                    f"[Tool Result — enterprise::{tool_name}]:\n"
+                    f"{json.dumps(result, indent=2)}"
+                )
+                message_payload.append({"role": "user", "content": tool_result_msg})
+                status.update(
+                    label=f"📋 Enterprise hook {tool_name} finished — feeding back to DeepSeek"
+                )
+                continue
 
             # Attempt to start the server if not already running
             if server_name not in mcp_client.processes:
