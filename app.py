@@ -267,9 +267,27 @@ def build_sellerboard_context(report_type: str = "daily", max_rows: int = 50) ->
     if df is None or df.empty:
         return ""
     preview = df.head(max_rows).to_csv(index=False)
+    label = report_type.replace("_", " ").title()
     return (
-        f"\n\n[Live Sellerboard {report_type} report — {len(df)} rows total, "
-        f"showing first {min(max_rows, len(df))}]:\n```csv\n{preview}\n```\n"
+        f"\n\n---\n### Live Sellerboard {label} Report\n"
+        f"*{len(df)} rows total, showing first {min(max_rows, len(df))}*\n\n"
+        f"```csv\n{preview}\n```\n"
+    )
+
+
+def build_sellerboard_system_block(report_types: list[str]) -> str:
+    """Return a system-prompt block telling the model live Sellerboard data is auto-injected."""
+    types_desc = " and ".join(f"`{t}`" for t in report_types)
+    return (
+        "\n\n## Live Sellerboard Data (Auto-Injected)\n"
+        "For operational roles (Rick, Sunny, Mollie), live Sellerboard CSV data is "
+        "automatically fetched and injected into **every user message**. "
+        "You do **not** need to call any tool or ask for it. "
+        "The data appears below the user's prompt with a "
+        "`### Live Sellerboard ... Report` section header. "
+        "Read it directly, reference the figures in your analysis, "
+        "and answer questions using the live data.\n"
+        f"**Reports auto-injected:** {types_desc}."
     )
 
 
@@ -399,7 +417,6 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
     secret_lines = "\n".join(f"  - {name}" for name in configured)
     return (
         "\n\n## Available Enterprise Data & Integration Hooks\n"
-        "Live Sellerboard CSV feeds are available when SELLERBOARD_*_LINK secrets are set. "
         "To invoke a native integration hook, output a JSON tool call block exactly like this:\n\n"
         "```tool_call\n{\"server\": \"enterprise\", \"tool\": \"TOOL_NAME\", \"arguments\": {...}}\n```\n\n"
         f"**Configured secrets:**\n{secret_lines}\n\n"
@@ -511,6 +528,16 @@ with st.spinner("Loading your personalized workspace preset..."):
             )
 
         system_prompt = f"{master_prompt}\n\n## Active Task Directives\n{preset_instructions}{mcp_block}{build_enterprise_tools_block(CLOUD_SECRETS)}"
+
+        # Append Sellerboard-awareness for operational tracks that have live links configured
+        if user in OPERATIONAL_TRACKS:
+            sb_types = []
+            if CLOUD_SECRETS.get("SELLERBOARD_DAILY_LINK"):
+                sb_types.append("daily")
+            if CLOUD_SECRETS.get("SELLERBOARD_PRODUCT_LINK"):
+                sb_types.append("product")
+            if sb_types:
+                system_prompt += build_sellerboard_system_block(sb_types)
 
     except Exception:
         system_prompt = "You are a helpful assistant for Weatherman."
