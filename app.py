@@ -806,7 +806,8 @@ if selected_preset == "open-ended-playground":
                                     try:
                                         resp = requests.post(
                                             "https://api.dropboxapi.com/2/users/get_current_account",
-                                            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                                            headers={"Authorization": f"Bearer {token}"},
+                                            data="null",
                                             timeout=15,
                                         )
                                         resp.raise_for_status()
@@ -824,8 +825,8 @@ if selected_preset == "open-ended-playground":
                                 else:
                                     try:
                                         resp = requests.get(
-                                            "https://api.triplewhale.com/api/v1/",
-                                            headers={"X-API-Key": token},
+                                            "https://api.triplewhale.com/api/v2/get-shops",
+                                            headers={"X-TW-API-Key": token},
                                             timeout=15,
                                         )
                                         if resp.status_code == 200:
