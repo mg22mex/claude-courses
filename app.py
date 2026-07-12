@@ -741,6 +741,100 @@ if selected_preset == "open-ended-playground":
                 # the preset architecture. Future AI prompts will receive the full
                 # context including this dataframe and the user's chat instructions.
                 # ------------------------------------------------------------------
+
+                # ------------------------------------------------------------------
+                # 🔧 Enterprise Integration Diagnostics
+                # ------------------------------------------------------------------
+                with st.expander("🔧 Enterprise Integration Diagnostics", expanded=False):
+                    st.caption(
+                        "Test connectivity for your configured enterprise integrations. "
+                        "Each button performs a lightweight handshake — no data is modified."
+                    )
+
+                    diag_cols = st.columns(4)
+
+                    with diag_cols[0]:
+                        if st.button("Test Monday.com Connection", key="diag_monday"):
+                            with st.spinner("Probing Monday.com API..."):
+                                token = _secret_get("MONDAY_API_TOKEN")
+                                if not token:
+                                    st.warning("⚠️  MONDAY_API_TOKEN not configured")
+                                else:
+                                    try:
+                                        resp = requests.post(
+                                            "https://api.monday.com/v2",
+                                            headers={"Authorization": token, "Content-Type": "application/json"},
+                                            json={"query": "query { boards(limit: 1) { id name } }"},
+                                            timeout=15,
+                                        )
+                                        resp.raise_for_status()
+                                        st.success("✅ Connected successfully")
+                                    except Exception as e:
+                                        st.error(f"❌ Connection Failed: {e}")
+
+                    with diag_cols[1]:
+                        if st.button("Test Slack Integration", key="diag_slack"):
+                            with st.spinner("Probing Slack API..."):
+                                token = _secret_get("SLACK_BOT_TOKEN")
+                                if not token:
+                                    st.warning("⚠️  SLACK_BOT_TOKEN not configured")
+                                else:
+                                    try:
+                                        resp = requests.get(
+                                            "https://slack.com/api/auth.test",
+                                            headers={"Authorization": f"Bearer {token}"},
+                                            timeout=15,
+                                        )
+                                        data = resp.json()
+                                        if resp.status_code == 200 and data.get("ok"):
+                                            st.success("✅ Connected successfully")
+                                        else:
+                                            st.error(f"❌ Connection Failed: {data.get('error', 'Check Token Permissions')}")
+                                    except Exception as e:
+                                        st.error(f"❌ Connection Failed: {e}")
+
+                    with diag_cols[2]:
+                        if st.button("Test Dropbox Access", key="diag_dropbox"):
+                            with st.spinner("Probing Dropbox API..."):
+                                token = _secret_get("DROPBOX_ACCESS_TOKEN")
+                                if not token:
+                                    st.warning("⚠️  DROPBOX_ACCESS_TOKEN not configured")
+                                else:
+                                    try:
+                                        resp = requests.post(
+                                            "https://api.dropboxapi.com/2/users/get_current_account",
+                                            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                                            timeout=15,
+                                        )
+                                        resp.raise_for_status()
+                                        st.success("✅ Connected successfully")
+                                    except Exception as e:
+                                        st.error(f"❌ Connection Failed: {e}")
+
+                    with diag_cols[3]:
+                        if st.button("Test Triple Whale Link", key="diag_triplewhale"):
+                            with st.spinner("Probing Triple Whale API..."):
+                                token = _secret_get("TRIPLEWHALE_API_KEY")
+                                if not token:
+                                    st.warning("⚠️  TRIPLEWHALE_API_KEY not configured")
+                                else:
+                                    try:
+                                        resp = requests.get(
+                                            "https://api.triplewhale.com/api/v1/",
+                                            headers={"X-API-Key": token},
+                                            timeout=15,
+                                        )
+                                        if resp.status_code == 200:
+                                            st.success("✅ Connected successfully")
+                                        elif resp.status_code in (401, 403):
+                                            st.error("❌ Connection Failed: Check Token Permissions")
+                                        else:
+                                            st.error(f"❌ Connection Failed: HTTP {resp.status_code}")
+                                    except requests.exceptions.ConnectionError:
+                                        st.error("❌ Connection Failed: Cannot reach Triple Whale API")
+                                    except Exception as e:
+                                        st.error(f"❌ Connection Failed: {e}")
+
             else:
                 st.info("📡 Live Sellerboard data stream returned empty — upload a file below to get started.")
         else:
