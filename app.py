@@ -191,7 +191,7 @@ def render_graphify_section() -> None:
         graph_path = Path("graphify-out/graph.html")
         if graph_path.exists():
             html_data = graph_path.read_text(encoding="utf-8")
-            st.components.v1.html(html_data, height=800, scrolling=True)
+            st.html(html_data)
         else:
             st.info(
                 "📊 **Repository map not yet generated.**\n\n"
@@ -295,8 +295,67 @@ def sellerboard_dataframe(report_type: str = "daily") -> pd.DataFrame | None:
         return None
 
 
-def build_sellerboard_context(report_type: str = "daily", max_rows: int = 50) -> str:
-    """Expose a compact Sellerboard snapshot for model context during analysis."""
+# ---------------------------------------------------------------------------
+# Sellerboard column mapping for fulfillment-anomaly-detector schema
+# ---------------------------------------------------------------------------
+
+SELLERBOARD_FULFILLMENT_COLUMN_MAP: dict[str, str] = {
+    # Explicit Sellerboard column → fulfillment-anomaly-detector schema
+    "fulfillment_rate": "on_time_pct",
+    "return_rate": "return_rate",
+    "on_time_delivery": "on_time_delivery",
+    # General aliases (section 1.2 of SKILL.md)
+    "order": "order_id",
+    "fulfillment_id": "order_id",
+    "shipment_id": "order_id",
+    "warehouse_code": "warehouse",
+    "wh": "warehouse",
+    "origin_warehouse": "warehouse",
+    "carrier_name": "carrier",
+    "shipper": "carrier",
+    "shipping_provider": "carrier",
+    "courier": "carrier",
+    "logistics_provider": "carrier",
+    "shipped_date": "ship_date",
+    "date_shipped": "ship_date",
+    "dispatch_date": "ship_date",
+    "departure_date": "ship_date",
+    "eta": "estimated_delivery",
+    "promised_date": "estimated_delivery",
+    "expected_delivery": "estimated_delivery",
+    "est_delivery": "estimated_delivery",
+    "target_date": "estimated_delivery",
+    "delivery_date": "actual_delivery",
+    "date_delivered": "actual_delivery",
+    "received_date": "actual_delivery",
+    "proof_of_delivery": "actual_delivery",
+}
+
+
+def normalize_sellerboard_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Rename Sellerboard CSV columns to fulfillment-anomaly-detector schema.
+
+    Applies the alias mapping from SELLERBOARD_FULFILLMENT_COLUMN_MAP so the
+    downstream AI always receives columns matching the expected schema
+    (order_id, warehouse, carrier, ship_date, estimated_delivery,
+    actual_delivery). Unknown columns are kept as-is.
+    """
+    renamed = df.rename(columns=SELLERBOARD_FULFILLMENT_COLUMN_MAP)
+    matched = set(SELLERBOARD_FULFILLMENT_COLUMN_MAP.keys()) & set(df.columns)
+    unmatched = set(df.columns) - set(SELLERBOARD_FULFILLMENT_COLUMN_MAP.keys())
+    if matched:
+        print(f"[SELLERBOARD] Column mapping: {len(matched)} columns remapped: {sorted(matched)}")
+    if unmatched:
+        print(f"[SELLERBOARD] Column mapping: {len(unmatched)} columns passed through: {sorted(unmatched)[:10]}")
+    return renamed
+
+
+def build_sellerboard_context(report_type: str = "daily", max_rows: int = 50, normalize_columns: bool = False) -> str:
+    """Expose a compact Sellerboard snapshot for model context during analysis.
+
+    Set *normalize_columns=True* to remap CSV column headers to the
+    fulfillment-anomaly-detector schema defined in SELLERBOARD_FULFILLMENT_COLUMN_MAP.
+    """
     df = sellerboard_dataframe(report_type)
     if df is None or df.empty:
         label = report_type.replace("_", " ").title()
@@ -307,6 +366,8 @@ def build_sellerboard_context(report_type: str = "daily", max_rows: int = 50) ->
             "DO NOT hallucinate metrics. Explicitly tell the user that the data failed to "
             "fetch from the configured URL.\n"
         )
+    if normalize_columns:
+        df = normalize_sellerboard_columns(df)
     preview = df.head(max_rows).to_csv(index=False)
     label = report_type.replace("_", " ").title()
     return (
@@ -682,11 +743,14 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
     # Inject live Sellerboard data for operational analysis tracks
     # (uses its own secret-resolution path — decoupled from other enterprise secrets)
     sb_types = _sellerboard_available() if user in OPERATIONAL_TRACKS else []
+    # Enable column normalization for the fulfillment-anomaly-detector to map
+    # Sellerboard CSV headers to the detector's expected schema fields.
+    normalize_sb = selected_preset == "fulfillment-anomaly-detector"
     sb_ctx_parts = []
     if "daily" in sb_types:
-        sb_ctx_parts.append(build_sellerboard_context("daily"))
+        sb_ctx_parts.append(build_sellerboard_context("daily", normalize_columns=normalize_sb))
     if "product" in sb_types:
-        sb_ctx_parts.append(build_sellerboard_context("product"))
+        sb_ctx_parts.append(build_sellerboard_context("product", normalize_columns=normalize_sb))
     # Filter out empty results from failed downloads so the elif error branch triggers
     sb_ctx_parts = [p for p in sb_ctx_parts if p]
     if sb_ctx_parts:
