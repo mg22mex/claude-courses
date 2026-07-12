@@ -678,6 +678,8 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
         sb_ctx_parts.append(build_sellerboard_context("daily"))
     if "product" in sb_types:
         sb_ctx_parts.append(build_sellerboard_context("product"))
+    # Filter out empty results from failed downloads so the elif error branch triggers
+    sb_ctx_parts = [p for p in sb_ctx_parts if p]
     if sb_ctx_parts:
         preview = sb_ctx_parts[0][:200]
         print(f"[SELLERBOARD] Injecting {len(sb_ctx_parts)} report(s). Preview: {preview!r}")
@@ -685,6 +687,9 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
     elif sb_types:
         # Links configured but downloads failed or returned empty — inject error so the model
         # knows data is missing instead of hallucinating local file paths.
+        errors = st.session_state.pop("_sellerboard_errors", [])
+        if errors:
+            print(f"[SELLERBOARD] Download errors: {' | '.join(errors)}")
         err_msg = (
             "\n\n---\n### Live Sellerboard Data\n"
             "System Error: Sellerboard data stream could not be loaded from the environment link.\n"
