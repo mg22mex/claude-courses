@@ -247,6 +247,8 @@ def fetch_sellerboard_data(report_type: str = "daily") -> bytes | None:
             raise ValueError("Empty response body — CSV link may be expired or unauthorized")
         return resp.text.encode("utf-8")
     except Exception as exc:
+        status = getattr(resp, "status_code", "N/A") if "resp" in dir() else "N/A"
+        print(f"[SELLERBOARD] HTTP {status} — {exc}")
         st.session_state.setdefault("_sellerboard_errors", []).append(str(exc))
         return None
 
@@ -297,7 +299,14 @@ def build_sellerboard_context(report_type: str = "daily", max_rows: int = 50) ->
     """Expose a compact Sellerboard snapshot for model context during analysis."""
     df = sellerboard_dataframe(report_type)
     if df is None or df.empty:
-        return ""
+        label = report_type.replace("_", " ").title()
+        return (
+            f"\n\n---\n### Live Sellerboard {label} Report\n"
+            "CRITICAL SYSTEM ERROR: The Live Sellerboard CSV data stream failed to download. "
+            "The server returned an empty string or network error. "
+            "DO NOT hallucinate metrics. Explicitly tell the user that the data failed to "
+            "fetch from the configured URL.\n"
+        )
     preview = df.head(max_rows).to_csv(index=False)
     label = report_type.replace("_", " ").title()
     return (
