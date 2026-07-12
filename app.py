@@ -243,6 +243,8 @@ def fetch_sellerboard_data(report_type: str = "daily") -> bytes | None:
     try:
         resp = requests.get(url, timeout=30)
         resp.raise_for_status()
+        if not resp.text.strip():
+            raise ValueError("Empty response body — CSV link may be expired or unauthorized")
         return resp.text.encode("utf-8")
     except Exception as exc:
         st.session_state.setdefault("_sellerboard_errors", []).append(str(exc))
@@ -253,14 +255,29 @@ def _sellerboard_available() -> list[str]:
     """Check Sellerboard links independently of other enterprise secrets.
 
     Returns a list of report types ('daily', 'product') for which a live
-    CSV link is configured.  This is a lightweight env/secret lookup —
-    no HTTP call, no caching.
+    CSV link is configured.  Checks os.environ FIRST (visible path for
+    HF Spaces), then falls back to st.secrets.  Lightweight — no HTTP.
     """
     types = []
-    if _secret_get("SELLERBOARD_DAILY_LINK"):
+    # explicit os.environ check so the path is obvious in HF Space logs
+    daily_url = os.environ.get("SELLERBOARD_DAILY_LINK")
+    if not daily_url:
+        try:
+            daily_url = st.secrets.get("SELLERBOARD_DAILY_LINK", "") or None
+        except Exception:
+            daily_url = None
+    if daily_url:
         types.append("daily")
-    if _secret_get("SELLERBOARD_PRODUCT_LINK"):
+
+    product_url = os.environ.get("SELLERBOARD_PRODUCT_LINK")
+    if not product_url:
+        try:
+            product_url = st.secrets.get("SELLERBOARD_PRODUCT_LINK", "") or None
+        except Exception:
+            product_url = None
+    if product_url:
         types.append("product")
+
     return types
 
 
@@ -454,6 +471,15 @@ DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY") or st.secrets.get("DEEPSEEK_AP
 GITHUB_RAW_URL = "https://raw.githubusercontent.com/mg22mex/claude-courses/main"
 CLOUD_SECRETS = init_cloud_secrets()
 
+# Startup diagnostics — log Sellerboard link detection to HF Space logs
+sb_startup = _sellerboard_available()
+if sb_startup:
+    print(f"[WEATHERMAN] Sellerboard links detected: {', '.join(sb_startup)}")
+    st.info(f"📡 Sellerboard links active: {', '.join(sb_startup)}")
+else:
+    print("[WEATHERMAN] WARNING — No Sellerboard links found in os.environ or st.secrets.")
+    st.warning("📡 Sellerboard links not configured — live metrics injection disabled.")
+
 # Initialise MCP client (lazy — servers are started on demand)
 mcp_client = MCPClient("mcp_config.json")
 
@@ -634,7 +660,18 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
     if "product" in sb_types:
         sb_ctx_parts.append(build_sellerboard_context("product"))
     if sb_ctx_parts:
+        preview = sb_ctx_parts[0][:200]
+        print(f"[SELLERBOARD] Injecting {len(sb_ctx_parts)} report(s). Preview: {preview!r}")
         full_user_content += "".join(sb_ctx_parts)
+    elif sb_types:
+        # Links configured but downloads failed or returned empty — inject error so the model
+        # knows data is missing instead of hallucinating local file paths.
+        err_msg = (
+            "\n\n---\n### Live Sellerboard Data\n"
+            "System Error: Sellerboard data stream could not be loaded from the environment link.\n"
+        )
+        print(f"[SELLERBOARD] WARNING — All {len(sb_types)} configured report(s) returned empty/failed. Injecting error marker.")
+        full_user_content += err_msg
 
     # Initialise DeepSeek client (Requirement #1: model routing)
     client = openai.OpenAI(api_key=DEEPSEEK_KEY, base_url="https://api.deepseek.com/v1")
