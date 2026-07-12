@@ -253,6 +253,7 @@ def fetch_sellerboard_data(report_type: str = "daily") -> bytes | None:
         return None
 
 
+@st.cache_data
 def _sellerboard_available() -> list[str]:
     """Check Sellerboard links independently of other enterprise secrets.
 
@@ -807,7 +808,7 @@ if selected_preset == "open-ended-playground":
                                         resp = requests.post(
                                             "https://api.dropboxapi.com/2/users/get_current_account",
                                             headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-                                            json=None,
+                                            json={},
                                             timeout=15,
                                         )
                                         if resp.status_code == 401:
@@ -818,11 +819,7 @@ if selected_preset == "open-ended-playground":
                                         else:
                                             resp.raise_for_status()
                                             st.success("✅ Connected successfully")
-                                    except requests.exceptions.HTTPError as e:
-                                        st.error(f"❌ Connection Failed: {e}")
-                                    except requests.exceptions.ConnectionError:
-                                        st.error("❌ Connection Failed: Cannot reach Dropbox API")
-                                    except Exception as e:
+                                    except requests.exceptions.RequestException as e:
                                         st.error(f"❌ Connection Failed: {e}")
 
                     with diag_cols[3]:
