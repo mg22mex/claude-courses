@@ -527,6 +527,13 @@ if user == "Select Name":
 
 dept_path = folder_map[user]
 
+# --- Detect profile switch and clear stale context ---
+if st.session_state.get("_active_user") != user:
+    if "messages" in st.session_state and st.session_state.messages:
+        print(f"[WEATHERMAN] Profile switch: '{st.session_state._active_user}' -> '{user}'. Clearing {len(st.session_state.messages)} stale message(s).")
+    st.session_state.messages = []
+    st.session_state._active_user = user
+
 # --- Preset Dropdown ---
 selected_preset = st.sidebar.selectbox("Select Workspace Preset Task", preset_map[user])
 
@@ -568,7 +575,18 @@ with st.spinner("Loading your personalized workspace preset..."):
                 f"**Enabled servers:**\n{server_lines}"
             )
 
-        system_prompt = f"{master_prompt}\n\n## Active Task Directives\n{preset_instructions}{mcp_block}{build_enterprise_tools_block(CLOUD_SECRETS)}"
+        # Build core prompt parts individually so a single failure doesn't nuke the entire prompt
+        core_parts = [master_prompt, f"\n\n## Active Task Directives\n{preset_instructions}"]
+        if mcp_block:
+            core_parts.append(mcp_block)
+        try:
+            et_block = build_enterprise_tools_block(CLOUD_SECRETS)
+            if et_block:
+                core_parts.append(et_block)
+        except Exception as exc:
+            print(f"[WEATHERMAN] Enterprise tools block skipped: {exc}")
+
+        system_prompt = "".join(core_parts)
 
         # Append Sellerboard-awareness for operational tracks that have live links configured
         # (uses its own secret resolution, decoupled from other enterprise secrets)
@@ -577,7 +595,8 @@ with st.spinner("Loading your personalized workspace preset..."):
             if sb_types:
                 system_prompt += build_sellerboard_system_block(sb_types)
 
-    except Exception:
+    except Exception as exc:
+        print(f"[WEATHERMAN] CRITICAL — System prompt construction failed: {exc}")
         system_prompt = "You are a helpful assistant for Weatherman."
 
 st.sidebar.success(f"{user}'s Profile & Preset Loaded!")
@@ -689,6 +708,18 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
     tool_used = False
 
     # Status log for real-time visibility (Requirement #2: st.status())
+    # Log payload structure to HF Space logs for debugging
+    sys_role_count = sum(1 for m in message_payload if m["role"] == "system")
+    user_role_count = sum(1 for m in message_payload if m["role"] == "user")
+    sys_preview = message_payload[0]["content"][:300] if sys_role_count else "[MISSING]"
+    print(f"[WEATHERMAN] API payload: {len(message_payload)} messages ({sys_role_count} system, {user_role_count} user). "
+          f"System prompt start: {sys_preview!r}")
+    if "Sellerboard" in message_payload[0]["content"]:
+        print("[WEATHERMAN] Sellerboard awareness block IS in system prompt.")
+    if "Live Sellerboard" in message_payload[-1]["content"]:
+        idx = message_payload[-1]["content"].find("Live Sellerboard")
+        print(f"[WEATHERMAN] Sellerboard data IS in last user message (starts at char {idx}).")
+
     with st.status("🤖 DeepSeek is processing your request...", expanded=True) as status:
         for turn in range(max_tool_turns):
             stream = client.chat.completions.create(
