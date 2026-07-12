@@ -810,8 +810,18 @@ if selected_preset == "open-ended-playground":
                                             json=None,
                                             timeout=15,
                                         )
-                                        resp.raise_for_status()
-                                        st.success("✅ Connected successfully")
+                                        if resp.status_code == 401:
+                                            st.error(
+                                                "❌ Token Expired (Generated tokens expire after 4 hours. "
+                                                "Please generate a new short-lived token or use a refresh token flow)."
+                                            )
+                                        else:
+                                            resp.raise_for_status()
+                                            st.success("✅ Connected successfully")
+                                    except requests.exceptions.HTTPError as e:
+                                        st.error(f"❌ Connection Failed: {e}")
+                                    except requests.exceptions.ConnectionError:
+                                        st.error("❌ Connection Failed: Cannot reach Dropbox API")
                                     except Exception as e:
                                         st.error(f"❌ Connection Failed: {e}")
 
@@ -824,13 +834,12 @@ if selected_preset == "open-ended-playground":
                                     st.warning("⚠️  TRIPLEWHALE_API_KEY not configured")
                                 else:
                                     try:
-                                        resp = requests.post(
-                                            "https://api.triplewhale.com/api/v2/data-in/products",
-                                            headers={"X-TW-API-Key": token, "Content-Type": "application/json"},
-                                            json={},
+                                        resp = requests.get(
+                                            "https://api.triplewhale.com/api/v2/users/api-keys/me",
+                                            headers={"x-api-key": token},
                                             timeout=15,
                                         )
-                                        if resp.status_code == 200 or resp.status_code == 400:
+                                        if resp.status_code == 200:
                                             st.success("✅ Connected successfully")
                                         elif resp.status_code in (401, 403):
                                             st.error("❌ Connection Failed: Check Token Permissions")
