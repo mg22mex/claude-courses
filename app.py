@@ -249,6 +249,21 @@ def fetch_sellerboard_data(report_type: str = "daily") -> bytes | None:
         return None
 
 
+def _sellerboard_available() -> list[str]:
+    """Check Sellerboard links independently of other enterprise secrets.
+
+    Returns a list of report types ('daily', 'product') for which a live
+    CSV link is configured.  This is a lightweight env/secret lookup —
+    no HTTP call, no caching.
+    """
+    types = []
+    if _secret_get("SELLERBOARD_DAILY_LINK"):
+        types.append("daily")
+    if _secret_get("SELLERBOARD_PRODUCT_LINK"):
+        types.append("product")
+    return types
+
+
 def sellerboard_dataframe(report_type: str = "daily") -> pd.DataFrame | None:
     """Parse cached Sellerboard CSV bytes into a Pandas DataFrame."""
     raw = fetch_sellerboard_data(report_type)
@@ -530,12 +545,9 @@ with st.spinner("Loading your personalized workspace preset..."):
         system_prompt = f"{master_prompt}\n\n## Active Task Directives\n{preset_instructions}{mcp_block}{build_enterprise_tools_block(CLOUD_SECRETS)}"
 
         # Append Sellerboard-awareness for operational tracks that have live links configured
+        # (uses its own secret resolution, decoupled from other enterprise secrets)
         if user in OPERATIONAL_TRACKS:
-            sb_types = []
-            if CLOUD_SECRETS.get("SELLERBOARD_DAILY_LINK"):
-                sb_types.append("daily")
-            if CLOUD_SECRETS.get("SELLERBOARD_PRODUCT_LINK"):
-                sb_types.append("product")
+            sb_types = _sellerboard_available()
             if sb_types:
                 system_prompt += build_sellerboard_system_block(sb_types)
 
@@ -614,17 +626,15 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
     full_user_content = prompt + file_context if file_context else prompt
 
     # Inject live Sellerboard data for operational analysis tracks
-    if user in OPERATIONAL_TRACKS and (
-        CLOUD_SECRETS.get("SELLERBOARD_DAILY_LINK")
-        or CLOUD_SECRETS.get("SELLERBOARD_PRODUCT_LINK")
-    ):
-        sellerboard_ctx = ""
-        if CLOUD_SECRETS.get("SELLERBOARD_DAILY_LINK"):
-            sellerboard_ctx += build_sellerboard_context("daily")
-        if CLOUD_SECRETS.get("SELLERBOARD_PRODUCT_LINK"):
-            sellerboard_ctx += build_sellerboard_context("product")
-        if sellerboard_ctx:
-            full_user_content += sellerboard_ctx
+    # (uses its own secret-resolution path — decoupled from other enterprise secrets)
+    sb_types = _sellerboard_available() if user in OPERATIONAL_TRACKS else []
+    sb_ctx_parts = []
+    if "daily" in sb_types:
+        sb_ctx_parts.append(build_sellerboard_context("daily"))
+    if "product" in sb_types:
+        sb_ctx_parts.append(build_sellerboard_context("product"))
+    if sb_ctx_parts:
+        full_user_content += "".join(sb_ctx_parts)
 
     # Initialise DeepSeek client (Requirement #1: model routing)
     client = openai.OpenAI(api_key=DEEPSEEK_KEY, base_url="https://api.deepseek.com/v1")
