@@ -581,12 +581,16 @@ folder_map = {
 }
 
 preset_map = {
-    "General / Master Guide": ["global-onboarding", "portal-flight-manual-lookup"],
-    "Rick": ["fulfillment-anomaly-detector", "write-a-prd", "ppt-generation", "architecture-diagram"],
-    "Sunny": ["lead-time-anomaly", "customs-tariff-audit", "warehouse-balancing", "xlsx-processing", "data-table-validator"],
-    "Mollie": ["csv-analytics", "monte-carlo-analyze-root-cause", "reconciliation-engine", "anomaly-alert-webhook"],
-    "Christine": ["brand-guardrails", "email-automation", "listing-verification", "campaign-analytics"],
-    "Paula & Gabby": ["svg-auditor", "design-token-validator", "component-spec-compiler", "asset-pack-optimizer"],
+    "General / Master Guide": ["global-onboarding", "portal-flight-manual-lookup", "open-ended-playground"],
+    "Rick": ["fulfillment-anomaly-detector", "write-a-prd", "ppt-generation", "architecture-diagram", "open-ended-playground"],
+    "Sunny": ["lead-time-anomaly", "customs-tariff-audit", "warehouse-balancing", "xlsx-processing", "data-table-validator", "open-ended-playground"],
+    "Mollie": ["csv-analytics", "monte-carlo-analyze-root-cause", "reconciliation-engine", "anomaly-alert-webhook", "open-ended-playground"],
+    "Christine": ["brand-guardrails", "email-automation", "listing-verification", "campaign-analytics", "open-ended-playground"],
+    "Paula & Gabby": ["svg-auditor", "design-token-validator", "component-spec-compiler", "asset-pack-optimizer", "open-ended-playground"],
+}
+
+PRESET_LABELS: dict[str, str] = {
+    "open-ended-playground": "Open-Ended Data Playground 🔓",
 }
 
 # Block rendering until a user is selected
@@ -604,8 +608,11 @@ if st.session_state.get("_active_user") != user:
     st.session_state.messages = []
     st.session_state._active_user = user
 
-# --- Preset Dropdown ---
-selected_preset = st.sidebar.selectbox("Select Workspace Preset Task", preset_map[user])
+# --- Preset Dropdown (with display labels) ---
+preset_options = preset_map[user]
+preset_display_labels = [PRESET_LABELS.get(p, p) for p in preset_options]
+selected_label = st.sidebar.selectbox("Select Workspace Preset Task", preset_display_labels)
+selected_preset = preset_options[preset_display_labels.index(selected_label)]
 
 # --- Backend model mapping (Requirement #1: exact API handles) ---
 model_to_use = "deepseek-reasoner" if engine_choice == "DeepSeek-R1 (Data/Reasoning)" else "deepseek-chat"
@@ -625,8 +632,20 @@ with st.spinner("Loading your personalized workspace preset..."):
 
         master_resp = requests.get(master_prompt_url)
         master_prompt = master_resp.text if master_resp.status_code == 200 else "You are a helpful assistant for Weatherman."
-        preset_resp = requests.get(preset_prompt_url)
-        preset_instructions = preset_resp.text if preset_resp.status_code == 200 else f"Execute operational task: {selected_preset}."
+
+        if selected_preset == "open-ended-playground":
+            preset_instructions = (
+                "You are in an open-ended sandbox. There are no strict rubrics, "
+                "no predefined tasks, and no scoring criteria. The user has full "
+                "freedom to explore, build, analyze, or generate whatever they need. "
+                "Support them with clean code, actionable insights, and well-structured "
+                "output. Use the available enterprise tools and MCP servers when they "
+                "add value. If the user is unsure where to start, suggest a few "
+                "high-impact directions based on the data and context available."
+            )
+        else:
+            preset_resp = requests.get(preset_prompt_url)
+            preset_instructions = preset_resp.text if preset_resp.status_code == 200 else f"Execute operational task: {selected_preset}."
 
         # Build tool-aware system prompt (Requirement #2: MCP tool descriptions)
         enabled_servers = [k for k, v in mcp_client.servers.items() if v.get("enabled")]
@@ -686,6 +705,50 @@ if uploaded_file is not None:
 # ------------------------------------------------------------------
 
 render_graphify_section()
+
+# ------------------------------------------------------------------
+# Open-Ended Data Playground
+# ------------------------------------------------------------------
+
+if selected_preset == "open-ended-playground":
+    st.divider()
+    st.header("🔓 Open-Ended Data Playground")
+    st.caption(
+        "No rubrics, no scoring criteria, no fixed tasks — just a live data stream "
+        "and a blank canvas. Build dashboards, run ad-hoc analysis, prototype tools, "
+        "or explore the dataset however you see fit."
+    )
+
+    col_metrics = st.columns(3)
+    if user in OPERATIONAL_TRACKS:
+        sb_types = _sellerboard_available()
+        if "daily" in sb_types or "product" in sb_types:
+            playground_df = sellerboard_dataframe("daily")
+            if playground_df is not None and not playground_df.empty:
+                col_metrics[0].metric("Rows Available", len(playground_df))
+                col_metrics[1].metric("Columns", len(playground_df.columns))
+                numeric_cols = playground_df.select_dtypes(include="number").columns.tolist()
+                if numeric_cols:
+                    col_metrics[2].metric("Numeric Fields", len(numeric_cols))
+
+                with st.expander("View Raw Live Dataset", expanded=True):
+                    st.dataframe(playground_df, use_container_width=True)
+
+                # ------------------------------------------------------------------
+                # This layout is intentionally wide open for custom ad-hoc widget
+                # injections, Plotly charts, Altair specs, or download hooks.
+                # Any Streamlit component can be added below without restructuring
+                # the preset architecture. Future AI prompts will receive the full
+                # context including this dataframe and the user's chat instructions.
+                # ------------------------------------------------------------------
+            else:
+                st.info("📡 Live Sellerboard data stream returned empty — upload a file below to get started.")
+        else:
+            st.info("📡 No Sellerboard links configured. Upload a file below to populate the playground.")
+    else:
+        st.info("📁 Upload a file below to populate the playground with data.")
+
+    st.divider()
 
 # ------------------------------------------------------------------
 # Chat Interface
