@@ -757,13 +757,14 @@ if selected_preset == "open-ended-playground":
                         if st.button("Test Monday.com Connection", key="diag_monday"):
                             with st.spinner("Probing Monday.com API..."):
                                 token = _secret_get("MONDAY_API_TOKEN")
+                                token = token.strip().strip("'").strip('"') if token else None
                                 if not token:
                                     st.warning("⚠️  MONDAY_API_TOKEN not configured")
                                 else:
                                     try:
                                         resp = requests.post(
                                             "https://api.monday.com/v2",
-                                            headers={"Authorization": token, "Content-Type": "application/json"},
+                                            headers={"Authorization": token, "API-Version": "2023-10"},
                                             json={"query": "query { boards(limit: 1) { id name } }"},
                                             timeout=15,
                                         )
@@ -776,6 +777,7 @@ if selected_preset == "open-ended-playground":
                         if st.button("Test Slack Integration", key="diag_slack"):
                             with st.spinner("Probing Slack API..."):
                                 token = _secret_get("SLACK_BOT_TOKEN")
+                                token = token.strip().strip("'").strip('"') if token else None
                                 if not token:
                                     st.warning("⚠️  SLACK_BOT_TOKEN not configured")
                                 else:
@@ -797,6 +799,7 @@ if selected_preset == "open-ended-playground":
                         if st.button("Test Dropbox Access", key="diag_dropbox"):
                             with st.spinner("Probing Dropbox API..."):
                                 token = _secret_get("DROPBOX_ACCESS_TOKEN")
+                                token = token.strip().strip("'").strip('"') if token else None
                                 if not token:
                                     st.warning("⚠️  DROPBOX_ACCESS_TOKEN not configured")
                                 else:
@@ -815,6 +818,7 @@ if selected_preset == "open-ended-playground":
                         if st.button("Test Triple Whale Link", key="diag_triplewhale"):
                             with st.spinner("Probing Triple Whale API..."):
                                 token = _secret_get("TRIPLEWHALE_API_KEY")
+                                token = token.strip().strip("'").strip('"') if token else None
                                 if not token:
                                     st.warning("⚠️  TRIPLEWHALE_API_KEY not configured")
                                 else:
