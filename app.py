@@ -806,8 +806,8 @@ if selected_preset == "open-ended-playground":
                                     try:
                                         resp = requests.post(
                                             "https://api.dropboxapi.com/2/users/get_current_account",
-                                            headers={"Authorization": f"Bearer {token}"},
-                                            data="null",
+                                            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                                            json=None,
                                             timeout=15,
                                         )
                                         resp.raise_for_status()
@@ -824,12 +824,13 @@ if selected_preset == "open-ended-playground":
                                     st.warning("⚠️  TRIPLEWHALE_API_KEY not configured")
                                 else:
                                     try:
-                                        resp = requests.get(
-                                            "https://api.triplewhale.com/api/v2/get-shops",
-                                            headers={"X-TW-API-Key": token},
+                                        resp = requests.post(
+                                            "https://api.triplewhale.com/api/v2/data-in/products",
+                                            headers={"X-TW-API-Key": token, "Content-Type": "application/json"},
+                                            json={},
                                             timeout=15,
                                         )
-                                        if resp.status_code == 200:
+                                        if resp.status_code == 200 or resp.status_code == 400:
                                             st.success("✅ Connected successfully")
                                         elif resp.status_code in (401, 403):
                                             st.error("❌ Connection Failed: Check Token Permissions")
