@@ -533,19 +533,24 @@ def read_dropbox_meta(path: str = "") -> dict:
         return {"ok": False, "error": str(exc)}
 
 
-def get_google_credentials() -> "_GoogleCreds | None":
+def get_google_credentials() -> tuple["_GoogleCreds | None", str | None]:
     """Obtain Google OAuth2 credentials via refresh token for Gmail & Drive.
-
-    Returns a ``Credentials`` object that auto-refreshes the access token
-    on each API call.
+    Returns a tuple of (credentials, error_message).
     """
     if not _GOOGLE_AVAILABLE:
-        return None
+        return None, "Google API client libraries are not installed or available."
+
     client_id = _secret_get("GOOGLE_CLIENT_ID")
     client_secret = _secret_get("GOOGLE_CLIENT_SECRET")
     refresh_token = _secret_get("GOOGLE_REFRESH_TOKEN")
+
     if not client_id or not client_secret or not refresh_token:
-        return None
+        missing = []
+        if not client_id: missing.append("GOOGLE_CLIENT_ID")
+        if not client_secret: missing.append("GOOGLE_CLIENT_SECRET")
+        if not refresh_token: missing.append("GOOGLE_REFRESH_TOKEN")
+        return None, f"Missing environment variables: {', '.join(missing)}"
+
     try:
         c_id = client_id.strip().strip("'").strip('"')
         c_secret = client_secret.strip().strip("'").strip('"')
@@ -563,17 +568,16 @@ def get_google_credentials() -> "_GoogleCreds | None":
 
         creds.refresh(Request())
 
-        return creds
+        return creds, None
     except Exception as exc:
-        print(f"[GOOGLE AUTH ERROR] Failed token exchange: {exc}")
-        return None
+        return None, str(exc)
 
 
 def test_google_gmail() -> dict:
     """Verify Gmail API connectivity by fetching the profile."""
-    creds = get_google_credentials()
-    if not creds:
-        return {"ok": False, "error": "Google credentials not configured"}
+    creds, error = get_google_credentials()
+    if error:
+        return {"ok": False, "error": error}
     try:
         service = _google_build("gmail", "v1", credentials=creds)
         profile = service.users().getProfile(userId="me").execute()
@@ -585,9 +589,9 @@ def test_google_gmail() -> dict:
 
 def test_google_drive() -> dict:
     """Verify Google Drive API connectivity by listing the first file."""
-    creds = get_google_credentials()
-    if not creds:
-        return {"ok": False, "error": "Google credentials not configured"}
+    creds, error = get_google_credentials()
+    if error:
+        return {"ok": False, "error": error}
     try:
         service = _google_build("drive", "v3", credentials=creds)
         result = service.files().list(pageSize=1).execute()
