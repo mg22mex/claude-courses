@@ -672,10 +672,8 @@ CLOUD_SECRETS = init_cloud_secrets()
 sb_startup = _sellerboard_available()
 if sb_startup:
     print(f"[WEATHERMAN] Sellerboard links detected: {', '.join(sb_startup)}")
-    st.info(f"📡 Sellerboard links active: {', '.join(sb_startup)}")
 else:
     print("[WEATHERMAN] WARNING — No Sellerboard links found in os.environ or st.secrets.")
-    st.warning("📡 Sellerboard links not configured — live metrics injection disabled.")
 
 # Initialise MCP client (lazy — servers are started on demand)
 mcp_client = MCPClient("mcp_config.json")
@@ -846,28 +844,11 @@ if selected_preset == "open-ended-playground":
         "or explore the dataset however you see fit."
     )
 
-    col_metrics = st.columns(3)
     if user in OPERATIONAL_TRACKS:
         sb_types = _sellerboard_available()
         if "daily" in sb_types or "product" in sb_types:
             playground_df = sellerboard_dataframe("daily")
             if playground_df is not None and not playground_df.empty:
-                col_metrics[0].metric("Rows Available", len(playground_df))
-                col_metrics[1].metric("Columns", len(playground_df.columns))
-                numeric_cols = playground_df.select_dtypes(include="number").columns.tolist()
-                if numeric_cols:
-                    col_metrics[2].metric("Numeric Fields", len(numeric_cols))
-
-                with st.expander("View Raw Live Dataset", expanded=True):
-                    st.dataframe(playground_df, use_container_width=True)
-
-                # ------------------------------------------------------------------
-                # This layout is intentionally wide open for custom ad-hoc widget
-                # injections, Plotly charts, Altair specs, or download hooks.
-                # Any Streamlit component can be added below without restructuring
-                # the preset architecture. Future AI prompts will receive the full
-                # context including this dataframe and the user's chat instructions.
-                # ------------------------------------------------------------------
 
                 # ------------------------------------------------------------------
                 # 🔧 Enterprise Integration Diagnostics
@@ -1259,3 +1240,14 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
     # Automated long-term storage (Requirement #3: autosave)
     # ------------------------------------------------------------------
     autosave_chat(st.session_state.messages)
+
+# ------------------------------------------------------------------
+# Raw Live Dataset Viewer (tucked away at the bottom)
+# ------------------------------------------------------------------
+if selected_preset == "open-ended-playground" and user in OPERATIONAL_TRACKS:
+    sb_types = _sellerboard_available()
+    if "daily" in sb_types:
+        df = sellerboard_dataframe("daily")
+        if df is not None and not df.empty:
+            with st.expander("🛠️ View Raw Live Dataset", expanded=False):
+                st.dataframe(df, use_container_width=True)
