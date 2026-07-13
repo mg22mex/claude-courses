@@ -547,14 +547,25 @@ def get_google_credentials() -> "_GoogleCreds | None":
     if not client_id or not client_secret or not refresh_token:
         return None
     try:
-        return _GoogleCreds(
-            None,  # no initial access token — lazy refresh
-            refresh_token=refresh_token,
+        c_id = client_id.strip().strip("'").strip('"')
+        c_secret = client_secret.strip().strip("'").strip('"')
+        r_token = refresh_token.strip().strip("'").strip('"')
+
+        creds = _GoogleCreds(
+            token=None,
+            refresh_token=r_token,
             token_uri="https://oauth2.googleapis.com/token",
-            client_id=client_id,
-            client_secret=client_secret,
+            client_id=c_id,
+            client_secret=c_secret,
         )
-    except Exception:
+
+        from google.auth.transport.requests import Request
+
+        creds.refresh(Request())
+
+        return creds
+    except Exception as exc:
+        print(f"[GOOGLE AUTH ERROR] Failed token exchange: {exc}")
         return None
 
 
