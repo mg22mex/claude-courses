@@ -11,6 +11,23 @@ from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 
+# Optional: Dropbox SDK (with refresh-token auth support)
+try:
+    import dropbox
+
+    _DROPBOX_SDK_AVAILABLE = True
+except ImportError:
+    _DROPBOX_SDK_AVAILABLE = False
+
+# Optional: Google API client (Gmail + Drive)
+try:
+    from google.oauth2.credentials import Credentials as _GoogleCreds
+    from googleapiclient.discovery import build as _google_build
+
+    _GOOGLE_AVAILABLE = True
+except ImportError:
+    _GOOGLE_AVAILABLE = False
+
 st.set_page_config(page_title="Weatherman Claude Portal", layout="wide")
 
 # ---------------------------------------------------------------------------
@@ -224,6 +241,10 @@ def init_cloud_secrets() -> dict[str, str | None]:
         "DROPBOX_REFRESH_TOKEN",
         "DROPBOX_APP_KEY",
         "DROPBOX_APP_SECRET",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "GOOGLE_REFRESH_TOKEN",
+        "FATHOM_API_KEY",
         "TRIPLEWHALE_API_KEY",
         "SELLERBOARD_DAILY_LINK",
         "SELLERBOARD_PRODUCT_LINK",
@@ -471,53 +492,115 @@ def post_to_slack(channel: str = "", text: str = "") -> dict:
         return {"ok": False, "error": str(exc)}
 
 
-def get_dropbox_access_token() -> str | None:
-    """Obtain a fresh short-lived Dropbox access token via OAuth refresh token handshake."""
+def get_dropbox_client() -> dropbox.Dropbox | None:
+    """Create a Dropbox SDK client using refresh-token OAuth flow.
+
+    The SDK handles short-lived token refreshes automatically, keeping
+    the session alive without manual token-exchange calls.
+    """
+    if not _DROPBOX_SDK_AVAILABLE:
+        return None
     refresh_token = _secret_get("DROPBOX_REFRESH_TOKEN")
     app_key = _secret_get("DROPBOX_APP_KEY")
     app_secret = _secret_get("DROPBOX_APP_SECRET")
     if not refresh_token or not app_key or not app_secret:
         return None
     try:
-        url = "https://api.dropboxapi.com/oauth2/token"
-        payload = {
-            "grant_type": "refresh_token",
-            "refresh_token": refresh_token,
-            "client_id": app_key,
-            "client_secret": app_secret,
-        }
-        res = requests.post(url, data=payload, timeout=10)
-        res.raise_for_status()
-        return res.json().get("access_token")
+        return dropbox.Dropbox(
+            oauth2_refresh_token=refresh_token,
+            app_key=app_key,
+            app_secret=app_secret,
+        )
     except Exception:
         return None
 
 
 def read_dropbox_meta(path: str = "") -> dict:
-    """Read Dropbox folder metadata (enterprise hook stub)."""
-    token = get_dropbox_access_token()
-    if not token:
-        msg = "read_dropbox_meta: DROPBOX_REFRESH_TOKEN not configured or token refresh failed."
+    """Read Dropbox folder metadata using the SDK (enterprise hook stub)."""
+    dbx = get_dropbox_client()
+    if not dbx:
+        msg = "read_dropbox_meta: Dropbox SDK unavailable or refresh token not configured."
         st.warning(msg)
         return {"ok": False, "error": msg}
     try:
         st.info(f"📁 Dropbox metadata read started — path '{path or '/'}'")
-        resp = requests.post(
-            "https://api.dropboxapi.com/2/files/list_folder",
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Content-Type": "application/json",
-            },
-            json={"path": path or "", "recursive": False},
-            timeout=30,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        st.success(f"✅ Dropbox metadata retrieved — {len(data.get('entries', []))} entries.")
-        return {"ok": True, "result": data}
+        result = dbx.files_list_folder(path=path or "", recursive=False)
+        entries = [{"name": e.name, "path": e.path_lower} for e in result.entries]
+        st.success(f"✅ Dropbox metadata retrieved — {len(entries)} entries.")
+        return {"ok": True, "result": {"entries": entries}}
     except Exception as exc:
         st.error(f"read_dropbox_meta failed: {exc}")
         return {"ok": False, "error": str(exc)}
+
+
+def get_google_credentials() -> _GoogleCreds | None:
+    """Obtain Google OAuth2 credentials via refresh token for Gmail & Drive.
+
+    Returns a ``Credentials`` object that auto-refreshes the access token
+    on each API call.
+    """
+    if not _GOOGLE_AVAILABLE:
+        return None
+    client_id = _secret_get("GOOGLE_CLIENT_ID")
+    client_secret = _secret_get("GOOGLE_CLIENT_SECRET")
+    refresh_token = _secret_get("GOOGLE_REFRESH_TOKEN")
+    if not client_id or not client_secret or not refresh_token:
+        return None
+    try:
+        return _GoogleCreds(
+            None,  # no initial access token — lazy refresh
+            refresh_token=refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=client_id,
+            client_secret=client_secret,
+        )
+    except Exception:
+        return None
+
+
+def test_google_gmail() -> dict:
+    """Verify Gmail API connectivity by fetching the profile."""
+    creds = get_google_credentials()
+    if not creds:
+        return {"ok": False, "error": "Google credentials not configured"}
+    try:
+        service = _google_build("gmail", "v1", credentials=creds)
+        profile = service.users().getProfile(userId="me").execute()
+        email = profile.get("emailAddress", "unknown")
+        return {"ok": True, "email": email}
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+def test_google_drive() -> dict:
+    """Verify Google Drive API connectivity by listing the first file."""
+    creds = get_google_credentials()
+    if not creds:
+        return {"ok": False, "error": "Google credentials not configured"}
+    try:
+        service = _google_build("drive", "v3", credentials=creds)
+        result = service.files().list(pageSize=1).execute()
+        files = result.get("files", [])
+        return {"ok": True, "file_count": len(files)}
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+def test_fathom_connection() -> dict:
+    """Verify Fathom API connectivity via X-Api-Key header."""
+    api_key = _secret_get("FATHOM_API_KEY")
+    if not api_key:
+        return {"ok": False, "error": "FATHOM_API_KEY not configured"}
+    try:
+        resp = requests.get(
+            "https://api.fathom.ai/external/v1/meetings",
+            headers={"X-Api-Key": api_key},
+            timeout=15,
+        )
+        resp.raise_for_status()
+        return {"ok": True}
+    except requests.exceptions.RequestException as e:
+        return {"ok": False, "error": str(e)}
 
 
 NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
@@ -776,9 +859,10 @@ if selected_preset == "open-ended-playground":
                         "Each button performs a lightweight handshake — no data is modified."
                     )
 
-                    diag_cols = st.columns(4)
+                    # Row 1 — existing services
+                    diag_row1 = st.columns(4)
 
-                    with diag_cols[0]:
+                    with diag_row1[0]:
                         if st.button("Test Monday.com Connection", key="diag_monday"):
                             with st.spinner("Probing Monday.com API..."):
                                 token = _secret_get("MONDAY_API_TOKEN")
@@ -798,7 +882,7 @@ if selected_preset == "open-ended-playground":
                                     except Exception as e:
                                         st.error(f"❌ Connection Failed: {e}")
 
-                    with diag_cols[1]:
+                    with diag_row1[1]:
                         if st.button("Test Slack Integration", key="diag_slack"):
                             with st.spinner("Probing Slack API..."):
                                 token = _secret_get("SLACK_BOT_TOKEN")
@@ -820,29 +904,20 @@ if selected_preset == "open-ended-playground":
                                     except Exception as e:
                                         st.error(f"❌ Connection Failed: {e}")
 
-                    with diag_cols[2]:
+                    with diag_row1[2]:
                         if st.button("Test Dropbox Access", key="diag_dropbox"):
                             with st.spinner("Probing Dropbox API..."):
-                                token = get_dropbox_access_token()
-                                if not token:
-                                    st.warning("⚠️  DROPBOX_REFRESH_TOKEN not configured or token refresh failed")
+                                dbx = get_dropbox_client()
+                                if not dbx:
+                                    st.warning("⚠️  Dropbox client unavailable — check DROPBOX_REFRESH_TOKEN / SDK install")
                                 else:
                                     try:
-                                        resp = requests.post(
-                                            "https://api.dropboxapi.com/2/users/get_current_account",
-                                            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-                                            json={},
-                                            timeout=15,
-                                        )
-                                        if resp.status_code == 401:
-                                            st.error("❌ Token Expired — refresh token handshake produced an invalid token.")
-                                        else:
-                                            resp.raise_for_status()
-                                            st.success("✅ Connected successfully")
-                                    except requests.exceptions.RequestException as e:
+                                        account = dbx.users_get_current_account()
+                                        st.success(f"✅ Connected as {account.name.display_name}")
+                                    except Exception as e:
                                         st.error(f"❌ Connection Failed: {e}")
 
-                    with diag_cols[3]:
+                    with diag_row1[3]:
                         if st.button("Test Triple Whale Link", key="diag_triplewhale"):
                             with st.spinner("Probing Triple Whale API..."):
                                 token = _secret_get("TRIPLEWHALE_API_KEY")
@@ -866,6 +941,40 @@ if selected_preset == "open-ended-playground":
                                         st.error("❌ Connection Failed: Cannot reach Triple Whale API")
                                     except Exception as e:
                                         st.error(f"❌ Connection Failed: {e}")
+
+                    # Row 2 — Google (Gmail, Drive) and Fathom
+                    diag_row2 = st.columns(4)
+
+                    with diag_row2[0]:
+                        if st.button("Test Google Gmail", key="diag_gmail"):
+                            with st.spinner("Probing Gmail API..."):
+                                result = test_google_gmail()
+                                if result.get("ok"):
+                                    st.success(f"✅ Gmail connected — {result['email']}")
+                                else:
+                                    st.error(f"❌ Gmail Failed: {result.get('error', 'unknown')}")
+
+                    with diag_row2[1]:
+                        if st.button("Test Google Drive", key="diag_drive"):
+                            with st.spinner("Probing Google Drive API..."):
+                                result = test_google_drive()
+                                if result.get("ok"):
+                                    st.success(f"✅ Drive connected — {result['file_count']} files found")
+                                else:
+                                    st.error(f"❌ Drive Failed: {result.get('error', 'unknown')}")
+
+                    with diag_row2[2]:
+                        if st.button("Test Fathom API", key="diag_fathom"):
+                            with st.spinner("Probing Fathom API..."):
+                                result = test_fathom_connection()
+                                if result.get("ok"):
+                                    st.success("✅ Fathom connected successfully")
+                                else:
+                                    st.error(f"❌ Fathom Failed: {result.get('error', 'unknown')}")
+
+                    with diag_row2[3]:
+                        # spare slot
+                        pass
 
             else:
                 st.info("📡 Live Sellerboard data stream returned empty — upload a file below to get started.")
