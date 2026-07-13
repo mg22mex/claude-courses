@@ -1241,13 +1241,3 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
     # ------------------------------------------------------------------
     autosave_chat(st.session_state.messages)
 
-# ------------------------------------------------------------------
-# Raw Live Dataset Viewer (tucked away at the bottom)
-# ------------------------------------------------------------------
-if selected_preset == "open-ended-playground" and user in OPERATIONAL_TRACKS:
-    sb_types = _sellerboard_available()
-    if "daily" in sb_types:
-        df = sellerboard_dataframe("daily")
-        if df is not None and not df.empty:
-            with st.expander("🛠️ View Raw Live Dataset", expanded=False):
-                st.dataframe(df, use_container_width=True)

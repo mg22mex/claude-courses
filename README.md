@@ -46,6 +46,7 @@ graph TD
 * **Total Workspace Presets:** 21 Pre-optimized task prompts
 * **Core Engine:** Dual-Engine Selection (DeepSeek Data/Logic vs. OpenClaude Creative/Copy)
 * **Automated Sync Gate:** GitHub Actions operational on repository push events to keep training data mirrored directly to live training engines.
+* **Streamlined UI:** Clean open-ended-playground dashboard with integrated diagnostics and collapsed raw data section — pure chat-driven interface.
 
 ---
 
