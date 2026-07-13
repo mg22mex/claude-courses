@@ -221,7 +221,9 @@ def init_cloud_secrets() -> dict[str, str | None]:
     keys = (
         "MONDAY_API_TOKEN",
         "SLACK_BOT_TOKEN",
-        "DROPBOX_ACCESS_TOKEN",
+        "DROPBOX_REFRESH_TOKEN",
+        "DROPBOX_APP_KEY",
+        "DROPBOX_APP_SECRET",
         "TRIPLEWHALE_API_KEY",
         "SELLERBOARD_DAILY_LINK",
         "SELLERBOARD_PRODUCT_LINK",
@@ -469,11 +471,33 @@ def post_to_slack(channel: str = "", text: str = "") -> dict:
         return {"ok": False, "error": str(exc)}
 
 
+def get_dropbox_access_token() -> str | None:
+    """Obtain a fresh short-lived Dropbox access token via OAuth refresh token handshake."""
+    refresh_token = _secret_get("DROPBOX_REFRESH_TOKEN")
+    app_key = _secret_get("DROPBOX_APP_KEY")
+    app_secret = _secret_get("DROPBOX_APP_SECRET")
+    if not refresh_token or not app_key or not app_secret:
+        return None
+    try:
+        url = "https://api.dropboxapi.com/oauth2/token"
+        payload = {
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token,
+            "client_id": app_key,
+            "client_secret": app_secret,
+        }
+        res = requests.post(url, data=payload, timeout=10)
+        res.raise_for_status()
+        return res.json().get("access_token")
+    except Exception:
+        return None
+
+
 def read_dropbox_meta(path: str = "") -> dict:
     """Read Dropbox folder metadata (enterprise hook stub)."""
-    token = _secret_get("DROPBOX_ACCESS_TOKEN")
+    token = get_dropbox_access_token()
     if not token:
-        msg = "read_dropbox_meta: DROPBOX_ACCESS_TOKEN is not configured."
+        msg = "read_dropbox_meta: DROPBOX_REFRESH_TOKEN not configured or token refresh failed."
         st.warning(msg)
         return {"ok": False, "error": msg}
     try:
@@ -799,10 +823,9 @@ if selected_preset == "open-ended-playground":
                     with diag_cols[2]:
                         if st.button("Test Dropbox Access", key="diag_dropbox"):
                             with st.spinner("Probing Dropbox API..."):
-                                token = _secret_get("DROPBOX_ACCESS_TOKEN")
-                                token = token.strip().strip("'").strip('"') if token else None
+                                token = get_dropbox_access_token()
                                 if not token:
-                                    st.warning("⚠️  DROPBOX_ACCESS_TOKEN not configured")
+                                    st.warning("⚠️  DROPBOX_REFRESH_TOKEN not configured or token refresh failed")
                                 else:
                                     try:
                                         resp = requests.post(
@@ -812,10 +835,7 @@ if selected_preset == "open-ended-playground":
                                             timeout=15,
                                         )
                                         if resp.status_code == 401:
-                                            st.error(
-                                                "❌ Token Expired (Generated tokens expire after 4 hours. "
-                                                "Please generate a new short-lived token or use a refresh token flow)."
-                                            )
+                                            st.error("❌ Token Expired — refresh token handshake produced an invalid token.")
                                         else:
                                             resp.raise_for_status()
                                             st.success("✅ Connected successfully")
