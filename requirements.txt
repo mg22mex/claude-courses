@@ -3,3 +3,6 @@ requests
 openai
 pandas
 mcp>=0.1.0
+dropbox
+google-auth
+google-api-python-client

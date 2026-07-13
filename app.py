@@ -492,7 +492,7 @@ def post_to_slack(channel: str = "", text: str = "") -> dict:
         return {"ok": False, "error": str(exc)}
 
 
-def get_dropbox_client() -> dropbox.Dropbox | None:
+def get_dropbox_client() -> "dropbox.Dropbox | None":
     """Create a Dropbox SDK client using refresh-token OAuth flow.
 
     The SDK handles short-lived token refreshes automatically, keeping
@@ -533,7 +533,7 @@ def read_dropbox_meta(path: str = "") -> dict:
         return {"ok": False, "error": str(exc)}
 
 
-def get_google_credentials() -> _GoogleCreds | None:
+def get_google_credentials() -> "_GoogleCreds | None":
     """Obtain Google OAuth2 credentials via refresh token for Gmail & Drive.
 
     Returns a ``Credentials`` object that auto-refreshes the access token
