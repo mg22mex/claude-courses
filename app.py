@@ -534,40 +534,44 @@ def read_dropbox_meta(path: str = "") -> dict:
 
 
 def get_google_credentials() -> tuple["_GoogleCreds | None", str | None]:
-    """Obtain Google OAuth2 credentials via refresh token for Gmail & Drive.
-    Returns a tuple of (credentials, error_message).
-    """
     if not _GOOGLE_AVAILABLE:
-        return None, "Google API client libraries are not installed or available."
+        return None, "Google API client libraries are not installed."
 
     client_id = _secret_get("GOOGLE_CLIENT_ID")
     client_secret = _secret_get("GOOGLE_CLIENT_SECRET")
     refresh_token = _secret_get("GOOGLE_REFRESH_TOKEN")
 
     if not client_id or not client_secret or not refresh_token:
-        missing = []
-        if not client_id: missing.append("GOOGLE_CLIENT_ID")
-        if not client_secret: missing.append("GOOGLE_CLIENT_SECRET")
-        if not refresh_token: missing.append("GOOGLE_REFRESH_TOKEN")
-        return None, f"Missing environment variables: {', '.join(missing)}"
+        return None, "Missing configuration keys."
 
     try:
         c_id = client_id.strip().strip("'").strip('"')
         c_secret = client_secret.strip().strip("'").strip('"')
         r_token = refresh_token.strip().strip("'").strip('"')
 
+        # Manually verify token via requests
+        payload = {
+            "client_id": c_id,
+            "client_secret": c_secret,
+            "refresh_token": r_token,
+            "grant_type": "refresh_token"
+        }
+        res = requests.post("https://oauth2.googleapis.com/token", data=payload, timeout=10)
+        data = res.json()
+
+        if res.status_code != 200:
+            return None, f"Google OAuth Endpoint rejected credentials: {data.get('error_description', data.get('error', res.text))}"
+
+        access_token = data.get("access_token")
+
         creds = _GoogleCreds(
-            token=None,
+            token=access_token,
             refresh_token=r_token,
             token_uri="https://oauth2.googleapis.com/token",
             client_id=c_id,
             client_secret=c_secret,
+            scopes=["https://www.googleapis.com/auth/gmail.modify", "https://www.googleapis.com/auth/drive"]
         )
-
-        from google.auth.transport.requests import Request
-
-        creds.refresh(Request())
-
         return creds, None
     except Exception as exc:
         return None, str(exc)
