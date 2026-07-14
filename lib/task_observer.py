@@ -201,9 +201,9 @@ class _TaskContext:
         self._task = manager.create_task(name)
         self._task_id = self._task.id
 
-    def __enter__(self) -> TaskManager:
+    def __enter__(self) -> "_TaskContext":
         self._manager.start_task(self._task_id)
-        return self._manager
+        return self
 
     def __exit__(self, exc_type: type | None, exc_val: Exception | None, exc_tb: Any) -> None:
         if exc_type and exc_val:

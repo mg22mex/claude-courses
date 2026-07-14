@@ -1617,8 +1617,11 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
         tm = TaskManager()
         with tm.run(f"DeepSeek: {prompt[:60]}") as task_ctx:
             for turn in range(max_tool_turns):
-                tm.update_task(task_ctx.task_id, progress=(turn + 1) / max_tool_turns,
-                               message=f"Turn {turn + 1}/{max_tool_turns}")
+                try:
+                    tm.update_task(task_ctx.task_id, progress=(turn + 1) / max_tool_turns,
+                                   message=f"Turn {turn + 1}/{max_tool_turns}")
+                except Exception as task_err:
+                    print(f"[WEATHERMAN] Task tracking error (non-fatal): {task_err}")
                 stream = client.chat.completions.create(
                     model=model_to_use,
                     messages=message_payload,
