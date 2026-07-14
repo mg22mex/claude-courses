@@ -71,12 +71,5 @@
   "69": "Master Profile: Design Team — Asset & System Governance",
   "70": "Master Profile: Mollie — Sales & Financial Analyst",
   "71": "Master Profile: Sunny — Purchasing & Logistics Specialist",
-  "72": "SYSTEM_PROMPT.md",
-  "73": "app.py",
-  "74": "_secret_get",
-  "75": "_HTMLToTextParser",
-  "76": "get_google_credentials",
-  "77": "sellerboard_dataframe",
-  "78": "Live Sellerboard Fulfillment Data Integration",
-  "79": "get_dropbox_client"
+  "72": "SYSTEM_PROMPT.md"
 }

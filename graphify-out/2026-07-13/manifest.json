@@ -1,12 +1,12 @@
 {
   ".openclaude/settings.local.json": {
-    "mtime": 1783992458.8149076,
-    "ast_hash": "b7d9cbd2e2b3b3aed0c53cc207fbb9d0",
+    "mtime": 1783381128.4075425,
+    "ast_hash": "6cf7faf0a534c8fad18ca5f24a0268ce",
     "semantic_hash": ""
   },
   "app.py": {
-    "mtime": 1783991640.5481336,
-    "ast_hash": "d88d56ccf219d589f4564ef38369a498",
+    "mtime": 1783436827.373891,
+    "ast_hash": "48596b4c65354f7c7ae709eaef5521bb",
     "semantic_hash": ""
   },
   "mcp_config.json": {
@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1783980036.4232986,
-    "ast_hash": "bfd97468abc2943b1ebef5894b638757",
+    "mtime": 1783443675.2788432,
+    "ast_hash": "9c22373ec4b0a49ed54dbc4140a6c646",
     "semantic_hash": ""
   },
   "SYSTEM_PROMPT.md": {
@@ -45,13 +45,13 @@
     "semantic_hash": ""
   },
   "portal-flight-manual.md": {
-    "mtime": 1783979472.0130308,
-    "ast_hash": "a2f578d640bbef3f946c9ed796770021",
+    "mtime": 1783389116.275501,
+    "ast_hash": "f1558f68f0a32f65d5f4b9b78bfc6e48",
     "semantic_hash": ""
   },
   "requirements.txt": {
-    "mtime": 1783976459.4355242,
-    "ast_hash": "94d04bbbaf324db8709170638db3828d",
+    "mtime": 1783436475.7125292,
+    "ast_hash": "fa1d1f15832d638e7e87cdc6502a6ff2",
     "semantic_hash": ""
   },
   "training/christine/data/raw-copy-deck.md": {
@@ -315,8 +315,8 @@
     "semantic_hash": ""
   },
   "training/rick/presets/fulfillment-anomaly-detector/SKILL.md": {
-    "mtime": 1783882054.7437027,
-    "ast_hash": "fc13cce40960cff84d3da4d715e4e574",
+    "mtime": 1783380822.5072446,
+    "ast_hash": "ae0d9324d012c41de05707173093dd9e",
     "semantic_hash": ""
   },
   "training/rick/presets/ppt-generation/SKILL.md": {
@@ -407,11 +407,6 @@
   "training/design/data/mock-assets/logo-hero-main.svg": {
     "mtime": 1783008144.4368746,
     "ast_hash": "b970807a9b1ac978feafe14f3cfcb1d9",
-    "semantic_hash": ""
-  },
-  "training/rick/presets/fulfillment-anomaly-detector/instructions.md": {
-    "mtime": 1783882045.6568232,
-    "ast_hash": "ad8613c1a627926b39d2a96678eeb9dc",
     "semantic_hash": ""
   }
 }

@@ -1,16 +1,16 @@
-# Graph Report - Claude-courses  (2026-07-13)
+# Graph Report - Claude-courses  (2026-07-07)
 
 ## Corpus Check
-- 78 files · ~79,144 words
+- 77 files · ~74,283 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1121 nodes · 1077 edges · 80 communities (79 shown, 1 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 9 edges (avg confidence: 0.5)
+- 1057 nodes · 990 edges · 73 communities (72 shown, 1 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5b50e646`
+- Built from commit: `926e9dfd`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -88,42 +88,26 @@
 - Master Profile: Mollie — Sales & Financial Analyst
 - Master Profile: Sunny — Purchasing & Logistics Specialist
 - SYSTEM_PROMPT.md
-- app.py
-- _secret_get
-- _HTMLToTextParser
-- get_google_credentials
-- sellerboard_dataframe
-- Live Sellerboard Fulfillment Data Integration
-- get_dropbox_client
 
 ## God Nodes (most connected - your core abstractions)
-1. `_secret_get()` - 12 edges
-2. `MCPClient` - 10 edges
-3. `_HTMLToTextParser` - 9 edges
-4. `Investigation queries` - 9 edges
-5. `get_google_credentials()` - 8 edges
-6. `Investigation steps` - 8 edges
-7. `Sales & Financials: Order-to-Profit Analysis` - 8 edges
-8. `The Weatherman AI Portal` - 7 edges
-9. `Marketing: Brand Compliance & Copy Optimization` - 7 edges
-10. `Lesson Breakdown` - 7 edges
+1. `MCPClient` - 10 edges
+2. `Investigation queries` - 9 edges
+3. `Investigation steps` - 8 edges
+4. `Sales & Financials: Order-to-Profit Analysis` - 8 edges
+5. `The Weatherman AI Portal` - 7 edges
+6. `Marketing: Brand Compliance & Copy Optimization` - 7 edges
+7. `Lesson Breakdown` - 7 edges
+8. `Walkthrough` - 7 edges
+9. `Walkthrough` - 7 edges
+10. `Walkthrough` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `fetch_fathom_meetings()` --calls--> `_secret_get()`  [EXTRACTED]
-  app.py → app.py  _Bridges community 74 → community 75_
-- `fetch_sellerboard_data()` --calls--> `_secret_get()`  [EXTRACTED]
-  app.py → app.py  _Bridges community 74 → community 77_
-- `get_dropbox_client()` --calls--> `_secret_get()`  [EXTRACTED]
-  app.py → app.py  _Bridges community 74 → community 79_
-- `get_google_credentials()` --calls--> `_secret_get()`  [EXTRACTED]
-  app.py → app.py  _Bridges community 74 → community 76_
-- `fetch_fathom_meetings()` --calls--> `get_google_credentials()`  [EXTRACTED]
-  app.py → app.py  _Bridges community 76 → community 75_
+- None detected - all connections are within the same source files.
 
 ## Import Cycles
 - None detected.
 
-## Communities (80 total, 1 thin omitted)
+## Communities (73 total, 1 thin omitted)
 
 ### Community 0 - "SKILL.md"
 Cohesion: 0.05
@@ -151,7 +135,7 @@ Nodes (26): 1.1 Accept input formats, 1.2 Auto-detect format, 1.3 Parse and norm
 
 ### Community 6 - "SKILL.md"
 Cohesion: 0.07
-Nodes (27): 1.1 Accept input formats, 1.2 Identify required columns, 1.3 Report schema to the user, 1. Intake & Schema Mapping, 2.1 Validate and normalise dates, 2.2 Validate status field, 2.3 Remove noise rows, 2. Data Cleansing (+19 more)
+Nodes (26): 1.1 Accept input formats, 1.2 Identify required columns, 1.3 Report schema to the user, 1. Intake & Schema Mapping, 2.1 Validate and normalise dates, 2.2 Validate status field, 2.3 Remove noise rows, 2. Data Cleansing (+18 more)
 
 ### Community 7 - "SKILL.md"
 Cohesion: 0.07
@@ -190,8 +174,8 @@ Cohesion: 0.10
 Nodes (20): 1.1 Accept input formats, 1.2 Normalized schema, 1.3 Validate input completeness, 1. Intake & Schema, 2.1 Join on transaction ID, 2.2 Amount discrepancy detection, 2.3 Missing transaction isolation, 2.4 Aggregated reconciliation (+12 more)
 
 ### Community 16 - "MCPClient"
-Cohesion: 0.27
-Nodes (3): MCPClient, Minimal MCP client that launches server subprocesses over stdio., Launch an MCP server subprocess if not already running.
+Cohesion: 0.13
+Nodes (11): autosave_chat(), build_md_export(), detect_table_data(), MCPClient, Detect markdown tables or CSV blocks in text and return raw CSV., Render the full conversation as a markdown transcript., Append a timestamped snapshot of the conversation to the chat_history directory., Minimal MCP client that launches server subprocesses over stdio. (+3 more)
 
 ### Community 17 - "SKILL.md"
 Cohesion: 0.10
@@ -413,48 +397,16 @@ Nodes (3): Directives, Master Profile: Mollie — Sales & Financial Analyst, Ope
 Cohesion: 0.50
 Nodes (3): Directives, Master Profile: Sunny — Purchasing & Logistics Specialist, Operational Focus Areas
 
-### Community 73 - "app.py"
-Cohesion: 0.12
-Nodes (16): autosave_chat(), build_enterprise_tools_block(), build_md_export(), build_sellerboard_system_block(), detect_table_data(), execute_native_tool(), Bridge native Python enterprise hooks into the MCP execution loop., Describe available native enterprise hooks for the system prompt. (+8 more)
-
-### Community 74 - "_secret_get"
-Cohesion: 0.14
-Nodes (14): init_cloud_secrets(), post_to_slack(), Read a deployment secret from env or Streamlit secrets without raising., Safe-check Hugging Face / cloud environment variables at startup., Push a row to Monday.com via GraphQL (enterprise hook stub)., Post a message to Slack (enterprise hook stub)., Fetch DM history with a team member by name — bypasses ``conversations.list`` en, Read recent messages from a Slack channel.      Resolves ``#channel-name`` to a (+6 more)
-
-### Community 75 - "_HTMLToTextParser"
-Cohesion: 0.18
-Nodes (7): fetch_fathom_meetings(), _gmail_decode_body(), _HTMLToTextParser, Lightweight HTML-to-text extractor that collects visible text., Recursively extract plain-text body from a Gmail message payload.      Falls bac, Fetch recent meeting records from Fathom API, with automatic Gmail fallback., HTMLParser
-
-### Community 76 - "get_google_credentials"
-Cohesion: 0.18
-Nodes (11): get_google_credentials(), list_gdrive_files(), Verify Gmail API connectivity by fetching the profile., Verify Google Drive API connectivity by listing the first file., Search Gmail messages and return subject/from/snippet for each match., List files from Google Drive with name, type, size, and timestamps., Read a Google Drive file's content by ID (text export for Docs/Sheets, raw text, read_gdrive_file_content() (+3 more)
-
-### Community 77 - "sellerboard_dataframe"
-Cohesion: 0.25
-Nodes (9): build_sellerboard_context(), fetch_sellerboard_data(), normalize_sellerboard_columns(), Fetch live Sellerboard CSV and return raw bytes for stable cache keys., Parse cached Sellerboard CSV bytes into a Pandas DataFrame., Rename Sellerboard CSV columns to fulfillment-anomaly-detector schema.      Appl, Expose a compact Sellerboard snapshot for model context during analysis.      Se, sellerboard_dataframe() (+1 more)
-
-### Community 78 - "Live Sellerboard Fulfillment Data Integration"
-Cohesion: 0.40
-Nodes (4): Column Mapping: Sellerboard → Fulfillment Schema, Data Source Priority, Error Handling, Live Sellerboard Fulfillment Data Integration
-
-### Community 79 - "get_dropbox_client"
-Cohesion: 0.50
-Nodes (4): get_dropbox_client(), Create a Dropbox SDK client using refresh-token OAuth flow.      The SDK handles, Read Dropbox folder metadata using the SDK (enterprise hook stub)., read_dropbox_meta()
-
 ## Knowledge Gaps
-- **749 isolated node(s):** `Project Overview`, `Repository Structure`, `Workflow Rules`, `Quality Gates`, `Filenames & Assets` (+744 more)
+- **746 isolated node(s):** `Project Overview`, `Repository Structure`, `Workflow Rules`, `Quality Gates`, `Filenames & Assets` (+741 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `init_cloud_secrets()` connect `_secret_get` to `app.py`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `sync_to_monday()` connect `_secret_get` to `app.py`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `Minimal MCP client that launches server subprocesses over stdio.`, `Launch an MCP server subprocess if not already running.`, `Detect markdown tables or CSV blocks in text and return raw CSV.` to the rest of the system?**
-  _780 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _752 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `SKILL.md` be split into smaller, more focused modules?**
   _Cohesion score 0.05263157894736842 - nodes in this community are weakly interconnected._
 - **Should `SKILL.md` be split into smaller, more focused modules?**
@@ -463,3 +415,7 @@ _Questions this graph is uniquely positioned to answer:_
   _Cohesion score 0.06666666666666667 - nodes in this community are weakly interconnected._
 - **Should `SKILL.md` be split into smaller, more focused modules?**
   _Cohesion score 0.06896551724137931 - nodes in this community are weakly interconnected._
+- **Should `SKILL.md` be split into smaller, more focused modules?**
+  _Cohesion score 0.06896551724137931 - nodes in this community are weakly interconnected._
+- **Should `SKILL.md` be split into smaller, more focused modules?**
+  _Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected._
