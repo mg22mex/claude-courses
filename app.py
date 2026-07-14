@@ -494,6 +494,59 @@ def post_to_slack(channel: str = "", text: str = "") -> dict:
         return {"ok": False, "error": str(exc)}
 
 
+def search_slack_messages(channel: str = "", limit: int = 10) -> dict:
+    """Read recent messages from a Slack channel.
+
+    Resolves ``#channel-name`` to a channel ID via ``conversations.list``,
+    then fetches history with ``conversations.history``.
+    """
+    token = _secret_get("SLACK_BOT_TOKEN")
+    if not token:
+        return {"ok": False, "error": "SLACK_BOT_TOKEN not configured"}
+    try:
+        channel_id = channel
+        if channel.startswith("#"):
+            name_wanted = channel.lstrip("#").lower()
+            resp = requests.get(
+                "https://slack.com/api/conversations.list",
+                headers={"Authorization": f"Bearer {token}"},
+                params={"types": "public_channel,private_channel", "limit": 200},
+                timeout=15,
+            )
+            data = resp.json()
+            if not data.get("ok"):
+                return {"ok": False, "error": f"conversations.list failed: {data.get('error', 'unknown')}"}
+            for ch in data.get("channels", []):
+                if ch.get("name", "").lower() == name_wanted:
+                    channel_id = ch["id"]
+                    break
+            else:
+                return {"ok": False, "error": f"Channel '{channel}' not found in workspace"}
+        if not channel_id:
+            return {"ok": False, "error": "No channel specified — use #channel-name format"}
+
+        resp = requests.get(
+            "https://slack.com/api/conversations.history",
+            headers={"Authorization": f"Bearer {token}"},
+            params={"channel": channel_id, "limit": limit},
+            timeout=15,
+        )
+        data = resp.json()
+        if not data.get("ok"):
+            return {"ok": False, "error": data.get("error", "unknown Slack error")}
+
+        messages = []
+        for msg in data.get("messages", []):
+            messages.append({
+                "ts": msg.get("ts", ""),
+                "user": msg.get("user", ""),
+                "text": msg.get("text", ""),
+            })
+        return {"ok": True, "channel": channel, "channel_id": channel_id, "messages": messages, "count": len(messages)}
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
 def get_dropbox_client() -> "dropbox.Dropbox | None":
     """Create a Dropbox SDK client using refresh-token OAuth flow.
 
@@ -882,6 +935,7 @@ def fetch_fathom_meetings(limit: int = 5, query: str = "") -> dict:
 NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
     "sync_to_monday": sync_to_monday,
     "post_to_slack": post_to_slack,
+    "search_slack_messages": search_slack_messages,
     "read_dropbox_meta": read_dropbox_meta,
     "search_gmail_messages": search_gmail_messages,
     "search_gmail": search_gmail_messages,
@@ -907,11 +961,22 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
     tool_lines = (
         "  - `sync_to_monday(board_id, item_name, column_values?)` — Push a row to Monday.com\n"
         "  - `post_to_slack(channel, text)` — Post a message to a Slack channel\n"
+        "  - `search_slack_messages(channel, limit?)` — Read recent messages from a Slack channel (use #channel-name format, limit defaults to 10)\n"
         "  - `read_dropbox_meta(path?)` — List entries in a Dropbox folder\n"
         "  - `search_gmail(query, max_results?)` — Search Gmail messages; returns subject/from/date/body for each match\n"
         "  - `list_gdrive_files(page_size?)` — List Google Drive files with metadata\n"
         "  - `read_gdrive_file_content(file_id)` — Read a Drive file's text content by ID\n"
         "  - `fetch_fathom_meetings(limit?, query?)` — Fetch meetings from Fathom API; auto-falls back to Gmail recap search if Fathom returns empty or is unreachable. `query` filters by keyword (e.g. \"Rick\", \"Weekly\")"
+    )
+    routing_directive = (
+        "\n\n## Tool Routing Rules\n"
+        "When the user mentions **Slack**, **messages**, **channels**, or asks about "
+        "conversations or DMs — use `search_slack_messages` (to read) or `post_to_slack` "
+        "(to send). Do NOT use Gmail or any other tool for Slack-related queries.\n"
+        "When the user asks about their **email**, **inbox**, or specific Gmail queries — "
+        "use `search_gmail`.\n"
+        "Choose the tool that matches the user's stated platform. If they say "
+        "\"check my Slack\", do NOT check Gmail."
     )
     secret_lines = "\n".join(f"  - {name}" for name in configured)
     return (
@@ -920,6 +985,7 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
         "```tool_call\n{\"server\": \"enterprise\", \"tool\": \"TOOL_NAME\", \"arguments\": {...}}\n```\n\n"
         f"**Configured secrets:**\n{secret_lines}\n\n"
         f"**Native tools (call via enterprise server):**\n{tool_lines}"
+        f"{routing_directive}"
     )
 
 
@@ -1060,7 +1126,15 @@ with st.spinner("Loading your personalized workspace preset..."):
             )
 
         # Build core prompt parts individually so a single failure doesn't nuke the entire prompt
-        core_parts = [master_prompt, f"\n\n## Active Task Directives\n{preset_instructions}"]
+        core_parts = [
+            master_prompt,
+            f"\n\n## Active Task Directives\n{preset_instructions}",
+            "\n\n## Current Context\n"
+            f"Today's date is **July 13, 2026**. All date-sensitive reasoning, "
+            f"queries about \"recent\" messages, and relative-time references should "
+            f"use this date as the present. Do not rely on your training cutoff or "
+            f"any other date.",
+        ]
         if mcp_block:
             core_parts.append(mcp_block)
         try:
