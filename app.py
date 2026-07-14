@@ -494,6 +494,103 @@ def post_to_slack(channel: str = "", text: str = "") -> dict:
         return {"ok": False, "error": str(exc)}
 
 
+# ---------------------------------------------------------------------------
+# Team Slack User ID map — bypasses conversations.list entirely for DMs
+# ---------------------------------------------------------------------------
+_TEAM_SLACK_IDS: dict[str, str] = {
+    # (all keys stored lowercase for case-insensitive matching)
+    "sunny": "U066ARLFH4K",
+    "sajjad": "U066ARLFH4K",
+    "rick": "U4Y0JPMD4",
+    "rick reichmuth": "U4Y0JPMD4",
+    "diego": "U5206HQ00",
+    "diego marquez": "U5206HQ00",
+    "allyse": "U08F1V0FPDY",
+    "allyse c": "U08F1V0FPDY",
+    "stifany": "UQC0FDA2Z",
+    "stifany ong": "UQC0FDA2Z",
+    "paula": "U04PH54YZ3N",
+    "paula bacolod": "U04PH54YZ3N",
+    "arqam": "U08E1C77J77",
+    "mollie": "U03SW53P95E",
+    "mollie cutillo": "U03SW53P95E",
+    "marco": "U0AMTGG4XRD",
+    "marco gastelum": "U0AMTGG4XRD",
+}
+
+# Build a set of known names for quick matching
+_TEAM_KNOWN_NAMES: set[str] = set(_TEAM_SLACK_IDS.keys())
+
+
+def slack_dm_history(contact_name: str, limit: int = 10) -> dict:
+    """Fetch DM history with a team member by name — bypasses ``conversations.list`` entirely.
+
+    Looks up *contact_name* (case-insensitive) in the hardcoded team roster,
+    resolves the Slack user ID, opens a DM via ``conversations.open``, and
+    fetches recent messages with ``conversations.history``.
+
+    Supported names: sunny/sajjad, rick, diego, allyse, stifany, paula,
+    arqam, mollie, marco (including full names).
+    """
+    token = _secret_get("SLACK_BOT_TOKEN")
+    if not token:
+        return {"ok": False, "error": "SLACK_BOT_TOKEN not configured"}
+
+    key = contact_name.strip().lower()
+    user_id = _TEAM_SLACK_IDS.get(key)
+    if not user_id:
+        return {
+            "ok": False,
+            "error": f"Unknown team member '{contact_name}'. Known names: {', '.join(sorted(_TEAM_KNOWN_NAMES))}",
+        }
+
+    try:
+        # Step 1: open DM (create if it doesn't exist yet)
+        open_resp = requests.post(
+            "https://slack.com/api/conversations.open",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+            json={"users": user_id},
+            timeout=15,
+        )
+        open_data = open_resp.json()
+        if not open_data.get("ok"):
+            return {"ok": False, "error": f"conversations.open failed: {open_data.get('error', 'unknown')}"}
+
+        dm_channel_id = open_data["channel"]["id"]
+
+        # Step 2: fetch history
+        hist_resp = requests.get(
+            "https://slack.com/api/conversations.history",
+            headers={"Authorization": f"Bearer {token}"},
+            params={"channel": dm_channel_id, "limit": limit},
+            timeout=15,
+        )
+        hist_data = hist_resp.json()
+        if not hist_data.get("ok"):
+            return {"ok": False, "error": f"conversations.history failed: {hist_data.get('error', 'unknown')}"}
+
+        messages = []
+        for msg in hist_data.get("messages", []):
+            messages.append({
+                "ts": msg.get("ts", ""),
+                "user": msg.get("user", ""),
+                "text": msg.get("text", ""),
+            })
+        return {
+            "ok": True,
+            "contact_name": contact_name,
+            "user_id": user_id,
+            "dm_channel_id": dm_channel_id,
+            "messages": messages,
+            "count": len(messages),
+        }
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
 def search_slack_messages(channel: str = "", limit: int = 10) -> dict:
     """Read recent messages from a Slack channel.
 
@@ -936,6 +1033,7 @@ NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
     "sync_to_monday": sync_to_monday,
     "post_to_slack": post_to_slack,
     "search_slack_messages": search_slack_messages,
+    "slack_dm_history": slack_dm_history,
     "read_dropbox_meta": read_dropbox_meta,
     "search_gmail_messages": search_gmail_messages,
     "search_gmail": search_gmail_messages,
@@ -962,6 +1060,9 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
         "  - `sync_to_monday(board_id, item_name, column_values?)` — Push a row to Monday.com\n"
         "  - `post_to_slack(channel, text)` — Post a message to a Slack channel\n"
         "  - `search_slack_messages(channel, limit?)` — Read recent messages from a Slack channel (use #channel-name format, limit defaults to 10)\n"
+        "  - `slack_dm_history(contact_name, limit?)` — Fetch DM history with a team member by name. "
+        "Bypasses conversations.list entirely. Supports: sunny/sajjad, rick, diego, allyse, "
+        "stifany, paula, arqam, mollie, marco (limit defaults to 10)\n"
         "  - `read_dropbox_meta(path?)` — List entries in a Dropbox folder\n"
         "  - `search_gmail(query, max_results?)` — Search Gmail messages; returns subject/from/date/body for each match\n"
         "  - `list_gdrive_files(page_size?)` — List Google Drive files with metadata\n"
@@ -970,9 +1071,14 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
     )
     routing_directive = (
         "\n\n## Tool Routing Rules\n"
-        "When the user mentions **Slack**, **messages**, **channels**, or asks about "
-        "conversations or DMs — use `search_slack_messages` (to read) or `post_to_slack` "
-        "(to send). Do NOT use Gmail or any other tool for Slack-related queries.\n"
+        "When the user mentions **Slack**, **messages**, **DMs**, **channels**, or asks about "
+        "conversations, direct messages, or contact history — use Slack tools only.\n"
+        "  - To **read a channel**: use `search_slack_messages`\n"
+        "  - To **read DMs with a team member**: use `slack_dm_history`\n"
+        "  - To **send a message**: use `post_to_slack`\n"
+        "IMPORTANT: `slack_dm_history` bypasses `conversations.list` entirely — it uses a hardcoded "
+        "team roster. Do NOT try to resolve team member names via `search_slack_messages` or any "
+        "other channel-listing approach. Look up the person directly in `slack_dm_history`.\n"
         "When the user asks about their **email**, **inbox**, or specific Gmail queries — "
         "use `search_gmail`.\n"
         "Choose the tool that matches the user's stated platform. If they say "
