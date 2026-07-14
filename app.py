@@ -514,6 +514,8 @@ def post_to_slack(channel: str = "", text: str = "") -> dict:
 
 # ---------------------------------------------------------------------------
 # Team Slack User ID map — bypasses conversations.list entirely for DMs
+# IMPORTANT: All IDs below are verified production IDs. Do NOT use placeholder
+# or example IDs (e.g. U07A5BU3J2B). These are the actual workspace user IDs.
 # ---------------------------------------------------------------------------
 _TEAM_SLACK_IDS: dict[str, str] = {
     # (all keys stored lowercase for case-insensitive matching)
@@ -1092,6 +1094,68 @@ def web_scrape(url: str, selector: str | None = None, timeout: int = 15000) -> d
         return {"ok": False, "error": f"Playwright scrape failed: {exc}"}
 
 
+def execute_ui_screenshot_validation(
+    url: str,
+    viewport_width: int = 1280,
+    viewport_height: int = 720,
+    full_page: bool = False,
+) -> dict:
+    """Launch a headless browser, navigate to a URL, capture a screenshot and DOM state.
+
+    Use this for visual validation of UI render output. Returns a base64-encoded
+    PNG screenshot plus the page title and current URL.
+
+    Args:
+        url: Full URL to navigate to (including https://).
+        viewport_width: Browser viewport width in pixels (default 1280).
+        viewport_height: Browser viewport height in pixels (default 720).
+        full_page: If True, captures the full scrollable page (default False).
+
+    Returns:
+        dict with base64 PNG, page title, URL, viewport metadata.
+    """
+    if not _PLAYWRIGHT_AVAILABLE:
+        return {"ok": False, "error": "Playwright is not installed on this server"}
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(
+                viewport={"width": viewport_width, "height": viewport_height}
+            )
+            page = context.new_page()
+            page.goto(url, timeout=30000, wait_until="networkidle")
+            title = page.title()
+            final_url = page.url
+
+            # Capture screenshot as base64
+            screenshot_bytes = page.screenshot(full_page=full_page)
+            import base64
+            screenshot_b64 = base64.b64encode(screenshot_bytes).decode("utf-8")
+
+            # Extract key DOM state
+            dom_metrics = page.evaluate("""() => ({
+                scrollHeight: document.documentElement.scrollHeight,
+                scrollWidth: document.documentElement.scrollWidth,
+                bodyChildren: document.body ? document.body.children.length : 0,
+                visibleText: document.body ? document.body.innerText.substring(0, 2000) : ""
+            })""")
+
+            browser.close()
+
+        return {
+            "ok": True,
+            "url": url,
+            "final_url": final_url,
+            "title": title,
+            "screenshot_base64": screenshot_b64,
+            "viewport": {"width": viewport_width, "height": viewport_height},
+            "full_page": full_page,
+            "dom_metrics": dom_metrics,
+        }
+    except Exception as exc:
+        return {"ok": False, "error": f"UI screenshot validation failed: {exc}"}
+
+
 NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
     "sync_to_monday": sync_to_monday,
     "post_to_slack": post_to_slack,
@@ -1104,6 +1168,7 @@ NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
     "read_gdrive_file_content": read_gdrive_file_content,
     "fetch_fathom_meetings": fetch_fathom_meetings,
     "web_scrape": web_scrape,
+    "execute_ui_screenshot_validation": execute_ui_screenshot_validation,
 }
 
 
@@ -1134,7 +1199,13 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
         "  - `fetch_fathom_meetings(limit?, query?)` — Fetch meetings from Fathom API; auto-falls back to Gmail recap search if Fathom returns empty or is unreachable. `query` filters by keyword (e.g. \"Rick\", \"Weekly\")\n"
         "  - `web_scrape(url, selector?, timeout?)` — Fetch and extract text from a URL using a full browser (Playwright). Renders JavaScript. "
         "Useful for SPAs, dashboards, or pages that require JS execution. "
-        "`selector` is an optional CSS selector to extract a specific element. `timeout` in ms (default 15000)."
+        "`selector` is an optional CSS selector to extract a specific element. `timeout` in ms (default 15000).\n"
+        "  - `execute_ui_screenshot_validation(url, viewport_width?, viewport_height?, full_page?)` — "
+        "Launch a headless Playwright browser, navigate to a URL, capture a base64-encoded PNG screenshot, "
+        "and return DOM metrics (scroll dimensions, element count, visible text). "
+        "Use this for visual validation of UI render output. "
+        "`viewport_width` (default 1280), `viewport_height` (default 720), "
+        "`full_page` (default False, captures full scrollable page if True)."
     )
     routing_directive = (
         "\n\n## Tool Routing Rules\n"
