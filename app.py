@@ -13,6 +13,16 @@ from datetime import datetime
 from html.parser import HTMLParser
 from pathlib import Path
 
+# Local library modules
+from lib.task_observer import TaskManager
+from lib.ui_templates import (
+    build_html_report,
+    build_markdown,
+    metric_card,
+    report_header,
+    summary_table,
+)
+
 # Optional: Dropbox SDK (with refresh-token auth support)
 try:
     import dropbox
@@ -1604,111 +1614,115 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
         print(f"[WEATHERMAN] Sellerboard data IS in last user message (starts at char {idx}).")
 
     with st.status("🤖 DeepSeek is processing your request...", expanded=True) as status:
-        for turn in range(max_tool_turns):
-            stream = client.chat.completions.create(
-                model=model_to_use,
-                messages=message_payload,
-                stream=True,
-            )
-
-            collected = ""
-            reasoning_collected = ""
-            response_placeholder = st.empty()
-
-            for chunk in stream:
-                delta = chunk.choices[0].delta
-                # R1 model may include reasoning_content before content
-                rc = getattr(delta, "reasoning_content", None)
-                if rc:
-                    reasoning_collected += rc
-                    response_placeholder.markdown(
-                        f"🧠 *Thinking...*\n\n```\n{reasoning_collected}\n```▌"
-                    )
-                if delta.content:
-                    collected += delta.content
-                    response_placeholder.markdown(collected + "▌")
-
-            response_placeholder.markdown(collected)
-
-            # Check for tool calls embedded in the response
-            tool_call_match = re.search(
-                r"```tool_call\n(\{.*?\})\n```", collected, re.DOTALL
-            )
-
-            if not tool_call_match:
-                # No more tool calls — this is the final answer
-                final_response = collected
-                status.update(label="✅ Response complete", state="complete")
-                break
-
-            # ---- Execute MCP tool (Requirement #2) ----
-            tool_used = True
-            tc = json.loads(tool_call_match.group(1))
-            server_name = tc.get("server", "")
-            tool_name = tc.get("tool", "")
-            arguments = tc.get("arguments", {})
-
-            status.update(
-                label=f"🔧 Executing MCP tool: {server_name}::{tool_name}",
-                state="running",
-            )
-
-            # ---- Native enterprise hooks (Monday, Slack, Dropbox) ----
-            if server_name == "enterprise":
-                result = execute_native_tool(tool_name, arguments)
-                clean_text = collected[: tool_call_match.start()].strip()
-                tool_result_msg = (
-                    f"{clean_text}\n\n"
-                    f"[Tool Result — enterprise::{tool_name}]:\n"
-                    f"{json.dumps(result, indent=2)}"
+        tm = TaskManager()
+        with tm.run(f"DeepSeek: {prompt[:60]}") as task_ctx:
+            for turn in range(max_tool_turns):
+                tm.update_task(task_ctx.task_id, progress=(turn + 1) / max_tool_turns,
+                               message=f"Turn {turn + 1}/{max_tool_turns}")
+                stream = client.chat.completions.create(
+                    model=model_to_use,
+                    messages=message_payload,
+                    stream=True,
                 )
-                message_payload.append({"role": "user", "content": tool_result_msg})
+
+                collected = ""
+                reasoning_collected = ""
+                response_placeholder = st.empty()
+
+                for chunk in stream:
+                    delta = chunk.choices[0].delta
+                    # R1 model may include reasoning_content before content
+                    rc = getattr(delta, "reasoning_content", None)
+                    if rc:
+                        reasoning_collected += rc
+                        response_placeholder.markdown(
+                            f"🧠 *Thinking...*\n\n```\n{reasoning_collected}\n```▌"
+                        )
+                    if delta.content:
+                        collected += delta.content
+                        response_placeholder.markdown(collected + "▌")
+
+                response_placeholder.markdown(collected)
+
+                # Check for tool calls embedded in the response
+                tool_call_match = re.search(
+                    r"```tool_call\n(\{.*?\})\n```", collected, re.DOTALL
+                )
+
+                if not tool_call_match:
+                    # No more tool calls — this is the final answer
+                    final_response = collected
+                    status.update(label="✅ Response complete", state="complete")
+                    break
+
+                # ---- Execute MCP tool (Requirement #2) ----
+                tool_used = True
+                tc = json.loads(tool_call_match.group(1))
+                server_name = tc.get("server", "")
+                tool_name = tc.get("tool", "")
+                arguments = tc.get("arguments", {})
+
                 status.update(
-                    label=f"📋 Enterprise hook {tool_name} finished — feeding back to DeepSeek"
+                    label=f"🔧 Executing MCP tool: {server_name}::{tool_name}",
+                    state="running",
                 )
-                continue
 
-            # Attempt to start the server if not already running
-            if server_name not in mcp_client.processes:
-                started = mcp_client.start_server(server_name)
-                if not started:
-                    status.update(
-                        label=f"⚠️ Server '{server_name}' not available — skipping tool call.",
-                        state="error",
-                    )
-                    # Inject a fallback message so the model can still respond
+                # ---- Native enterprise hooks (Monday, Slack, Dropbox) ----
+                if server_name == "enterprise":
+                    result = execute_native_tool(tool_name, arguments)
+                    clean_text = collected[: tool_call_match.start()].strip()
                     tool_result_msg = (
-                        f"[Tool {server_name}::{tool_name}] Error: "
-                        f"Server '{server_name}' is not enabled or the command is unavailable."
+                        f"{clean_text}\n\n"
+                        f"[Tool Result — enterprise::{tool_name}]:\n"
+                        f"{json.dumps(result, indent=2)}"
                     )
+                    message_payload.append({"role": "user", "content": tool_result_msg})
+                    status.update(
+                        label=f"📋 Enterprise hook {tool_name} finished — feeding back to DeepSeek"
+                    )
+                    continue
+
+                # Attempt to start the server if not already running
+                if server_name not in mcp_client.processes:
+                    started = mcp_client.start_server(server_name)
+                    if not started:
+                        status.update(
+                            label=f"⚠️ Server '{server_name}' not available — skipping tool call.",
+                            state="error",
+                        )
+                        # Inject a fallback message so the model can still respond
+                        tool_result_msg = (
+                            f"[Tool {server_name}::{tool_name}] Error: "
+                            f"Server '{server_name}' is not enabled or the command is unavailable."
+                        )
+                    else:
+                        status.update(label=f"✅ Connected to {server_name}")
                 else:
-                    status.update(label=f"✅ Connected to {server_name}")
+                    status.update(label=f"🔄 Calling {server_name}::{tool_name}...")
+
+                if server_name in mcp_client.processes:
+                    result = mcp_client.call_tool(server_name, tool_name, arguments)
+                    status.update(
+                        label=f"📋 Tool {server_name}::{tool_name} returned — feeding back to DeepSeek"
+                    )
+
+                    # Strip the tool_call block from the collected text so we keep only the
+                    # model's conversational text
+                    clean_text = collected[: tool_call_match.start()].strip()
+                    tool_result_msg = (
+                        f"{clean_text}\n\n"
+                        f"[Tool Result — {server_name}::{tool_name}]:\n"
+                        f"{json.dumps(result, indent=2) if result else 'No result returned.'}"
+                    )
+
+                # Append the tool result as a user-role message so the model sees it
+                message_payload.append({"role": "user", "content": tool_result_msg})
+                status.update(label=f"🤖 DeepSeek is processing tool results (turn {turn + 1}/{max_tool_turns})...")
+
             else:
-                status.update(label=f"🔄 Calling {server_name}::{tool_name}...")
-
-            if server_name in mcp_client.processes:
-                result = mcp_client.call_tool(server_name, tool_name, arguments)
-                status.update(
-                    label=f"📋 Tool {server_name}::{tool_name} returned — feeding back to DeepSeek"
-                )
-
-                # Strip the tool_call block from the collected text so we keep only the
-                # model's conversational text
-                clean_text = collected[: tool_call_match.start()].strip()
-                tool_result_msg = (
-                    f"{clean_text}\n\n"
-                    f"[Tool Result — {server_name}::{tool_name}]:\n"
-                    f"{json.dumps(result, indent=2) if result else 'No result returned.'}"
-                )
-
-            # Append the tool result as a user-role message so the model sees it
-            message_payload.append({"role": "user", "content": tool_result_msg})
-            status.update(label=f"🤖 DeepSeek is processing tool results (turn {turn + 1}/{max_tool_turns})...")
-
-        else:
-            # Exhausted max_tool_turns without a final answer
-            final_response = collected if collected else "Max tool turns reached. Please rephrase your request."
-            status.update(label="⚠️ Max tool turns reached", state="error")
+                # Exhausted max_tool_turns without a final answer
+                final_response = collected if collected else "Max tool turns reached. Please rephrase your request."
+                status.update(label="⚠️ Max tool turns reached", state="error")
 
     # If no tool was used the full turn, final_response is already set from the break above.
     # For the tool-used path where we broke out, final_response is also set.
@@ -1724,7 +1738,7 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
 
     # Export buttons for the fresh response (Requirement #3)
     msg_index = len(st.session_state.messages) - 1
-    col_a, col_b, _ = st.columns([1, 1, 4])
+    col_a, col_b, col_c, _ = st.columns([1, 1, 1, 3])
     md_bytes = final_response.encode("utf-8")
     col_a.download_button(
         label="📄 Download .md",
@@ -1742,6 +1756,14 @@ if prompt := st.chat_input("Ask a question, run a baseline template, or analyze 
             mime="text/csv",
             key=f"dl_csv_fresh_{msg_index}",
         )
+    html_content, html_filename, html_mime = build_html_report(final_response, title="Weatherman Report")
+    col_c.download_button(
+        label="📋 Download .html",
+        data=html_content,
+        file_name=f"report_{msg_index}.html",
+        mime=html_mime,
+        key=f"dl_html_fresh_{msg_index}",
+    )
 
     # ------------------------------------------------------------------
     # Automated long-term storage (Requirement #3: autosave)
