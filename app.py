@@ -30,6 +30,14 @@ try:
 except ImportError:
     _GOOGLE_AVAILABLE = False
 
+# Optional: Playwright (web scraping / JS-rendered page fetching)
+try:
+    from playwright.sync_api import sync_playwright
+
+    _PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    _PLAYWRIGHT_AVAILABLE = False
+
 st.set_page_config(page_title="Weatherman Claude Portal", layout="wide")
 
 # ---------------------------------------------------------------------------
@@ -1029,6 +1037,51 @@ def fetch_fathom_meetings(limit: int = 5, query: str = "") -> dict:
         return {"ok": False, "error": f"Fathom unavailable ({fathom_error}); Gmail fallback failed: {exc}"}
 
 
+# ---------------------------------------------------------------------------
+# Playwright Web Scraper
+# ---------------------------------------------------------------------------
+
+def web_scrape(url: str, selector: str | None = None, timeout: int = 15000) -> dict:
+    """Fetch and extract text content from a URL using Playwright (JS-rendered).
+
+    Args:
+        url: Full URL to fetch (including https://).
+        selector: Optional CSS selector to extract a specific element.
+        timeout: Navigation timeout in milliseconds (default 15000).
+
+    Returns:
+        dict with extracted text content and metadata.
+    """
+    if not _PLAYWRIGHT_AVAILABLE:
+        return {"ok": False, "error": "Playwright is not installed on this server"}
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto(url, timeout=timeout, wait_until="networkidle")
+            if selector:
+                el = page.query_selector(selector)
+                text = el.inner_text() if el else ""
+            else:
+                text = page.inner_text("body")
+            title = page.title()
+            browser.close()
+        lines = text.split("\n")
+        truncated = len(lines) > 300
+        if truncated:
+            text = "\n".join(lines[:300]) + "\n\n[...content truncated at 300 lines]"
+        return {
+            "ok": True,
+            "url": url,
+            "title": title,
+            "text": text,
+            "length": len(text),
+            "truncated": truncated,
+        }
+    except Exception as exc:
+        return {"ok": False, "error": f"Playwright scrape failed: {exc}"}
+
+
 NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
     "sync_to_monday": sync_to_monday,
     "post_to_slack": post_to_slack,
@@ -1040,6 +1093,7 @@ NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
     "list_gdrive_files": list_gdrive_files,
     "read_gdrive_file_content": read_gdrive_file_content,
     "fetch_fathom_meetings": fetch_fathom_meetings,
+    "web_scrape": web_scrape,
 }
 
 
@@ -1067,7 +1121,10 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
         "  - `search_gmail(query, max_results?)` — Search Gmail messages; returns subject/from/date/body for each match\n"
         "  - `list_gdrive_files(page_size?)` — List Google Drive files with metadata\n"
         "  - `read_gdrive_file_content(file_id)` — Read a Drive file's text content by ID\n"
-        "  - `fetch_fathom_meetings(limit?, query?)` — Fetch meetings from Fathom API; auto-falls back to Gmail recap search if Fathom returns empty or is unreachable. `query` filters by keyword (e.g. \"Rick\", \"Weekly\")"
+        "  - `fetch_fathom_meetings(limit?, query?)` — Fetch meetings from Fathom API; auto-falls back to Gmail recap search if Fathom returns empty or is unreachable. `query` filters by keyword (e.g. \"Rick\", \"Weekly\")\n"
+        "  - `web_scrape(url, selector?, timeout?)` — Fetch and extract text from a URL using a full browser (Playwright). Renders JavaScript. "
+        "Useful for SPAs, dashboards, or pages that require JS execution. "
+        "`selector` is an optional CSS selector to extract a specific element. `timeout` in ms (default 15000)."
     )
     routing_directive = (
         "\n\n## Tool Routing Rules\n"
