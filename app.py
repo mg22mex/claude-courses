@@ -622,10 +622,126 @@ def test_fathom_connection() -> dict:
         return {"ok": False, "error": str(e)}
 
 
+# ---------------------------------------------------------------------------
+# Tool-callable wrappers — Gmail, Drive, Fathom
+# ---------------------------------------------------------------------------
+
+
+def search_gmail_messages(query: str = "", max_results: int = 5) -> dict:
+    """Search Gmail messages and return subject/from/snippet for each match."""
+    creds, error = get_google_credentials()
+    if error:
+        return {"ok": False, "error": error}
+    try:
+        service = _google_build("gmail", "v1", credentials=creds)
+        result = service.users().messages().list(
+            userId="me", q=query, maxResults=max_results
+        ).execute()
+        messages = result.get("messages", [])
+        if not messages:
+            return {"ok": True, "messages": [], "count": 0}
+
+        details = []
+        for msg in messages:
+            msg_data = service.users().messages().get(
+                userId="me", id=msg["id"]
+            ).execute()
+            headers = {
+                h["name"]: h["value"]
+                for h in msg_data.get("payload", {}).get("headers", [])
+            }
+            details.append({
+                "id": msg["id"],
+                "thread_id": msg_data.get("threadId", ""),
+                "subject": headers.get("Subject", ""),
+                "from": headers.get("From", ""),
+                "date": headers.get("Date", ""),
+                "snippet": msg_data.get("snippet", ""),
+            })
+        return {"ok": True, "messages": details, "count": len(details)}
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+def list_gdrive_files(page_size: int = 10) -> dict:
+    """List files from Google Drive with name, type, size, and timestamps."""
+    creds, error = get_google_credentials()
+    if error:
+        return {"ok": False, "error": error}
+    try:
+        service = _google_build("drive", "v3", credentials=creds)
+        result = service.files().list(
+            pageSize=page_size,
+            fields="files(id, name, mimeType, size, createdTime, modifiedTime)",
+        ).execute()
+        files = result.get("files", [])
+        return {"ok": True, "files": files, "count": len(files)}
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+def read_gdrive_file_content(file_id: str) -> dict:
+    """Read a Google Drive file's content by ID (text export for Docs/Sheets, raw text otherwise)."""
+    creds, error = get_google_credentials()
+    if error:
+        return {"ok": False, "error": error}
+    try:
+        service = _google_build("drive", "v3", credentials=creds)
+        meta = service.files().get(
+            fileId=file_id, fields="id, name, mimeType"
+        ).execute()
+        mime = meta.get("mimeType", "")
+
+        if mime == "application/vnd.google-apps.document":
+            raw = service.files().export(
+                fileId=file_id, mimeType="text/plain"
+            ).execute()
+        elif mime == "application/vnd.google-apps.spreadsheet":
+            raw = service.files().export(
+                fileId=file_id, mimeType="text/csv"
+            ).execute()
+        else:
+            raw = service.files().get_media(fileId=file_id).execute()
+
+        text = raw.decode("utf-8") if isinstance(raw, bytes) else str(raw)
+        truncated = len(text) > 50000
+        return {
+            "ok": True,
+            "name": meta["name"],
+            "mime_type": mime,
+            "content": text[:50000],
+            "truncated": truncated,
+        }
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+def fetch_fathom_meetings(limit: int = 5) -> dict:
+    """Fetch recent meeting records from the Fathom API."""
+    api_key = _secret_get("FATHOM_API_KEY")
+    if not api_key:
+        return {"ok": False, "error": "FATHOM_API_KEY not configured"}
+    try:
+        resp = requests.get(
+            f"https://api.fathom.ai/external/v1/meetings?limit={limit}",
+            headers={"X-Api-Key": api_key},
+            timeout=15,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return {"ok": True, "meetings": data.get("meetings", data)}
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
 NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
     "sync_to_monday": sync_to_monday,
     "post_to_slack": post_to_slack,
     "read_dropbox_meta": read_dropbox_meta,
+    "search_gmail_messages": search_gmail_messages,
+    "list_gdrive_files": list_gdrive_files,
+    "read_gdrive_file_content": read_gdrive_file_content,
+    "fetch_fathom_meetings": fetch_fathom_meetings,
 }
 
 
@@ -642,14 +758,22 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
     configured = [k for k, v in cloud_secrets.items() if v]
     if not configured:
         return ""
-    tool_lines = "\n".join(f"  - `{name}`" for name in NATIVE_ENTERPRISE_TOOLS)
+    tool_lines = (
+        "  - `sync_to_monday(board_id, item_name, column_values?)` — Push a row to Monday.com\n"
+        "  - `post_to_slack(channel, text)` — Post a message to a Slack channel\n"
+        "  - `read_dropbox_meta(path?)` — List entries in a Dropbox folder\n"
+        "  - `search_gmail_messages(query, max_results?)` — Search Gmail and return subject/from/snippet\n"
+        "  - `list_gdrive_files(page_size?)` — List Google Drive files with metadata\n"
+        "  - `read_gdrive_file_content(file_id)` — Read a Drive file's text content by ID\n"
+        "  - `fetch_fathom_meetings(limit?)` — Fetch recent meeting records from Fathom"
+    )
     secret_lines = "\n".join(f"  - {name}" for name in configured)
     return (
         "\n\n## Available Enterprise Data & Integration Hooks\n"
         "To invoke a native integration hook, output a JSON tool call block exactly like this:\n\n"
         "```tool_call\n{\"server\": \"enterprise\", \"tool\": \"TOOL_NAME\", \"arguments\": {...}}\n```\n\n"
         f"**Configured secrets:**\n{secret_lines}\n\n"
-        f"**Native tools:**\n{tool_lines}"
+        f"**Native tools (call via enterprise server):**\n{tool_lines}"
     )
 
 
