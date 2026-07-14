@@ -35,6 +35,7 @@ except ImportError:
 try:
     from google.oauth2.credentials import Credentials as _GoogleCreds
     from googleapiclient.discovery import build as _google_build
+    from googleapiclient.http import MediaFileUpload
 
     _GOOGLE_AVAILABLE = True
 except ImportError:
@@ -888,6 +889,50 @@ def read_gdrive_file_content(file_id: str) -> dict:
         return {"ok": False, "error": str(exc)}
 
 
+def upload_file_to_gdrive(file_path: str, folder_id: str | None = None) -> dict:
+    """Upload a local file to Google Drive.
+
+    Uses the existing portal Google Workspace OAuth credentials. The refresh token
+    must include the ``https://www.googleapis.com/auth/drive.file`` or
+    ``https://www.googleapis.com/auth/drive`` scope (already configured in the
+    portal's GOOGLE_REFRESH_TOKEN flow).
+
+    Args:
+        file_path: Absolute or relative path to the local file to upload.
+        folder_id: Optional destination folder ID in Google Drive. If omitted,
+            the file lands in the root "My Drive" folder.
+
+    Returns:
+        dict with keys: ok, file_id?, name?, mime_type?, size?, error?
+    """
+    creds, error = get_google_credentials()
+    if error:
+        return {"ok": False, "error": error}
+    try:
+        path = Path(file_path)
+        if not path.exists():
+            return {"ok": False, "error": f"File not found: {file_path}"}
+        if not path.is_file():
+            return {"ok": False, "error": f"Path is not a file: {file_path}"}
+
+        service = _google_build("drive", "v3", credentials=creds)
+        media = MediaFileUpload(str(path), resumable=True)
+        body = {"name": path.name}
+        if folder_id:
+            body["parents"] = [folder_id]
+
+        uploaded = service.files().create(body=body, media_body=media, fields="id, name, mimeType, size").execute()
+        return {
+            "ok": True,
+            "file_id": uploaded["id"],
+            "name": uploaded.get("name", path.name),
+            "mime_type": uploaded.get("mimeType", ""),
+            "size": uploaded.get("size", 0),
+        }
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
 class _HTMLToTextParser(HTMLParser):
     """Lightweight HTML-to-text extractor that collects visible text."""
 
@@ -1166,6 +1211,7 @@ NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
     "search_gmail": search_gmail_messages,
     "list_gdrive_files": list_gdrive_files,
     "read_gdrive_file_content": read_gdrive_file_content,
+    "upload_file_to_gdrive": upload_file_to_gdrive,
     "fetch_fathom_meetings": fetch_fathom_meetings,
     "web_scrape": web_scrape,
     "execute_ui_screenshot_validation": execute_ui_screenshot_validation,
@@ -1196,6 +1242,10 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
         "  - `search_gmail(query, max_results?)` — Search Gmail messages; returns subject/from/date/body for each match\n"
         "  - `list_gdrive_files(page_size?)` — List Google Drive files with metadata\n"
         "  - `read_gdrive_file_content(file_id)` — Read a Drive file's text content by ID\n"
+        "  - `upload_file_to_gdrive(file_path, folder_id?)` — Upload a local file to Google Drive. "
+        "Returns the new file's id, name, mimeType, and size. `folder_id` optionally places the file "
+        "inside a specific Drive folder. Requires ``https://www.googleapis.com/auth/drive.file`` or "
+        "``https://www.googleapis.com/auth/drive`` OAuth scope.\n"
         "  - `fetch_fathom_meetings(limit?, query?)` — Fetch meetings from Fathom API; auto-falls back to Gmail recap search if Fathom returns empty or is unreachable. `query` filters by keyword (e.g. \"Rick\", \"Weekly\")\n"
         "  - `web_scrape(url, selector?, timeout?)` — Fetch and extract text from a URL using a full browser (Playwright). Renders JavaScript. "
         "Useful for SPAs, dashboards, or pages that require JS execution. "
@@ -1219,6 +1269,8 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
         "other channel-listing approach. Look up the person directly in `slack_dm_history`.\n"
         "When the user asks about their **email**, **inbox**, or specific Gmail queries — "
         "use `search_gmail`.\n"
+        "When the user asks to **upload**, **save**, **store**, or **push** a file to Google Drive "
+        "— use `upload_file_to_gdrive`. Do NOT attempt raw HTTP multipart uploads.\n"
         "Choose the tool that matches the user's stated platform. If they say "
         "\"check my Slack\", do NOT check Gmail."
     )
