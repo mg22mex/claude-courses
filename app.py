@@ -738,13 +738,14 @@ def _gmail_decode_body(payload: dict) -> str:
 def fetch_fathom_meetings(limit: int = 5, query: str = "") -> dict:
     """Fetch recent meeting records from Fathom API, with automatic Gmail fallback.
 
-    Attempts the Fathom API first. If the API key is missing, the API returns
-    an empty list, or an error occurs, the function automatically falls back to
-    searching Gmail for Fathom recap emails (from no-reply@fathom.video).
-    Extracted fields include Meeting Purpose, Key Takeaways, and Topics.
+    Attempts the Fathom API first. Falls back to Gmail when the API returns
+    empty, missing the expected structure, or errors. The Gmail fallback
+    searches for Fathom recap emails broadly and extracts Meeting Purpose,
+    Key Takeaways, and Topics from the message body.
     """
     # --- Primary route: Fathom API ---
     api_key = _secret_get("FATHOM_API_KEY")
+    fathom_error = None
     if api_key:
         try:
             resp = requests.get(
@@ -754,14 +755,23 @@ def fetch_fathom_meetings(limit: int = 5, query: str = "") -> dict:
             )
             resp.raise_for_status()
             data = resp.json()
-            meetings = data.get("meetings", data)
-            if meetings:
+
+            # Safely extract meetings list — handle dict, bare list, any shape
+            if isinstance(data, dict):
+                meetings = data.get("meetings") or []
+            elif isinstance(data, list):
+                meetings = data
+            else:
+                meetings = []
+
+            if len(meetings) > 0:
                 result: dict = {"ok": True, "source": "fathom_api", "meetings": meetings, "count": len(meetings)}
                 if query:
                     ql = query.lower()
                     result["meetings"] = [m for m in meetings if ql in str(m).lower()]
                     result["count"] = len(result["meetings"])
                 return result
+            fathom_error = "Fathom API returned empty meetings list"
         except Exception as exc:
             fathom_error = str(exc)
     else:
@@ -775,8 +785,8 @@ def fetch_fathom_meetings(limit: int = 5, query: str = "") -> dict:
     try:
         service = _google_build("gmail", "v1", credentials=creds)
 
-        # Search for Fathom recap emails
-        gmail_query = "from:no-reply@fathom.video subject:Recap"
+        # Broad Fathom-related email search
+        gmail_query = "(from:no-reply@fathom.video OR subject:Fathom OR subject:Recap)"
         if query:
             gmail_query += f" {query}"
         list_result = service.users().messages().list(
@@ -815,7 +825,7 @@ def fetch_fathom_meetings(limit: int = 5, query: str = "") -> dict:
 
         return {"ok": True, "source": "gmail_fallback",
                 "meetings": meetings, "count": len(meetings),
-                "note": "Retrieved from Gmail Fathom recap emails (Fathom API fallback)"}
+                "note": f"Retrieved from Gmail Fathom recap emails (Fathom API fallback: {fathom_error})"}
 
     except Exception as exc:
         return {"ok": False, "error": f"Fathom unavailable ({fathom_error}); Gmail fallback failed: {exc}"}
@@ -826,6 +836,7 @@ NATIVE_ENTERPRISE_TOOLS: dict[str, Callable[..., dict]] = {
     "post_to_slack": post_to_slack,
     "read_dropbox_meta": read_dropbox_meta,
     "search_gmail_messages": search_gmail_messages,
+    "search_gmail": search_gmail_messages,
     "list_gdrive_files": list_gdrive_files,
     "read_gdrive_file_content": read_gdrive_file_content,
     "fetch_fathom_meetings": fetch_fathom_meetings,
@@ -849,10 +860,10 @@ def build_enterprise_tools_block(cloud_secrets: dict[str, str | None]) -> str:
         "  - `sync_to_monday(board_id, item_name, column_values?)` — Push a row to Monday.com\n"
         "  - `post_to_slack(channel, text)` — Post a message to a Slack channel\n"
         "  - `read_dropbox_meta(path?)` — List entries in a Dropbox folder\n"
-        "  - `search_gmail_messages(query, max_results?)` — Search Gmail and return subject/from/snippet\n"
+        "  - `search_gmail(query, max_results?)` — Search Gmail messages; returns subject/from/date/body for each match\n"
         "  - `list_gdrive_files(page_size?)` — List Google Drive files with metadata\n"
         "  - `read_gdrive_file_content(file_id)` — Read a Drive file's text content by ID\n"
-        "  - `fetch_fathom_meetings(limit?, query?)` — Fetch meetings from Fathom API, auto-falls back to Gmail recap emails if Fathom unavailable. `query` filters results by keyword (e.g. \"Rick\", \"Weekly\")"
+        "  - `fetch_fathom_meetings(limit?, query?)` — Fetch meetings from Fathom API; auto-falls back to Gmail recap search if Fathom returns empty or is unreachable. `query` filters by keyword (e.g. \"Rick\", \"Weekly\")"
     )
     secret_lines = "\n".join(f"  - {name}" for name in configured)
     return (
