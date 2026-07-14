@@ -10,6 +10,7 @@ import base64
 import pandas as pd
 from collections.abc import Callable
 from datetime import datetime
+from html.parser import HTMLParser
 from pathlib import Path
 
 # Optional: Dropbox SDK (with refresh-token auth support)
@@ -717,14 +718,61 @@ def read_gdrive_file_content(file_id: str) -> dict:
         return {"ok": False, "error": str(exc)}
 
 
+class _HTMLToTextParser(HTMLParser):
+    """Lightweight HTML-to-text extractor that collects visible text."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._text_parts: list[str] = []
+        self._skip = False
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag in ("script", "style"):
+            self._skip = True
+        if tag in ("br", "tr", "p", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6"):
+            self._text_parts.append("\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in ("script", "style"):
+            self._skip = False
+
+    def handle_data(self, data: str) -> None:
+        if not self._skip:
+            stripped = data.strip()
+            if stripped:
+                self._text_parts.append(stripped + " ")
+
+    def get_text(self) -> str:
+        return "".join(self._text_parts).strip()
+
+
 def _gmail_decode_body(payload: dict) -> str:
-    """Recursively extract plain-text body from a Gmail message payload."""
+    """Recursively extract plain-text body from a Gmail message payload.
+
+    Falls back to HTML-to-text extraction when no ``text/plain`` part is
+    available (e.g. Fathom HTML-only recap emails).
+    """
     if payload.get("mimeType") == "text/plain" and payload.get("body", {}).get("data"):
         raw = payload["body"]["data"]
         try:
             return base64.urlsafe_b64decode(raw).decode("utf-8", errors="replace")
         except Exception:
             return base64.b64decode(raw).decode("utf-8", errors="replace")
+
+    if payload.get("mimeType") == "text/html" and payload.get("body", {}).get("data"):
+        raw = payload["body"]["data"]
+        try:
+            decoded = base64.urlsafe_b64decode(raw).decode("utf-8", errors="replace")
+        except Exception:
+            decoded = base64.b64decode(raw).decode("utf-8", errors="replace")
+        # Debug: print a snippet of the raw HTML before parsing
+        snippet = decoded[:300].replace("\n", " ").strip()
+        print(f"[_gmail_decode_body] text/html payload snippet: {snippet}", flush=True)
+        parser = _HTMLToTextParser()
+        parser.feed(decoded)
+        result = parser.get_text()
+        return result if result else "(HTML content — text extraction produced no output)"
+
     if "parts" in payload:
         texts = []
         for part in payload["parts"]:
